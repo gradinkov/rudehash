@@ -1,4 +1,4 @@
-$Config = ConvertFrom-StringData(Get-Content "./rudehash.properties" -raw)
+$Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)
 $Tools = "$Env:USERPROFILE\tools"
 $FirstRun = $true
 
