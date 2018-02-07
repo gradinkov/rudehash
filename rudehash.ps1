@@ -4,9 +4,9 @@ $FirstRun = $true
 
 $Coins =
 @{
-	"ZCL" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = "europe.equihash-hub.miningpoolhub.com"; Port = 20575 }
-	"ZEC" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = "europe.equihash-hub.miningpoolhub.com"; Port = 20570 }
-	"ZEN" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = "europe.equihash-hub.miningpoolhub.com"; Port = 20594 }
+	"ZCL" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575 }
+	"ZEC" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570 }
+	"ZEN" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594 }
 }
 
 $Miners =
