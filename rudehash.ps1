@@ -15,7 +15,7 @@ $Miners =
 	"bminer" = [pscustomobject]@{ Url = "https://www.bminercontent.com/releases/bminer-v5.3.0-e337b9a-amd64.zip"; ArchiveFile = "bminer.zip"; ExeFile = "bminer.exe"; FilesInRoot = $false }
 }
 
-function GenerateMinerArgs ($Name)
+function Initialize-Miner-Args ($Name)
 {
 	switch ($Name)
 	{
@@ -25,7 +25,7 @@ function GenerateMinerArgs ($Name)
 	return $Args
 }
 
-function CalcProfit ()
+function Measure-Profit ()
 {
 	# API: https://github.com/miningpoolhub/php-mpos/wiki/API-Reference
 
@@ -49,7 +49,7 @@ function CalcProfit ()
 	return ($WtmObj | Select-Object -Index ($LineNo + 56)).Trim()
 }
 
-function DownloadFile ($Url, $FileName)
+function Get-Archive ($Url, $FileName)
 {
 	$TempDir = [io.path]::combine($PSScriptRoot, "temp")
 
@@ -74,7 +74,7 @@ function DownloadFile ($Url, $FileName)
 	return $TempDir
 }
 
-function CheckMiner ($Name)
+function Test-Miner ($Name)
 {
 	$MinerDir = [io.path]::combine($MinersDir, $Name)
 	$MinerExe = [io.path]::combine($MinerDir, $Miners[$Name].ExeFile)
@@ -91,7 +91,7 @@ function CheckMiner ($Name)
 			Remove-Item -Recurse -Path $MinerDir
 		}
 
-		$ArchiveDir = (DownloadFile ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
+		$ArchiveDir = (Get-Archive ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
 
 		if ($Miners[$Name].FilesInRoot)
 		{
@@ -113,17 +113,17 @@ function CheckMiner ($Name)
 	}
 }
 
-function RunMiner ($Name)
+function Start-Miner ($Name)
 {
 	# restart automatically if the miner crashes
 	while (1)
 	{
 		if ($FirstRun -or $Proc.HasExited)
 		{
-			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList (GenerateMinerArgs $Name) -PassThru -NoNewWindow
+			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList (Initialize-Miner-Args $Name) -PassThru -NoNewWindow
 		}
 
-		$EstProfit = CalcProfit
+		$EstProfit = Measure-Profit
 		#Clear-Host
 		Write-Host -ForegroundColor Green -BackgroundColor DarkYellow "Current estimated income / day: $EstProfit"
 		Start-Sleep -Seconds 60
@@ -135,5 +135,5 @@ function RunMiner ($Name)
 
 #Stop-Process $Proc
 
-CheckMiner $Config.Miner
-RunMiner $Config.Miner
+Test-Miner $Config.Miner
+Start-Miner $Config.Miner
