@@ -13,6 +13,7 @@ $Miners =
 @{
 	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true}
 	"bminer" = [pscustomobject]@{ Url = "https://www.bminercontent.com/releases/bminer-v5.3.0-e337b9a-amd64.zip"; ArchiveFile = "bminer.zip"; ExeFile = "bminer.exe"; FilesInRoot = $false }
+	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false }
 }
 
 function Initialize-Miner-Args ($Name)
@@ -21,6 +22,7 @@ function Initialize-Miner-Args ($Name)
 	{
 		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
 		"bminer" { $Args = "-uri stratum+ssl://" + $Config.User + "." + $Config.Worker + "@" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -api 127.0.0.1:1880" }
+		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry" }
 	}
 	return $Args
 }
