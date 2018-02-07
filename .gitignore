@@ -1,2 +1,5 @@
+miners/*
+temp/*
 .vscode/*
 rudehash.properties
+
