@@ -1,5 +1,5 @@
 $Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)
-$Tools = "$Env:USERPROFILE\tools"
+$MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $FirstRun = $true
 
 $Coins =
@@ -7,6 +7,11 @@ $Coins =
 	"ZCL" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = "europe.equihash-hub.miningpoolhub.com"; Port = 20575}
 	"ZEC" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = "europe.equihash-hub.miningpoolhub.com"; Port = 20570}
 	"ZEN" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = "europe.equihash-hub.miningpoolhub.com"; Port = 20594}
+}
+
+$Miners =
+@{
+	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true}
 }
 
 function CalcProfit ()
@@ -33,7 +38,71 @@ function CalcProfit ()
 	return ($WtmObj | Select-Object -Index ($LineNo + 56)).Trim()
 }
 
-function RunMiner ()
+function DownloadFile ($Url, $FileName)
+{
+	$TempDir = [io.path]::combine($PSScriptRoot, "temp")
+
+	if (Test-Path $TempDir)
+	{
+		Remove-Item -Recurse -Path $TempDir
+	}
+
+	New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
+
+	$DestFile = [io.path]::combine($TempDir, $FileName)
+	$Client = New-Object System.Net.WebClient
+	Try
+	{
+		$Client.DownloadFile($Url, $DestFile)
+	}
+	Catch
+	{
+		Write-Host $_.Exception
+	}
+
+	return $TempDir
+}
+
+function CheckMiner ($Name)
+{
+	$MinerDir = [io.path]::combine($MinersDir, $Name)
+	$MinerExe = [io.path]::combine($MinerDir, $Miners[$Name].ExeFile)
+
+	if (-Not (Test-Path -LiteralPath $MinersDir))
+	{
+		New-Item -ItemType Directory -Path $MinersDir | Out-Null
+	}
+
+	if (-Not (Test-Path -LiteralPath $MinerExe))
+	{
+		if (Test-Path -LiteralPath $MinerDir)
+		{
+			Remove-Item -Recurse -Path $MinerDir
+		}
+
+		$ArchiveDir = (DownloadFile ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
+
+		if ($Miners[$Name].FilesInRoot)
+		{
+			$DestPath = ([io.path]::combine($ArchiveDir, $Name))
+		}
+		else
+		{
+			$DestPath = $ArchiveDir
+		}
+
+		Expand-Archive -LiteralPath ([io.path]::combine($ArchiveDir, $Miners[$Name].ArchiveFile)) -DestinationPath $DestPath
+
+		if (-Not ($Miners[$Name].FilesInRoot))
+		{
+			$DestPath = (Rename-Item -Path (Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName -NewName $Name -PassThru).FullName
+		}
+
+		Move-Item -Force $DestPath $MinersDir
+	}
+}
+
+function RunMiner ($Name)
 {
 	# restart automatically if the miner crashes
 	while (1)
@@ -42,7 +111,7 @@ function RunMiner ()
 
 		if ($FirstRun -or $Proc.HasExited)
 		{
-			$Proc = Start-Process -FilePath "$Tools\zecminer\miner.exe" -ArgumentList $Args -PassThru -NoNewWindow
+			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList $Args -PassThru -NoNewWindow
 		}
 
 		$EstProfit = CalcProfit
@@ -55,5 +124,7 @@ function RunMiner ()
 	}
 }
 
-RunMiner
 #Stop-Process $Proc
+
+CheckMiner $Config.Miner
+RunMiner $Config.Miner
