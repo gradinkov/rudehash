@@ -13,5 +13,5 @@ Coin=ZCL
 # Pool Fee is 0.9 Pool Fee + 0.2 AE Fee on MPH
 PoolFee=1.1
 
-# Possible values: zecminer
+# Possible values: zecminer, bminer
 Miner=zecminer

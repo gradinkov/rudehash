@@ -12,6 +12,17 @@ $Coins =
 $Miners =
 @{
 	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true}
+	"bminer" = [pscustomobject]@{ Url = "https://www.bminercontent.com/releases/bminer-v5.3.0-e337b9a-amd64.zip"; ArchiveFile = "bminer.zip"; ExeFile = "bminer.exe"; FilesInRoot = $false }
+}
+
+function GenerateMinerArgs ($Name)
+{
+	switch ($Name)
+	{
+		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
+		"bminer" { $Args = "-uri stratum+ssl://" + $Config.User + "." + $Config.Worker + "@" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -api 127.0.0.1:1880" }
+	}
+	return $Args
 }
 
 function CalcProfit ()
@@ -107,11 +118,9 @@ function RunMiner ($Name)
 	# restart automatically if the miner crashes
 	while (1)
 	{
-		$Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api"
-
 		if ($FirstRun -or $Proc.HasExited)
 		{
-			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList $Args -PassThru -NoNewWindow
+			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList (GenerateMinerArgs $Name) -PassThru -NoNewWindow
 		}
 
 		$EstProfit = CalcProfit
