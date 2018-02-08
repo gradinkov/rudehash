@@ -16,6 +16,16 @@ $Miners =
 	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false }
 }
 
+$RigStats =
+[pscustomobject]@{
+	Coin = $Config.Coin;
+	Miner = $Config.Miner;
+	Worker = $Config.Worker;
+	HashRate = 0;
+	Difficulty = 0;
+	Profit = "";
+}
+
 function Initialize-Miner-Args ($Name)
 {
 	switch ($Name)
@@ -27,27 +37,42 @@ function Initialize-Miner-Args ($Name)
 	return $Args
 }
 
-function Measure-Profit ()
+# MPH API: https://github.com/miningpoolhub/php-mpos/wiki/API-Reference
+function Get-HashRate ()
 {
-	# API: https://github.com/miningpoolhub/php-mpos/wiki/API-Reference
-
-	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
-	$PoolJson = Invoke-WebRequest -Uri $PoolUrl | ConvertFrom-Json
-	$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
-	#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
-	#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
-
 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getuserworkers&api_key=" + $Config.ApiKey
 	$PoolJson = Invoke-WebRequest -Uri $PoolUrl | ConvertFrom-Json
 	$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
 	# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
 	$HashRate = $PoolWorker.hashrate * 1000
 
+	if (-Not ($HashRate))
+	{
+		$HashRate = 0
+	}
+
+	return $HashRate
+}
+
+function Get-Difficulty ()
+{
+	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
+	$PoolJson = Invoke-WebRequest -Uri $PoolUrl | ConvertFrom-Json
+	$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
+	#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
+	#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
+
+	return $Difficulty
+}
+
+function Measure-Profit ($HashRate, $Difficulty)
+{
 	#$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&d=$Difficulty&p=" + $Config.Power + "&cost=" + $Config.ElectricityCost + "&fee=" + $Config.PoolFee + "&commit=Calculate"
 	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=$HashRate&d=$Difficulty&p=0&cost=0&fee=" + $Config.PoolFee + "&commit=Calculate"
 	$WtmHtml = Invoke-WebRequest -Uri $WtmUrl
 	$WtmObj = $WtmHtml.Content -split "[`r`n]"
 	$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
+
 	return ($WtmObj | Select-Object -Index ($LineNo + 56)).Trim()
 }
 
@@ -115,6 +140,27 @@ function Test-Miner ($Name)
 	}
 }
 
+function Write-Pretty ($BgColor, $String)
+{
+	$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width
+	$SpaceCount = $WindowWidth - $String.length
+	$String += " " * $SpaceCount
+
+	Write-Host -ForegroundColor White -BackgroundColor $BgColor $String 
+}
+
+function Write-Stats ()
+{
+	$RigStats.HashRate = Get-HashRate
+	$RigStats.Difficulty = Get-Difficulty
+	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
+
+	#Clear-Host
+	Write-Pretty Blue ("Worker: " + $RigStats.Worker + " ● Coin: " + $RigStats.Coin + " ● Miner: " + $RigStats.Miner)
+	Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s ● Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
+	Write-Pretty DarkGreen ("Estimated daily income: " + $RigStats.Profit)
+}
+
 function Start-Miner ($Name)
 {
 	# restart automatically if the miner crashes
@@ -125,9 +171,7 @@ function Start-Miner ($Name)
 			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList (Initialize-Miner-Args $Name) -PassThru -NoNewWindow
 		}
 
-		$EstProfit = Measure-Profit
-		#Clear-Host
-		Write-Host -ForegroundColor Green -BackgroundColor DarkYellow "Current estimated income / day: $EstProfit"
+		Write-Stats
 		Start-Sleep -Seconds 60
 		$FirstRun = $false
 		#Register-EngineEvent PowerShell.Exiting –Action { Stop-Process $Proc }
