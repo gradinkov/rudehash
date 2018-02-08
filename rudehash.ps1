@@ -32,7 +32,7 @@ function Initialize-Miner-Args ($Name)
 	{
 		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
 		"bminer" { $Args = "-uri stratum+ssl://" + $Config.User + "." + $Config.Worker + "@" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -api 127.0.0.1:1880" }
-		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry" }
+		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
 	}
 	return $Args
 }
