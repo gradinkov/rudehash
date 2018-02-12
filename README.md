@@ -11,17 +11,25 @@ RudeHash is a simple wrapper script to mine coins directly. Features:
 * Income estimation using WhatToMine numbers
 * Auto-restart upon miner crash
 
-Supported coins: 
-  * ZCL
-  * ZEC
-  * ZEN
+## Support
 
-Supported miners:
-  * Bminer
-  * DSTM
-  * Zec Miner
+Coins:
 
-It has the potential to become multi-pool and multi-algo , but right now it only supports Mining Pool Hub and EquiHash.
+| Coin | Algo |
+|---|---|
+| ZCL | EquiHash |
+| ZEC | EquiHash |
+| ZEN | EquiHash |
+
+Algos:
+
+| Algo | Miner |
+|---|---|
+| EquiHash | Bminer, DSTM, Zec Miner |
+
+Pools:
+
+* Mining Pool Hub
 
 ## Installation
 
