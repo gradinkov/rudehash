@@ -13,8 +13,14 @@ PoolFee=1.1
 # Possible values: zcl, zec, zen
 Coin=zcl
 
+# Possible values: equihash, lyra2v2, neoscrypt
+Algo=equihash
+
 # Possible values: zecminer, bminer, dstm
 Miner=zecminer
 
 # Possible values: asia, europe, us-east
 Region=europe
+
+# Possible values: false, true
+Debug=false

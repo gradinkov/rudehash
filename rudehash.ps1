@@ -1,5 +1,6 @@
 $Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
+$ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $FirstRun = $true
 $Config.Coin = $Config.Coin.ToLower()
 
@@ -15,6 +16,12 @@ $Miners =
 	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash") }
 	"bminer" = [pscustomobject]@{ Url = "https://www.bminercontent.com/releases/bminer-v5.3.0-e337b9a-amd64.zip"; ArchiveFile = "bminer.zip"; ExeFile = "bminer.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
+	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "neoscrypt", "lyra2v2", "nist5") }
+}
+
+$Tools =
+@{
+	"7zip" = [pscustomobject]@{ Url = "http://7-zip.org/a/7za920.zip"; ArchiveFile = "7zip.zip"; ExeFile = "7za.exe"; FilesInRoot = $true }
 }
 
 $RigStats =
@@ -34,6 +41,7 @@ function Initialize-Miner-Args ($Name)
 		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
 		"bminer" { $Args = "-uri stratum+ssl://" + $Config.User + "." + $Config.Worker + "@" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -api 127.0.0.1:1880" }
 		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
+		"ccminer-tpruvot" { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
 	}
 	return $Args
 }
@@ -102,6 +110,65 @@ function Get-Archive ($Url, $FileName)
 	return $TempDir
 }
 
+function Expand-Stuff ($File, $DestDir)
+{
+	if ($File.EndsWith(".7z"))
+	{
+		Start-Process -FilePath ([io.path]::combine($ToolsDir, "7zip", $Tools["7zip"].ExeFile)) -ArgumentList ("x -o$DestDir $File") -NoNewWindow -Wait
+	}
+	else
+	{
+		Expand-Archive -LiteralPath $File -DestinationPath $DestDir
+	}
+}
+
+function Test-Tool ($Name)
+{
+	$ToolDir = [io.path]::combine($ToolsDir, $Name)
+	$ToolExe = [io.path]::combine($ToolDir, $Tools[$Name].ExeFile)
+
+	if (-Not (Test-Path -LiteralPath $ToolsDir))
+	{
+		New-Item -ItemType Directory -Path $ToolsDir | Out-Null
+	}
+
+	if (-Not (Test-Path -LiteralPath $ToolExe))
+	{
+		if (Test-Path -LiteralPath $ToolDir)
+		{
+			Remove-Item -Recurse -Path $ToolDir
+		}
+
+		$ArchiveDir = (Get-Archive ($Tools[$Name].Url) ($Tools[$Name].ArchiveFile))
+
+		if ($Tools[$Name].FilesInRoot)
+		{
+			$DestPath = ([io.path]::combine($ArchiveDir, $Name))
+		}
+		else
+		{
+			$DestPath = $ArchiveDir
+		}
+
+		Expand-Stuff ([io.path]::combine($ArchiveDir, $Tools[$Name].ArchiveFile)) $DestPath
+
+		if (-Not ($Tools[$Name].FilesInRoot))
+		{
+			$DestPath = (Rename-Item -Path (Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName -NewName $Name -PassThru).FullName
+		}
+
+		Move-Item -Force $DestPath $ToolsDir
+	}
+}
+
+function Test-Tools ()
+{
+	foreach ($Tool in $Tools.Keys)
+	{
+		Test-Tool $Tool
+	}
+}
+
 function Test-Miner ($Name)
 {
 	$MinerDir = [io.path]::combine($MinersDir, $Name)
@@ -130,7 +197,7 @@ function Test-Miner ($Name)
 			$DestPath = $ArchiveDir
 		}
 
-		Expand-Archive -LiteralPath ([io.path]::combine($ArchiveDir, $Miners[$Name].ArchiveFile)) -DestinationPath $DestPath
+		Expand-Stuff ([io.path]::combine($ArchiveDir, $Miners[$Name].ArchiveFile)) $DestPath
 
 		if (-Not ($Miners[$Name].FilesInRoot))
 		{
@@ -158,11 +225,11 @@ function Write-Stats ()
 	$Sep = " `u{25CF} "
 
 	#Clear-Host
-	Write-Pretty Blue ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin + $Sep + "Miner: " + $RigStats.Miner)
-	Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
+	Write-Pretty Blue ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Miner: " + $RigStats.Miner)
 
 	if (-Not ($FirstRun) )
 	{
+		Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
 		Write-Pretty DarkGreen ("Estimated daily income: " + $RigStats.Profit)	
 	}
 }
@@ -208,7 +275,7 @@ function Write-Support ()
 	$Table.Dispose()
 }
 
-function Test-Support ($Coin, $Miner)
+function Test-Support ()
 {
 	$Match = $false
 
@@ -216,7 +283,7 @@ function Test-Support ($Coin, $Miner)
 	{
 		foreach	($MinerAlgo in $Miners[$Config.Miner].Algos)
 		{
-			if ($CoinAlgo -eq $MinerAlgo)
+			if (($CoinAlgo -eq $MinerAlgo) -And ($CoinAlgo -eq $Config.Algo))
 			{
 				$Match = $true
 			}
@@ -225,7 +292,7 @@ function Test-Support ($Coin, $Miner)
 
 	if (-Not ($Match))
 	{
-		Write-Pretty Red ("Incompatible configuration! The selected coin cannot be mined with the selected miner.")
+		Write-Pretty Red ("Incompatible configuration! The selected coin cannot be mined with the selected miner and/or algo.")
 		Write-Support
 		Exit
 	}
@@ -240,7 +307,15 @@ function Start-Miner ($Name)
 
 		if ($FirstRun -or $Proc.HasExited)
 		{
-			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList (Initialize-Miner-Args $Name) -PassThru -NoNewWindow
+			$Exe = [io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)
+			$Args = Initialize-Miner-Args $Name
+
+			if ($Config.Debug -eq "true")
+			{
+				Write-Pretty Magenta ("$Exe $Args")
+			}
+
+			$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
 		}
 
 		$FirstRun = $false
@@ -254,7 +329,7 @@ function Start-Miner ($Name)
 #Stop-Process $Proc
 
 Clear-Host
-
-Test-Support $Config.Coin $Config.Miner
+Test-Tools
+Test-Support
 Test-Miner $Config.Miner
 Start-Miner $Config.Miner
