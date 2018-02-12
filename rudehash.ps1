@@ -154,10 +154,11 @@ function Write-Stats ()
 	$RigStats.HashRate = Get-HashRate
 	$RigStats.Difficulty = Get-Difficulty
 	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
+	$Sep = " `u{25CF} "
 
 	#Clear-Host
-	Write-Pretty Blue ("Worker: " + $RigStats.Worker + " ● Coin: " + $RigStats.Coin + " ● Miner: " + $RigStats.Miner)
-	Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s ● Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
+	Write-Pretty Blue ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin + $Sep + "Miner: " + $RigStats.Miner)
+	Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
 	Write-Pretty DarkGreen ("Estimated daily income: " + $RigStats.Profit)
 }
 
