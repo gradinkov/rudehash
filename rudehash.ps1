@@ -167,6 +167,70 @@ function Write-Stats ()
 	}
 }
 
+function Write-Support ()
+{
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Coin", "string") | Out-Null
+	$Table.Columns.Add("Algo", "string") | Out-Null
+
+	Write-Host "Supported coins:"
+	foreach ($Key in $Coins.Keys)
+	{
+		$Row = $Table.NewRow()
+		$Row.Coin = $Key
+		$Algos = ""
+		$Algos += foreach ($Algo in $Coins[$Key].Algos) { $Algo }
+		$Row.Algo = $Algos
+		$Table.Rows.Add($Row)
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Table | Format-Table
+	$Table.Dispose()
+
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Miner", "string") | Out-Null
+	$Table.Columns.Add("Algo", "string") | Out-Null
+
+	Write-Host "Supported miners:"
+	foreach ($Key in $Miners.Keys)
+	{
+		$Row = $Table.NewRow()
+		$Row.Miner = $Key
+		$Algos = ""
+		$Algos += foreach ($Algo in $Miners[$Key].Algos) { $Algo }
+		$Row.Algo = $Algos
+		$Table.Rows.Add($Row)
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Table | Format-Table
+	$Table.Dispose()
+}
+
+function Test-Support ($Coin, $Miner)
+{
+	$Match = $false
+
+	foreach ($CoinAlgo in $Coins[$Config.Coin].Algos)
+	{
+		foreach	($MinerAlgo in $Miners[$Config.Miner].Algos)
+		{
+			if ($CoinAlgo -eq $MinerAlgo)
+			{
+				$Match = $true
+			}
+		}
+	}
+
+	if (-Not ($Match))
+	{
+		Write-Pretty Red ("Incompatible configuration! The selected coin cannot be mined with the selected miner.")
+		Write-Support
+		Exit
+	}
+}
+
 function Start-Miner ($Name)
 {
 	# restart automatically if the miner crashes
@@ -189,5 +253,8 @@ function Start-Miner ($Name)
 
 #Stop-Process $Proc
 
+Clear-Host
+
+Test-Support $Config.Coin $Config.Miner
 Test-Miner $Config.Miner
 Start-Miner $Config.Miner
