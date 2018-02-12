@@ -160,7 +160,11 @@ function Write-Stats ()
 	#Clear-Host
 	Write-Pretty Blue ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin + $Sep + "Miner: " + $RigStats.Miner)
 	Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
-	Write-Pretty DarkGreen ("Estimated daily income: " + $RigStats.Profit)
+
+	if (-Not ($FirstRun) )
+	{
+		Write-Pretty DarkGreen ("Estimated daily income: " + $RigStats.Profit)	
+	}
 }
 
 function Start-Miner ($Name)
@@ -168,14 +172,16 @@ function Start-Miner ($Name)
 	# restart automatically if the miner crashes
 	while (1)
 	{
+		Write-Stats
+
 		if ($FirstRun -or $Proc.HasExited)
 		{
 			$Proc = Start-Process -FilePath ([io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)) -ArgumentList (Initialize-Miner-Args $Name) -PassThru -NoNewWindow
 		}
 
-		Write-Stats
-		Start-Sleep -Seconds 60
 		$FirstRun = $false
+		Start-Sleep -Seconds 60
+
 		#Register-EngineEvent PowerShell.Exiting –Action { Stop-Process $Proc }
 		#$MinerStats = Send-Tcp localhost 42000 '{"id":1, "method":"getstat"}\n' 10
 	}
