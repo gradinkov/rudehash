@@ -25,7 +25,7 @@ Algos:
 
 | Algo | Miner |
 |---|---|
-| EquiHash | Bminer, ccminer-tpruvot, DSTM, Zec Miner |
+| EquiHash | ccminer-tpruvot, DSTM, Zec Miner |
 
 Pools:
 
