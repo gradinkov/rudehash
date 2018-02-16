@@ -16,7 +16,6 @@ $Miners =
 	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash") }
 	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "neoscrypt", "lyra2v2", "nist5") }
-	"nheqminer-gradinkov" = [pscustomobject]@{ Url = "https://github.com/gradinkov/nheqminer-gradinkov/releases/download/0.5c-1/nheqminer-gradinkov-0.5c-1.7z"; ArchiveFile = "nheqminer-gradinkov.7z"; ExeFile = "nheqminer.exe"; FilesInRoot = $false; Algos = @("equihash") }
 }
 
 $Tools =
@@ -41,7 +40,6 @@ function Initialize-Miner-Args ($Name)
 		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
 		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
 		"ccminer-tpruvot" { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
-		"nheqminer-gradinkov" { $Args = "-l " + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -u " + $Config.User + "." + $Config.Worker + " -cd 0 0 1 1 -p x" }
 	}
 	return $Args
 }
