@@ -7,6 +7,7 @@ $Config.Coin = $Config.Coin.ToLower()
 $Coins =
 @{
 	"mona" = [pscustomobject]@{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algos = @("lyra2v2") }
+	"vtc" = [pscustomobject]@{ PoolPage = "vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20507; Algos = @("lyra2v2") }
 	"zcl" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algos = @("equihash") }
 	"zec" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algos = @("equihash") }
 	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algos = @("equihash") }

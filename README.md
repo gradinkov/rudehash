@@ -18,6 +18,7 @@ Coins:
 | Coin | Algo |
 |---|---|
 | MONA | Lyra2v2 |
+| VTC | Lyra2v2 |
 | ZCL | EquiHash |
 | ZEC | EquiHash |
 | ZEN | EquiHash |
