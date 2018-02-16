@@ -6,18 +6,18 @@ $Config.Coin = $Config.Coin.ToLower()
 
 $Coins =
 @{
+	"mona" = [pscustomobject]@{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algos = @("lyra2v2") }
 	"zcl" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algos = @("equihash") }
 	"zec" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algos = @("equihash") }
 	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algos = @("equihash") }
-	"mona" = [pscustomobject]@{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algos = @("lyra2v2") }
 }
 
 $Miners =
 @{
-	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash") }
-	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "neoscrypt", "lyra2v2", "nist5") }
+	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"vertminer" = [pscustomobject]@{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2") }
+	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash") }
 }
 
 $Tools =
@@ -39,10 +39,10 @@ function Initialize-Miner-Args ($Name)
 {
 	switch ($Name)
 	{
-		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
-		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
 		"ccminer-tpruvot" { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
+		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
 		"vertminer" { $Args = "-o stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -u " + $Config.User + "." + $Config.Worker + " -p x" }
+		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
 	}
 	return $Args
 }
