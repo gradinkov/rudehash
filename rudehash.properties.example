@@ -10,13 +10,13 @@ ApiKey=wh29p4unl257lt18eucrzahuj5pswka74lu2gxn6utijyxbvered5ttf4v0lk926
 # Pool Fee is 0.9 Pool Fee + 0.2 AE Fee on MPH
 PoolFee=1.1
 
-# Possible values: zcl, zec, zen
+# Possible values: mona, zcl, zec, zen
 Coin=zcl
 
 # Possible values: equihash, lyra2v2, neoscrypt
 Algo=equihash
 
-# Possible values: ccminer-tpruvot, dstm, zecminer
+# Possible values: ccminer-tpruvot, dstm, vertminer, zecminer
 Miner=dstm
 
 # Possible values: asia, europe, us-east

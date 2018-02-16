@@ -17,6 +17,7 @@ Coins:
 
 | Coin | Algo |
 |---|---|
+| MONA | Lyra2v2 |
 | ZCL | EquiHash |
 | ZEC | EquiHash |
 | ZEN | EquiHash |
@@ -26,6 +27,7 @@ Algos:
 | Algo | Miner |
 |---|---|
 | EquiHash | ccminer-tpruvot, DSTM, Zec Miner |
+| Lyra2v2 | ccminer-tpruvot, vertminer |
 
 Pools:
 
