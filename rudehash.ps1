@@ -52,7 +52,6 @@ else
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $FirstRun = $true
-$Config.Coin = $Config.Coin.ToLower()
 
 $Coins =
 @{
@@ -64,12 +63,6 @@ $Coins =
 	"zcl" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algos = @("equihash") }
 	"zec" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algos = @("equihash") }
 	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algos = @("equihash") }
-}
-
-# use default algo if unspecified
-if (-Not ($Config.Algo))
-{
-	$Config.Algo = $Coins[$Config.Coin].Algos[0]
 }
 
 $Miners =
@@ -85,6 +78,141 @@ $Miners =
 $Tools =
 @{
 	"7zip" = [pscustomobject]@{ Url = "http://7-zip.org/a/7za920.zip"; ArchiveFile = "7zip.zip"; ExeFile = "7za.exe"; FilesInRoot = $true }
+}
+
+$Regions =
+@(
+	"asia"
+	"europe"
+	"us-east"
+)
+
+function Test-Property-Coin ()
+{
+	if (-Not ($Config.Coin))
+	{
+		Write-Pretty-Error ("Coin must be set!")
+		Exit-RudeHash
+	}
+
+	$Config.Coin = $Config.Coin.ToLower()
+
+	if (-Not ($Coins.ContainsKey($Config.Coin)))
+	{
+		Write-Pretty-Error ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
+		$Sep = "`u{00b7} "
+
+		Write-Pretty-Info "Supported coins:"
+		foreach ($Coin in $Coins.Keys)
+		{
+			Write-Pretty-Info ($Sep + $Coin.ToUpper())
+		}
+
+		Exit-RudeHash
+	}
+}
+
+function Test-Property-Miner ()
+{
+	if (-Not ($Config.Miner))
+	{
+		Write-Pretty-Error ("Miner must be set!")
+		Exit-RudeHash
+	}
+
+	if (-Not ($Miners.ContainsKey($Config.Miner)))
+	{
+		Write-Pretty-Error ("The """ + $Config.Miner + """ miner is not supported!")
+		$Sep = "`u{00b7} "
+
+		Write-Pretty-Info "Supported miners:"
+		foreach ($Miner in $Miners.Keys)
+		{
+			Write-Pretty-Info ($Sep + $Miner)
+		}
+
+		Exit-RudeHash
+	}
+}
+
+function Test-Property-Algo ()
+{
+	# make the array of dynamic size
+	[System.Collections.ArrayList]$Algos = @()
+	#$Coll = {$Algos}.Invoke()
+
+	foreach ($Miner in $Miners.Keys)
+	{
+		foreach ($Algo in $Miners[$Miner].Algos)
+		{
+			if (-Not ($Algos.Contains($Algo)))
+			{
+				$Algos.Add($Algo) | Out-Null
+			}
+		}
+	}
+
+	# use default algo if unspecified
+	if (-Not ($Config.Algo))
+	{
+		$Config.Algo = $Coins[$Config.Coin].Algos[0]
+	}
+	elseif (-Not ($Algos.Contains($Config.Algo)))
+	{
+		Write-Pretty-Error ("The """ + $Config.Algo + """ algo is not supported!")
+		$Sep = "`u{00b7} "
+
+		Write-Pretty-Info "Supported algos:"
+		foreach ($Algo in $Algos)
+		{
+			Write-Pretty-Info ($Sep + $Algo)
+		}
+
+		Exit-RudeHash
+	}
+}
+
+function Test-Property-Region ()
+{
+	if (-Not ($Regions.Contains($Config.Region)))
+	{
+		Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported!")
+		$Sep = "`u{00b7} "
+
+		Write-Pretty-Info "Supported regions:"
+		foreach ($Region in $Regions)
+		{
+			Write-Pretty-Info ($Sep + $Region)
+		}
+
+		Exit-RudeHash
+	}
+}
+
+function Test-Properties ()
+{
+	if (-Not ($Config.User))
+	{
+		Write-Pretty-Error "Username must be set!"
+		Exit-RudeHash
+	}
+
+	if (-Not ($Config.Worker))
+	{
+		Write-Pretty-Error "Worker must be set!"
+		Exit-RudeHash
+	}
+
+	if (-Not ($Config.ApiKey))
+	{
+		Write-Pretty-Error "API key must be set!"
+		Exit-RudeHash
+	}
+
+	Test-Property-Coin
+	Test-Property-Miner
+	Test-Property-Algo
+	Test-Property-Region
 }
 
 $RigStats =
@@ -126,7 +254,7 @@ function Get-HashRate ()
 	catch
 	{
 		$HashRate = 0
-		Write-Pretty-Error "Pool API call failed! Have you set your API key?"
+		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
 
 		if ($Config.Debug -eq "true")
 		{
@@ -156,7 +284,7 @@ function Get-Difficulty ()
 	catch
 	{
 		$Difficulty = 0
-		Write-Pretty-Error "Pool API call failed! Have you set your API key?"
+		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
 
 		if ($Config.Debug -eq "true")
 		{
@@ -428,6 +556,7 @@ function Start-Miner ($Name)
 
 #Stop-Process $Proc
 
+Test-Properties
 Test-Tools
 Test-Support
 Test-Miner $Config.Miner
