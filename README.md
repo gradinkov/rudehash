@@ -29,7 +29,7 @@ Algos:
 | Algo | Miner |
 |---|---|
 | EquiHash | ccminer-tpruvot, DSTM, Zec Miner |
-| Lyra2v2 | ccminer-tpruvot, vertminer |
+| Lyra2v2 | ccminer-klaust, ccminer-tpruvot, vertminer |
 
 Pools:
 

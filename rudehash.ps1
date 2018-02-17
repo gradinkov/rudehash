@@ -16,6 +16,7 @@ $Coins =
 
 $Miners =
 @{
+	"ccminer-klaust" = [pscustomobject]@{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2") }
 	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2") }
 	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"vertminer" = [pscustomobject]@{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2") }
@@ -41,7 +42,7 @@ function Initialize-Miner-Args ($Name)
 {
 	switch ($Name)
 	{
-		"ccminer-tpruvot" { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
+		{$_ -in "ccminer-klaust", "ccminer-tpruvot"} { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
 		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
 		"vertminer" { $Args = "-o stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -u " + $Config.User + "." + $Config.Worker + " -p x" }
 		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }

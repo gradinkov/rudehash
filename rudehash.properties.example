@@ -16,7 +16,7 @@ Coin=zcl
 # Possible values: equihash, lyra2v2, neoscrypt
 Algo=equihash
 
-# Possible values: ccminer-tpruvot, dstm, vertminer, zecminer
+# Possible values: ccminer-klaust, ccminer-tpruvot, dstm, vertminer, zecminer
 Miner=dstm
 
 # Possible values: asia, europe, us-east
