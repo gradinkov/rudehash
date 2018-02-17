@@ -277,7 +277,8 @@ function Write-Stats ()
 	$RigStats.HashRate = Get-HashRate
 	$RigStats.Difficulty = Get-Difficulty
 	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
-	$Sep = " `u{25CF} "
+	# $Sep = " `u{25a0} "
+	$Sep = " `u{25bc} "
 
 	#Clear-Host
 	Write-Pretty-Info ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Algo: " + $RigStats.Algo + $Sep + "Miner: " + $RigStats.Miner)
