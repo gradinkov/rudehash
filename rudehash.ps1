@@ -7,14 +7,15 @@ function Exit-RudeHash ()
 }
 function Write-Pretty ($BgColor, $String)
 {
+	$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width
+
 	ForEach ($Line in $($String -split "`r`n"))
 	{
-		$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width
-		$SpaceCount = $WindowWidth - $Line.length
+		$SpaceCount = $WindowWidth - ($Line.length % $WindowWidth)
 		$Line += " " * $SpaceCount
 	
 		Write-Host -ForegroundColor White -BackgroundColor $BgColor $Line
-	} 
+	}
 }
 
 function Write-Pretty-Error ($String)
@@ -114,10 +115,24 @@ function Initialize-Miner-Args ($Name)
 function Get-HashRate ()
 {
 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getuserworkers&api_key=" + $Config.ApiKey
-	$PoolJson = Invoke-WebRequest -Uri $PoolUrl | ConvertFrom-Json
-	$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
-	# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
-	$HashRate = $PoolWorker.hashrate * 1000
+
+	try
+	{
+		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorVariable Err | ConvertFrom-Json
+		$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
+		# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
+		$HashRate = $PoolWorker.hashrate * 1000	
+	}
+	catch
+	{
+		$HashRate = 0
+		Write-Pretty-Error "Pool API call failed! Have you set your API key?"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $Err
+		}
+	}
 
 	if (-Not ($HashRate))
 	{
@@ -130,10 +145,24 @@ function Get-HashRate ()
 function Get-Difficulty ()
 {
 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
-	$PoolJson = Invoke-WebRequest -Uri $PoolUrl | ConvertFrom-Json
-	$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
-	#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
-	#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
+
+	try
+	{
+		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing  -ErrorVariable Err | ConvertFrom-Json
+		$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
+		#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
+		#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
+	}
+	catch
+	{
+		$Difficulty = 0
+		Write-Pretty-Error "Pool API call failed! Have you set your API key?"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $Err
+		}
+	}
 
 	return $Difficulty
 }
@@ -142,7 +171,21 @@ function Measure-Profit ($HashRate, $Difficulty)
 {
 	#$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&d=$Difficulty&p=" + $Config.Power + "&cost=" + $Config.ElectricityCost + "&fee=" + $Config.PoolFee + "&commit=Calculate"
 	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=$HashRate&d=$Difficulty&p=0&cost=0&fee=" + $Config.PoolFee + "&commit=Calculate"
-	$WtmHtml = Invoke-WebRequest -Uri $WtmUrl
+
+	try
+	{
+		$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorVariable Err
+	}
+	catch
+	{
+		Write-Pretty-Error "WhatToMine request failed!"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $Err
+		}
+	}
+	
 	$WtmObj = $WtmHtml.Content -split "[`r`n]"
 	$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
 
