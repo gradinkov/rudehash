@@ -297,6 +297,7 @@ function Test-Support ()
 	{
 		Write-Pretty Red ("Incompatible configuration! The selected coin cannot be mined with the selected miner and/or algo.")
 		Write-Support
+		Read-Host -Prompt "Press Enter to exit..."
 		Exit
 	}
 }
