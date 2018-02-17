@@ -1,4 +1,52 @@
-$Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)
+Clear-Host
+
+function Exit-RudeHash ()
+{
+	Read-Host -Prompt "Press Enter to exit..."
+	Exit
+}
+function Write-Pretty ($BgColor, $String)
+{
+	ForEach ($Line in $($String -split "`r`n"))
+	{
+		$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width
+		$SpaceCount = $WindowWidth - $Line.length
+		$Line += " " * $SpaceCount
+	
+		Write-Host -ForegroundColor White -BackgroundColor $BgColor $Line
+	} 
+}
+
+function Write-Pretty-Error ($String)
+{
+	Write-Pretty Red $String
+}
+
+function Write-Pretty-Debug ($String)
+{
+	Write-Pretty Magenta $String
+}
+
+function Write-Pretty-Info ($String)
+{
+	Write-Pretty Blue $String
+}
+
+function Write-Pretty-Earnings ($String)
+{
+	Write-Pretty DarkGreen $String
+}
+
+if (Test-Path "$PSScriptRoot/rudehash.properties")
+{
+	$Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)
+}
+else
+{
+	Write-Pretty-Error ("Properties file 'rudehash.properties' not found! Please create it.")
+	Exit-RudeHash
+}
+
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $FirstRun = $true
@@ -216,15 +264,6 @@ function Test-Miner ($Name)
 	}
 }
 
-function Write-Pretty ($BgColor, $String)
-{
-	$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width
-	$SpaceCount = $WindowWidth - $String.length
-	$String += " " * $SpaceCount
-
-	Write-Host -ForegroundColor White -BackgroundColor $BgColor $String 
-}
-
 function Write-Stats ()
 {
 	$RigStats.HashRate = Get-HashRate
@@ -233,22 +272,22 @@ function Write-Stats ()
 	$Sep = " `u{25CF} "
 
 	#Clear-Host
-	Write-Pretty Blue ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Miner: " + $RigStats.Miner)
+	Write-Pretty-Info ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Miner: " + $RigStats.Miner)
 
 	if (-Not ($FirstRun) )
 	{
-		Write-Pretty Blue ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
-		Write-Pretty DarkGreen ("Estimated daily income: " + $RigStats.Profit)	
+		Write-Pretty-Info ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
+		Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
 	}
 }
 
-function Write-Support ()
+function Get-Support ()
 {
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Coin", "string") | Out-Null
 	$Table.Columns.Add("Algo", "string") | Out-Null
 
-	Write-Host "Supported coins:"
+	$Support = "Supported coins:"
 	foreach ($Key in $Coins.Keys)
 	{
 		$Row = $Table.NewRow()
@@ -260,14 +299,14 @@ function Write-Support ()
 	}
 
 	# use Format-Table to force flushing to screen immediately
-	$Table | Format-Table
+	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
 
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Miner", "string") | Out-Null
 	$Table.Columns.Add("Algo", "string") | Out-Null
 
-	Write-Host "Supported miners:"
+	$Support += "Supported miners:"
 	foreach ($Key in $Miners.Keys)
 	{
 		$Row = $Table.NewRow()
@@ -279,8 +318,9 @@ function Write-Support ()
 	}
 
 	# use Format-Table to force flushing to screen immediately
-	$Table | Format-Table
+	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
+	return $Support
 }
 
 function Test-Support ()
@@ -300,10 +340,9 @@ function Test-Support ()
 
 	if (-Not ($Match))
 	{
-		Write-Pretty Red ("Incompatible configuration! The selected coin cannot be mined with the selected miner and/or algo.")
-		Write-Support
-		Read-Host -Prompt "Press Enter to exit..."
-		Exit
+		Write-Pretty-Error ("Incompatible configuration! The selected coin cannot be mined with the selected miner and/or algo.")
+		Write-Pretty-Info (Get-Support)
+		Exit-RudeHash
 	}
 }
 
@@ -321,7 +360,7 @@ function Start-Miner ($Name)
 
 			if ($Config.Debug -eq "true")
 			{
-				Write-Pretty Magenta ("$Exe $Args")
+				Write-Pretty-Debug ("$Exe $Args")
 			}
 
 			$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
@@ -337,7 +376,6 @@ function Start-Miner ($Name)
 
 #Stop-Process $Proc
 
-Clear-Host
 Test-Tools
 Test-Support
 Test-Miner $Config.Miner
