@@ -18,6 +18,7 @@ Coins:
 | Coin | Algo |
 |---|---|
 | BTG | EquiHash |
+| ETH | Ethash |
 | FTC | NeoScrypt |
 | MONA | Lyra2v2 |
 | VTC | Lyra2v2 |
@@ -29,6 +30,7 @@ Algos:
 
 | Algo | Miner |
 |---|---|
+| Ethash | ethminer |
 | EquiHash | ccminer-tpruvot, DSTM, Zec Miner |
 | Lyra2v2 | ccminer-klaust, ccminer-tpruvot, vertminer |
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot |
