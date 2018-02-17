@@ -14,7 +14,8 @@ PoolFee=1.1
 Coin=zcl
 
 # Possible values: ethash, equihash, lyra2v2, neoscrypt
-Algo=equihash
+# Only necessary for multi-algo coins (currently none)
+#Algo=equihash
 
 # Possible values: ccminer-klaust, ccminer-tpruvot, dstm, ethminer, vertminer, zecminer
 Miner=dstm

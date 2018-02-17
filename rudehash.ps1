@@ -65,6 +65,12 @@ $Coins =
 	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algos = @("equihash") }
 }
 
+# use default algo if unspecified
+if (-Not ($Config.Algo))
+{
+	$Config.Algo = $Coins[$Config.Coin].Algos[0]
+}
+
 $Miners =
 @{
 	"ccminer-klaust" = [pscustomobject]@{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt") }
@@ -83,6 +89,7 @@ $Tools =
 $RigStats =
 [pscustomobject]@{
 	Coin = $Config.Coin;
+	Algo = $Config.Algo;
 	Miner = $Config.Miner;
 	Worker = $Config.Worker;
 	HashRate = 0;
@@ -273,7 +280,7 @@ function Write-Stats ()
 	$Sep = " `u{25CF} "
 
 	#Clear-Host
-	Write-Pretty-Info ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Miner: " + $RigStats.Miner)
+	Write-Pretty-Info ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Algo: " + $RigStats.Algo + $Sep + "Miner: " + $RigStats.Miner)
 
 	if (-Not ($FirstRun) )
 	{
