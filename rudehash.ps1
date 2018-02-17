@@ -43,7 +43,8 @@ if (Test-Path "$PSScriptRoot/rudehash.properties")
 }
 else
 {
-	Write-Pretty-Error ("Properties file 'rudehash.properties' not found! Please create it.")
+	Write-Pretty-Error ("Properties file 'rudehash.properties' not found! Please create it. Example:")
+	Write-Pretty-Info (Get-Content "$PSScriptRoot/rudehash.properties.example")
 	Exit-RudeHash
 }
 
