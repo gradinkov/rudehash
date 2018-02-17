@@ -29,7 +29,7 @@ function Write-Pretty-Debug ($String)
 
 function Write-Pretty-Info ($String)
 {
-	Write-Pretty Blue $String
+	Write-Pretty DarkBlue $String
 }
 
 function Write-Pretty-Earnings ($String)
