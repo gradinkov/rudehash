@@ -87,6 +87,15 @@ $Regions =
 	"us-east"
 )
 
+# MPH returns all hashrates in kH/s but WTM uses different magnitudes for different algos
+$WtmModifiers =
+@{
+	"ethash" = 1000000
+	"equihash" = 1
+	"lyra2v2" = 1000
+	"neoscrypt" = 1000
+}
+
 function Test-Property-Coin ()
 {
 	if (-Not ($Config.Coin))
@@ -249,7 +258,7 @@ function Get-HashRate ()
 		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorVariable Err | ConvertFrom-Json
 		$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
 		# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
-		$HashRate = $PoolWorker.hashrate * 1000	
+		$HashRate = $PoolWorker.hashrate * 1000
 	}
 	catch
 	{
@@ -268,6 +277,22 @@ function Get-HashRate ()
 	}
 
 	return $HashRate
+}
+
+function Get-HashRate-Pretty ($HashRate)
+{
+	if ($HashRate -ge 1000000)
+	{
+		return (($HashRate / 1000000).ToString() + " MH/s")
+	}
+	elseif ($HashRate -ge 1000)
+	{
+		return (($HashRate / 1000).ToString() + " kH/s")
+	}
+	else
+	{
+		return ($HashRate.ToString() + " H/s")
+	}
 }
 
 function Get-Difficulty ()
@@ -297,6 +322,7 @@ function Get-Difficulty ()
 
 function Measure-Profit ($HashRate, $Difficulty)
 {
+	$HashRate /= $WtmModifiers[$Config.Algo]
 	#$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&d=$Difficulty&p=" + $Config.Power + "&cost=" + $Config.ElectricityCost + "&fee=" + $Config.PoolFee + "&commit=Calculate"
 	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=$HashRate&d=$Difficulty&p=0&cost=0&fee=" + $Config.PoolFee + "&commit=Calculate"
 
@@ -456,7 +482,7 @@ function Write-Stats ()
 
 	if (-Not ($FirstRun) )
 	{
-		Write-Pretty-Info ("Hashrate: " + $RigStats.HashRate + " H/s" + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
+		Write-Pretty-Info ("Hashrate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
 		Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
 	}
 }
