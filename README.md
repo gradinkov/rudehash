@@ -4,7 +4,7 @@
 
 ## About
 
-RudeHash is a simple wrapper script to mine coins directly. Features:
+RudeHash is a simple wrapper script to mine coins directly on NVIDIA GPUs. Features:
 
 * Easy switching between supported coins and miners
 * Automatic download of miners
