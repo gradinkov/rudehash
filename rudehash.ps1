@@ -493,7 +493,7 @@ function Write-Stats ()
 
 	if (-Not ($FirstRun) )
 	{
-		Write-Pretty-Info ("Hashrate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
+		Write-Pretty-Info ("Reported Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Network Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
 		Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
 	}
 }
