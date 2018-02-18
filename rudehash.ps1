@@ -165,6 +165,7 @@ function Test-Property-Algo ()
 	if (-Not ($Config.Algo))
 	{
 		$Config.Algo = $Coins[$Config.Coin].Algos[0]
+		$RigStats.Algo = $Config.Algo
 	}
 	elseif (-Not ($Algos.Contains($Config.Algo)))
 	{
