@@ -18,6 +18,16 @@ function Write-Pretty ($BgColor, $String)
 	}
 }
 
+function Write-Pretty-Header ()
+{
+	$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width - 1
+	$String += "`u{2219}" * $WindowWidth
+
+	Write-Pretty DarkCyan $String
+	Write-Pretty DarkCyan "RudeHash NVIDIA Coin Miner `u{00a9} gradinkov"
+	Write-Pretty DarkCyan $String
+}
+
 function Write-Pretty-Error ($String)
 {
 	Write-Pretty Red $String
@@ -475,15 +485,15 @@ function Write-Stats ()
 	$RigStats.HashRate = Get-HashRate
 	$RigStats.Difficulty = Get-Difficulty
 	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
-	# $Sep = " `u{25a0} "
-	$Sep = " `u{25bc} "
+	# $Sep = " `u{25a0 | 25bc} "
+	$Sep = "  `u{2219}  "
 
 	#Clear-Host
 	Write-Pretty-Info ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Algo: " + $RigStats.Algo + $Sep + "Miner: " + $RigStats.Miner)
 
 	if (-Not ($FirstRun) )
 	{
-		Write-Pretty-Info ("Hashrate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 0)))
+		Write-Pretty-Info ("Hashrate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
 		Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
 	}
 }
@@ -582,7 +592,7 @@ function Start-Miner ($Name)
 }
 
 #Stop-Process $Proc
-
+Write-Pretty-Header
 Test-Properties
 Test-Tools
 Test-Support
