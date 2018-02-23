@@ -61,6 +61,7 @@ else
 
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
+$TempDir = [io.path]::combine($PSScriptRoot, "temp")
 $FirstRun = $true
 
 $Coins =
@@ -81,8 +82,17 @@ $Miners =
 	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt") }
 	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"ethminer" = [pscustomobject]@{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev1/ethminer-0.14.0.dev1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash") }
+	"excavator" = [pscustomobject]@{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt") }
 	"vertminer" = [pscustomobject]@{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2") }
 	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash") }
+}
+
+$ExcavatorAlgos = 
+@{
+	"ethash" = "daggerhashimoto"
+	"equihash" = "equihash"
+	"lyra2v2" = "lyra2rev2"
+	"neoscrypt" = "neoscrypt"
 }
 
 $Tools =
@@ -246,6 +256,170 @@ $RigStats =
 	Profit = "";
 }
 
+function Initialize-Temp ()
+{
+	try
+	{
+		if (Test-Path $TempDir -ErrorAction Stop)
+		{
+			Remove-Item -Recurse -Path $TempDir -ErrorAction Stop
+		}
+
+		New-Item -ItemType Directory -Path $TempDir -Force -ErrorAction Stop | Out-Null
+	}
+	catch
+	{
+		Write-Pretty-Error "Error setting up temporary directory! Do we have write access?"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+
+		Exit-RudeHash
+	}
+}
+
+function Read-Miner-Api ($Port, $Request, $Critical)
+{
+	$Timeout = 10
+
+	try
+	{
+		$Client = New-Object System.Net.Sockets.TcpClient "127.0.0.1", $Port
+		$Stream = $Client.GetStream()
+		$Writer = New-Object System.IO.StreamWriter $Stream
+		$Reader = New-Object System.IO.StreamReader $Stream
+		$Client.SendTimeout = $Timeout * 1000
+		$Client.ReceiveTimeout = $Timeout * 1000
+		$Writer.AutoFlush = $true
+
+		$Writer.WriteLine($Request)
+		$Response = $Reader.ReadLine()
+	}
+	catch
+	{
+		Write-Pretty-Error "Error connecting to miner API!"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+
+		if ($Critical -eq "true")
+		{
+			Exit-RudeHash
+		}
+	}
+	finally
+	{
+		if ($Reader) { $Reader.Close() }
+		if ($Writer) { $Writer.Close() }
+		if ($Stream) { $Stream.Close() }
+		if ($Client) { $Client.Close() }
+	}
+
+	return $Response
+}
+
+function Resolve-Pool-Ip ()
+{
+	try
+	{
+		$Ip = ([System.Net.DNS]::GetHostEntry($Coins[$Config.Coin].Server).AddressList[0].IPAddressToString)	
+	}
+	catch
+	{
+		Write-Pretty-Error "Error resolving pool IP addess! Is your network connection working?"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+
+		Exit-RudeHash
+	}
+	
+	return $Ip
+}
+
+function Get-Device-Count ()
+{
+	$Response = Read-Miner-Api 3456 '{"id":1,"method":"device.list","params":[]}' $true | ConvertFrom-Json
+	return $Response.devices.length
+}
+
+function Start-Excavator ()
+{
+	$Excavator = [io.path]::combine($MinersDir, "excavator", "excavator.exe")
+	$Proc = Start-Process -FilePath $Excavator -PassThru -NoNewWindow -RedirectStandardOutput nul
+	Write-Pretty-Info "Waiting for Excavator to start..."
+	Start-Sleep -Seconds 5
+	return $Proc
+}
+
+function Initialize-Json ($Count)
+{
+$ExcavatorJson = @"
+[
+	{"time":0,"commands":[
+		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Coins[$Config.Coin].Port)","$($Config.User).$($Config.Worker)"]}
+	]},
+	{"time":3,"commands":[
+		$(for ($i = 0; $i -lt $Count; $i++)
+		{
+			$Line = "{""id"":1,""method"":""worker.add"",""params"":[""0"",""$i""]}"
+			if (($Count - $i) -gt 1)
+			{
+				$Line += ",`r`n"
+			}
+			Write-Output $Line
+		})
+	]},
+	{"time":10,"loop":20,"commands":[
+		$(for ($i = 0; $i -lt $Count; $i++)
+		{
+			$Line = "{""id"":1,""method"":""worker.print.speed"",""params"":[""$i""]},"
+			if (($Count - $i) -gt 1)
+			{
+				$Line += "`r`n"
+			}
+			Write-Output $Line
+		})
+		{"id":1,"method":"algorithm.print.speeds","params":[]}
+	]}
+]
+"@
+	return $ExcavatorJson
+}
+
+function Initialize-Excavator ()
+{
+	$Proc = Start-Excavator
+	$DevCount = Get-Device-Count
+	Stop-Process $Proc
+
+	$Json = Initialize-Json $DevCount
+	$JsonFile = [io.path]::combine($TempDir, "excavator.json")
+
+	try
+	{
+		Set-Content -LiteralPath $JsonFile -Value $Json -ErrorAction Stop
+	}
+	catch
+	{
+		Write-Pretty-Error "Error writing Excavator JSON file! Make sure the file is not locked by another process!"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+
+		Exit-RudeHash
+	}
+	
+}
+
 function Initialize-Miner-Args ($Name)
 {
 	switch ($Name)
@@ -253,6 +427,11 @@ function Initialize-Miner-Args ($Name)
 		{$_ -in "ccminer-klaust", "ccminer-tpruvot"} { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
 		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --userpass " + $Config.User + "." + $Config.Worker + ":x" }
+		"excavator"
+		{
+			Initialize-Excavator
+			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json")
+		}
 		"vertminer" { $Args = "-o stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -u " + $Config.User + "." + $Config.Worker + " -p x" }
 		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
 	}
@@ -266,7 +445,7 @@ function Get-HashRate ()
 
 	try
 	{
-		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorVariable Err | ConvertFrom-Json
+		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorAction SilentlyContinue | ConvertFrom-Json
 		$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
 		# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
 		$HashRate = $PoolWorker.hashrate * 1000
@@ -278,7 +457,7 @@ function Get-HashRate ()
 
 		if ($Config.Debug -eq "true")
 		{
-			Write-Pretty-Debug $Err
+			Write-Pretty-Debug $_.Exception
 		}
 	}
 
@@ -312,7 +491,7 @@ function Get-Difficulty ()
 
 	try
 	{
-		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing  -ErrorVariable Err | ConvertFrom-Json
+		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing | ConvertFrom-Json
 		$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
 		#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
 		#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
@@ -324,7 +503,7 @@ function Get-Difficulty ()
 
 		if ($Config.Debug -eq "true")
 		{
-			Write-Pretty-Debug $Err
+			Write-Pretty-Debug $_.Exception
 		}
 	}
 
@@ -339,7 +518,7 @@ function Measure-Profit ($HashRate, $Difficulty)
 
 	try
 	{
-		$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorVariable Err
+		$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
 	}
 	catch
 	{
@@ -347,7 +526,7 @@ function Measure-Profit ($HashRate, $Difficulty)
 
 		if ($Config.Debug -eq "true")
 		{
-			Write-Pretty-Debug $Err
+			Write-Pretty-Debug $_.Exception
 		}
 	}
 	
@@ -359,24 +538,23 @@ function Measure-Profit ($HashRate, $Difficulty)
 
 function Get-Archive ($Url, $FileName)
 {
-	$TempDir = [io.path]::combine($PSScriptRoot, "temp")
-
-	if (Test-Path $TempDir)
-	{
-		Remove-Item -Recurse -Path $TempDir
-	}
-
-	New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
-
 	$DestFile = [io.path]::combine($TempDir, $FileName)
 	$Client = New-Object System.Net.WebClient
-	Try
+
+	try
 	{
 		$Client.DownloadFile($Url, $DestFile)
 	}
-	Catch
+	catch
 	{
-		Write-Host $_.Exception
+		Write-Pretty-Error "Error downloading package! Is your network connection working?"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+
+		Exit-RudeHash
 	}
 
 	return $TempDir
@@ -426,7 +604,15 @@ function Test-Tool ($Name)
 
 		if (-Not ($Tools[$Name].FilesInRoot))
 		{
-			$DestPath = (Rename-Item -Path (Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName -NewName $Name -PassThru).FullName
+			# don't try to rename tool dir to itself
+			if (((Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName).Split('\')[-1] -eq $Name)
+			{
+				$DestPath = [io.path]::combine($ArchiveDir, $Name)
+			}
+			else
+			{
+				$DestPath = (Rename-Item -Path (Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName -NewName $Name -PassThru).FullName
+			}
 		}
 
 		Move-Item -Force $DestPath $ToolsDir
@@ -473,7 +659,15 @@ function Test-Miner ($Name)
 
 		if (-Not ($Miners[$Name].FilesInRoot))
 		{
-			$DestPath = (Rename-Item -Path (Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName -NewName $Name -PassThru).FullName
+			# don't try to rename miner dir to itself
+			if (((Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName).Split('\')[-1] -eq $Name)
+			{
+				$DestPath = [io.path]::combine($ArchiveDir, $Name)
+			}
+			else
+			{
+				$DestPath = (Rename-Item -Path (Get-ChildItem -Directory $ArchiveDir | Select-Object -First 1).FullName -NewName $Name -PassThru).FullName
+			}
 		}
 
 		Move-Item -Force $DestPath $MinersDir
@@ -594,6 +788,7 @@ function Start-Miner ($Name)
 #Stop-Process $Proc
 Write-Pretty-Header
 Test-Properties
+Initialize-Temp
 Test-Tools
 Test-Support
 Test-Miner $Config.Miner

@@ -17,8 +17,8 @@ Coin=zcl
 # Only necessary for multi-algo coins (currently none)
 #Algo=equihash
 
-# Possible values: ccminer-klaust, ccminer-tpruvot, dstm, ethminer, vertminer, zecminer
-Miner=dstm
+# Possible values: ccminer-klaust, ccminer-tpruvot, dstm, ethminer, excavator, vertminer, zecminer
+Miner=excavator
 
 # Possible values: asia, europe, us-east
 Region=europe

@@ -30,10 +30,10 @@ Algos:
 
 | Algo | Miner |
 |---|---|
-| Ethash | ethminer |
-| EquiHash | ccminer-tpruvot, DSTM, Zec Miner |
-| Lyra2v2 | ccminer-klaust, ccminer-tpruvot, vertminer |
-| NeoScrypt | ccminer-klaust, ccminer-tpruvot |
+| Ethash | ethminer, Excavator |
+| EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
+| Lyra2v2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
+| NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
 
 Pools:
 
@@ -41,16 +41,22 @@ Pools:
 
 ## Installation
 
-* Download and install the [latest release of PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
-* Download and install the [latest release of Git for Windows](https://github.com/git-for-windows/git/releases/latest) (64 bit EXE recommended)
-* Start **Git Bash** from the Start Menu and download RudeHash to your home directory:
+Download and install the latest release of:
+
+* [NVIDIA Driver](https://www.geforce.com/drivers)
+* [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
+* [Git for Windows](https://github.com/git-for-windows/git/releases/latest) (64 bit EXE recommended)
+* [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
+
+Then Start **Git Bash** from the Start Menu and download RudeHash to your home directory:
 
 ~~~
 git clone https://github.com/gradinkov/rudehash.git ${USERPROFILE}/rudehash
 ~~~
 
-* Rename `rudehash.properties.example` to `rudehash.properties` and update the values as needed.
-* Create a new shortcut: `pwsh.exe -Command %USERPROFILE%\rudehash\rudehash.ps1`
+Copy `rudehash.properties.example` as `rudehash.properties` and update the values as needed.
+
+Finally, create a new shortcut: `pwsh.exe -Command %USERPROFILE%\rudehash\rudehash.ps1`
 
 ## Upgrading
 
