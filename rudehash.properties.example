@@ -1,27 +1,39 @@
-# MPH User
-User=gradinkov
+# Possible values: mph, zpool
+Pool=mph
 
-# Worker Name
+# Possible values: ethash, equihash, lyra2v2, neoscrypt, phi
+# Ignored if Coin is specified
+Algo=equihash
+
+# Possible values: ccminer-klaust, ccminer-phi, ccminer-tpruvot, dstm, ethminer, excavator, vertminer, zecminer
+Miner=excavator
+
+# Rig identifier
 Worker=rudehash
 
-# MPH API Key
+# Possible values: false, true
+Debug=false
+
+####################################################################################################
+# MPH
+####################################################################################################
+
+# MPH user
+User=gradinkov
+
+# MPH API key
 ApiKey=wh29p4unl257lt18eucrzahuj5pswka74lu2gxn6utijyxbvered5ttf4v0lk926
-
-# Pool Fee is 0.9 Pool Fee + 0.2 AE Fee on MPH
-PoolFee=1.1
-
-# Possible values: btg, eth, ftc, mona, vtc, zcl, zec, zen
-Coin=zcl
-
-# Possible values: ethash, equihash, lyra2v2, neoscrypt
-# Only necessary for multi-algo coins (currently none)
-#Algo=equihash
-
-# Possible values: ccminer-klaust, ccminer-tpruvot, dstm, ethminer, excavator, vertminer, zecminer
-Miner=excavator
 
 # Possible values: asia, europe, us-east
 Region=europe
 
-# Possible values: false, true
-Debug=false
+# Possible values: btg, eth, ftc, mona, vtc, zcl, zec, zen
+# Only set this if you don't want to use algo mining
+#Coin=zcl
+
+####################################################################################################
+# zpool
+####################################################################################################
+
+# BTC wallet address
+Wallet=1NDFEvsAT66yX2fMsfVn9kwMvaH7WeWBBH
