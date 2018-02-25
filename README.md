@@ -1,6 +1,6 @@
 # RudeHash
 
-![RudeHash](https://i.imgur.com/pOunR1T.png "RudeHash")
+![RudeHash](https://i.imgur.com/TsmNvVZ.png "RudeHash")
 
 ## About
 
