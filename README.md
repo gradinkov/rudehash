@@ -41,28 +41,14 @@ Pools:
 
 ## Installation
 
-Download and install the latest release of:
+1. Download and install the latest release of:
 
 * [NVIDIA Driver](https://www.geforce.com/drivers)
 * [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
-* [Git for Windows](https://github.com/git-for-windows/git/releases/latest) (64 bit EXE recommended)
 * [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
 
-Then Start **Git Bash** from the Start Menu and download RudeHash to your home directory:
+2. Download and extract the [latest release of RudeHash](https://github.com/gradinkov/rudehash/releases/latest). 
 
-~~~
-git clone https://github.com/gradinkov/rudehash.git ${USERPROFILE}/rudehash
-~~~
+3. Copy `rudehash.properties.example` to `rudehash.properties` and update the values as needed.
 
-Copy `rudehash.properties.example` as `rudehash.properties` and update the values as needed.
-
-Finally, create a new shortcut: `pwsh.exe -Command %USERPROFILE%\rudehash\rudehash.ps1`
-
-## Upgrading
-
-Start **Git Bash** from the Start Menu, then:
-
-~~~
-cd ${USERPROFILE}/rudehash
-git pull
-~~~
+4. Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`
