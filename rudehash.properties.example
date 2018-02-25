@@ -8,7 +8,7 @@ Algo=equihash
 # Possible values: ccminer-klaust, ccminer-phi, ccminer-tpruvot, dstm, ethminer, excavator, vertminer, zecminer
 Miner=excavator
 
-# Rig identifier
+# Rig nickname
 Worker=rudehash
 
 # Possible values: false, true
