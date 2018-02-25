@@ -4,14 +4,24 @@
 
 ## About
 
-RudeHash is a simple wrapper script to mine coins directly on NVIDIA GPUs. Features:
+RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in PowerShell. Features:
 
-* Easy switching between supported coins and miners
+* Easy switching between supported pools, coins, algos and miners
 * Automatic download of miners
-* Income estimation using WhatToMine numbers
 * Auto-restart upon miner crash
+* Coin mining earnings estimation, using WhatToMine numbers
 
 ## Support
+
+Algos:
+
+| Algo | Miner |
+|---|---|
+| Ethash | ethminer, Excavator |
+| EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
+| Lyra2v2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
+| NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
+| PHI1612 | ccminer-phi |
 
 Coins:
 
@@ -26,18 +36,12 @@ Coins:
 | ZEC | EquiHash |
 | ZEN | EquiHash |
 
-Algos:
-
-| Algo | Miner |
-|---|---|
-| Ethash | ethminer, Excavator |
-| EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
-| Lyra2v2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
-| NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
-
 Pools:
 
-* Mining Pool Hub
+| Pool | Mining modes |
+|---|---|
+| Mining Pool Hub | algo, coin |
+| zpool | algo |
 
 ## Installation
 

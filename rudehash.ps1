@@ -64,21 +64,54 @@ $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 $FirstRun = $true
 
+$Pools =
+@{
+	"mph" =
+	@{
+		PoolFee = 1.1
+		Authless = $false
+		CoinMining = $true
+		Regions = $true
+		Algos =
+		@{
+			"ethash" = @{ Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 17020 }
+			"equihash" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 17023 }
+			"lyra2v2" = @{ Server = "hub.miningpoolhub.com"; Port = 17018 }
+			"neoscrypt" = @{ Server = "hub.miningpoolhub.com"; Port = 17012 }
+		}
+	}
+	"zpool" =
+	@{
+		PoolFee = 2
+		Authless = $true
+		CoinMining = $false
+		Regions = $false
+		Algos =
+		@{
+			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142 }
+			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533 }
+			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233 }
+			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333 }
+		}
+	}
+}
+
 $Coins =
 @{
-	"btg" = [pscustomobject]@{ PoolPage = "bitcoin-gold"; WtmPage = "214-btg-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595; Algos = @("equihash") }
-	"eth" = [pscustomobject]@{ PoolPage = "ethereum"; WtmPage = "151-eth-ethash"; Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535; Algos = @("ethash") }
-	"ftc" = [pscustomobject]@{ PoolPage = "feathercoin"; WtmPage = "8-ftc-neoscrypt"; Server = "hub.miningpoolhub.com"; Port = 20510; Algos = @("neoscrypt") }
-	"mona" = [pscustomobject]@{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algos = @("lyra2v2") }
-	"vtc" = [pscustomobject]@{ PoolPage = "vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20507; Algos = @("lyra2v2") }
-	"zcl" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algos = @("equihash") }
-	"zec" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algos = @("equihash") }
-	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algos = @("equihash") }
+	"btg" = [pscustomobject]@{ PoolPage = "bitcoin-gold"; WtmPage = "214-btg-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595; Algo = "equihash" }
+	"eth" = [pscustomobject]@{ PoolPage = "ethereum"; WtmPage = "151-eth-ethash"; Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535; Algo = "ethash" }
+	"ftc" = [pscustomobject]@{ PoolPage = "feathercoin"; WtmPage = "8-ftc-neoscrypt"; Server = "hub.miningpoolhub.com"; Port = 20510; Algo = "neoscrypt" }
+	"mona" = [pscustomobject]@{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algo = "lyra2v2" }
+	"vtc" = [pscustomobject]@{ PoolPage = "vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20507; Algo = "lyra2v2" }
+	"zcl" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algo = "equihash" }
+	"zec" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algo = "equihash" }
+	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algo = "equihash" }
 }
 
 $Miners =
 @{
 	"ccminer-klaust" = [pscustomobject]@{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt") }
+	"ccminer-phi" = [pscustomobject]@{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi") }
 	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt") }
 	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
 	"ethminer" = [pscustomobject]@{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev1/ethminer-0.14.0.dev1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash") }
@@ -116,28 +149,172 @@ $WtmModifiers =
 	"neoscrypt" = 1000
 }
 
-function Test-Property-Coin ()
+function Get-Coin-Support ()
 {
-	if (-Not ($Config.Coin))
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Coin", "string") | Out-Null
+	$Table.Columns.Add("Algo", "string") | Out-Null
+
+	$Support = "Supported coins and their algos:"
+	foreach ($Key in $Coins.Keys)
 	{
-		Write-Pretty-Error ("Coin must be set!")
+		$Row = $Table.NewRow()
+		$Row.Coin = $Key.ToUpper()
+		$Algos = ""
+		$Algos += $Coins[$Key].Algo
+		$Row.Algo = $Algos
+		$Table.Rows.Add($Row)
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	return $Support
+}
+
+function Get-Miner-Support ()
+{
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Miner", "string") | Out-Null
+	$Table.Columns.Add("Algo", "string") | Out-Null
+
+	$Support += "Supported miners and algos:"
+	foreach ($Key in $Miners.Keys)
+	{
+		$Row = $Table.NewRow()
+		$Row.Miner = $Key
+		$Algos = ""
+		$Algos += foreach ($Algo in $Miners[$Key].Algos) { $Algo }
+		$Row.Algo = $Algos
+		$Table.Rows.Add($Row)
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	return $Support
+}
+
+function Get-Pool-Support ()
+{
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Pool", "string") | Out-Null
+	$Table.Columns.Add("Algo", "string") | Out-Null
+
+	$Support += "Supported pools and algos:"
+	foreach ($Key in $Pools.Keys)
+	{
+		$Row = $Table.NewRow()
+		$Row.Pool = $Key
+		$Algos = ""
+		$Algos += foreach ($Algo in $Pools[$Key].Algos.Keys) { $Algo }
+		$Row.Algo = $Algos
+		$Table.Rows.Add($Row)
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	return $Support
+}
+
+function Test-Property-Pool ()
+{
+	if (-Not ($Config.Pool))
+	{
+		Write-Pretty-Error ("Pool must be set!")
 		Exit-RudeHash
 	}
 
-	$Config.Coin = $Config.Coin.ToLower()
-
-	if (-Not ($Coins.ContainsKey($Config.Coin)))
+	if (-Not ($Pools.ContainsKey($Config.Pool)))
 	{
-		Write-Pretty-Error ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
+		Write-Pretty-Error ("The """ + $Config.Pool + """ pool is not supported!")
 		$Sep = "`u{00b7} "
 
-		Write-Pretty-Info "Supported coins:"
-		foreach ($Coin in $Coins.Keys)
+		Write-Pretty-Info "Supported pools:"
+		foreach ($Pool in $Pools.Keys)
 		{
-			Write-Pretty-Info ($Sep + $Coin.ToUpper())
+			Write-Pretty-Info ($Sep + $Pool)
 		}
 
 		Exit-RudeHash
+	}
+}
+
+function Test-BtcWallet ($Address)
+{
+	if ($Address.StartsWith("1") -Or $Address.StartsWith("3") -Or $Address.StartsWith("bc1"))
+	{
+		return $true
+	}
+	else
+	{
+		return $false
+	}
+}
+
+function Test-Property-Credentials ()
+{
+	if (-Not ($Config.Worker))
+	{
+		Write-Pretty-Error ("Worker must be set!")
+		Exit-RudeHash
+	}
+
+	if ($Pools[$Config.Pool].Authless)
+	{
+		if (-Not ($Config.Wallet))
+		{
+			Write-Pretty-Error ("$Config.Pool is anonymous, wallet address must be set!")
+			Exit-RudeHash
+		}
+		else
+		{
+			if (-Not (Test-BtcWallet $Config.Wallet))
+			{
+				Write-Pretty-Error ("Bitcoin wallet address is in incorrect format, please check it!")
+				Exit-RudeHash
+			}
+		}
+	}
+	else
+	{
+		if (-Not ($Config.User))
+		{
+			Write-Pretty-Error ("$Config.Pool implements authentication, username must be set!")
+			Exit-RudeHash
+		}
+
+		if (-Not ($Config.ApiKey))
+		{
+			Write-Pretty-Error ("$Config.Pool implements authentication, API key must be set!")
+			Exit-RudeHash
+		}
+	}
+}
+
+function Test-Property-Coin ()
+{
+	if ($Config.Coin)
+	{
+		$Config.Coin = $Config.Coin.ToLower()
+
+		if (-Not ($Coins.ContainsKey($Config.Coin)))
+		{
+			Write-Pretty-Error ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
+			$Sep = "`u{00b7} "
+
+			Write-Pretty-Info "Supported coins:"
+			foreach ($Coin in $Coins.Keys)
+			{
+				Write-Pretty-Info ($Sep + $Coin.ToUpper())
+			}
+
+			Exit-RudeHash
+		}
 	}
 }
 
@@ -166,91 +343,144 @@ function Test-Property-Miner ()
 
 function Test-Property-Algo ()
 {
-	# make the array of dynamic size
-	[System.Collections.ArrayList]$Algos = @()
-	#$Coll = {$Algos}.Invoke()
-
-	foreach ($Miner in $Miners.Keys)
+	if ($Config.Algo)
 	{
-		foreach ($Algo in $Miners[$Miner].Algos)
+		# make the array of dynamic size
+		[System.Collections.ArrayList]$Algos = @()
+		#$Coll = {$Algos}.Invoke()
+
+		# build a list of available algos
+		foreach ($Miner in $Miners.Keys)
 		{
-			if (-Not ($Algos.Contains($Algo)))
+			foreach ($Algo in $Miners[$Miner].Algos)
 			{
-				$Algos.Add($Algo) | Out-Null
+				if (-Not ($Algos.Contains($Algo)))
+				{
+					$Algos.Add($Algo) | Out-Null
+				}
 			}
 		}
-	}
 
-	# use default algo if unspecified
-	if (-Not ($Config.Algo))
-	{
-		$Config.Algo = $Coins[$Config.Coin].Algos[0]
-		$RigStats.Algo = $Config.Algo
-	}
-	elseif (-Not ($Algos.Contains($Config.Algo)))
-	{
-		Write-Pretty-Error ("The """ + $Config.Algo + """ algo is not supported!")
-		$Sep = "`u{00b7} "
-
-		Write-Pretty-Info "Supported algos:"
-		foreach ($Algo in $Algos)
+		if (-Not ($Algos.Contains($Config.Algo)))
 		{
-			Write-Pretty-Info ($Sep + $Algo)
-		}
+			Write-Pretty-Error ("The """ + $Config.Algo + """ algo is not supported!")
+			$Sep = "`u{00b7} "
 
-		Exit-RudeHash
+			Write-Pretty-Info "Supported algos:"
+			foreach ($Algo in $Algos)
+			{
+				Write-Pretty-Info ($Sep + $Algo)
+			}
+
+			Exit-RudeHash
+		}
 	}
 }
 
 function Test-Property-Region ()
 {
-	if (-Not ($Regions.Contains($Config.Region)))
+	if ($Pools[$Config.Pool].Regions)
 	{
-		Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported!")
-		$Sep = "`u{00b7} "
-
-		Write-Pretty-Info "Supported regions:"
-		foreach ($Region in $Regions)
+		if (-Not ($Config.Region))
 		{
-			Write-Pretty-Info ($Sep + $Region)
+			Write-Pretty-Error ("Region must be set!")
+			Exit-RudeHash
 		}
 
+		if (-Not ($Regions.Contains($Config.Region)))
+		{
+			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported!")
+			$Sep = "`u{00b7} "
+
+			Write-Pretty-Info "Supported regions:"
+			foreach ($Region in $Regions)
+			{
+				Write-Pretty-Info ($Sep + $Region)
+			}
+
+			Exit-RudeHash
+		}
+	}
+}
+
+function Test-Compatibility ()
+{
+	$Config.CoinMode = $false
+
+	if ($Config.Coin)
+	{
+		if (-Not ($Pools[$Config.Pool].CoinMining))
+		{
+			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """, please unset the 'Coin' property!")
+			Exit-RudeHash
+		}
+		else
+		{
+			# use coin algo if coin is specified
+			$Config.Algo = $Coins[$Config.Coin].Algo
+			$Config.CoinMode = $true
+		}
+	}
+
+	$MinerMatch = $false
+
+	foreach	($MinerAlgo in $Miners[$Config.Miner].Algos)
+	{
+		if ($Config.Algo -eq $MinerAlgo)
+		{
+			$MinerMatch = $true
+		}
+	}
+
+	if (-Not ($MinerMatch))
+	{
+		if ($Config.Coin)
+		{
+			Write-Pretty-Error ("Incompatible configuration! """ + $Config.Coin.ToUpper() + """ cannot be mined with """ + $Config.Miner + """.")
+			Write-Pretty-Info (Get-Coin-Support)
+		}
+		else
+		{
+			Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined with """ + $Config.Miner + """.")
+		}
+
+		Write-Pretty-Info (Get-Miner-Support)
 		Exit-RudeHash
+	}
+
+	if (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
+	{
+		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
+		Write-Pretty-Info (Get-Pool-Support)
+		Exit-RudeHash
+	}
+
+	# configuration is good, let's set up globals
+	if ($Config.CoinMode)
+	{
+		$Config.Server = $Coins[$Config.Coin].Server
+		$Config.Port = $Coins[$Config.Coin].Port
+	}
+	else
+	{
+		$Config.Server = $Pools[$Config.Pool].Algos[$Config.Algo].Server
+		$Config.Port = $Pools[$Config.Pool].Algos[$Config.Algo].Port
 	}
 }
 
 function Test-Properties ()
 {
-	if (-Not ($Config.User))
-	{
-		Write-Pretty-Error "Username must be set!"
-		Exit-RudeHash
-	}
-
-	if (-Not ($Config.Worker))
-	{
-		Write-Pretty-Error "Worker must be set!"
-		Exit-RudeHash
-	}
-
-	if (-Not ($Config.ApiKey))
-	{
-		Write-Pretty-Error "API key must be set!"
-		Exit-RudeHash
-	}
-
+	Test-Property-Pool
+	Test-Property-Credentials
+	Test-Property-Region
 	Test-Property-Coin
 	Test-Property-Miner
 	Test-Property-Algo
-	Test-Property-Region
+	Test-Compatibility
 }
 
 $RigStats =
 [pscustomobject]@{
-	Coin = $Config.Coin;
-	Algo = $Config.Algo;
-	Miner = $Config.Miner;
-	Worker = $Config.Worker;
 	HashRate = 0;
 	Difficulty = 0;
 	Profit = "";
@@ -326,7 +556,7 @@ function Resolve-Pool-Ip ()
 {
 	try
 	{
-		$Ip = ([System.Net.DNS]::GetHostEntry($Coins[$Config.Coin].Server).AddressList[0].IPAddressToString)	
+		$Ip = ([System.Net.DNS]::GetHostEntry($Config.Server).AddressList[0].IPAddressToString)	
 	}
 	catch
 	{
@@ -358,12 +588,12 @@ function Start-Excavator ()
 	return $Proc
 }
 
-function Initialize-Json ($Count)
+function Initialize-Json ($User, $Count)
 {
 $ExcavatorJson = @"
 [
 	{"time":0,"commands":[
-		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Coins[$Config.Coin].Port)","$($Config.User).$($Config.Worker)"]}
+		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Config.Port)","$($User)"]}
 	]},
 	{"time":3,"commands":[
 		$(for ($i = 0; $i -lt $Count; $i++)
@@ -393,13 +623,13 @@ $ExcavatorJson = @"
 	return $ExcavatorJson
 }
 
-function Initialize-Excavator ()
+function Initialize-Excavator ($User)
 {
 	$Proc = Start-Excavator
 	$DevCount = Get-Device-Count
 	Stop-Process $Proc
 
-	$Json = Initialize-Json $DevCount
+	$Json = Initialize-Json $User $DevCount
 	$JsonFile = [io.path]::combine($TempDir, "excavator.json")
 
 	try
@@ -420,21 +650,34 @@ function Initialize-Excavator ()
 	
 }
 
-function Initialize-Miner-Args ($Name)
+function Initialize-Miner-Args ()
 {
-	switch ($Name)
+	if ($Pools[$Config.Pool].Authless)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-tpruvot"} { $Args = "--algo=" + $Coins[$Config.Coin].Algos + " --url=stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --user=" + $Config.User + "." + $Config.Worker + " --pass x" }
-		"dstm" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --telemetry --noreconnect" }
-		"ethminer" { $Args = "--cuda --stratum " + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " --userpass " + $Config.User + "." + $Config.Worker + ":x" }
+		$PoolUser = $Config.Wallet
+		$PoolPass = $Config.Worker
+	}
+	else
+	{
+		$PoolUser = $Config.User + "." + $Config.Worker
+		$PoolPass = "x"
+	}
+
+	switch ($Config.Miner)
+	{
+		{$_ -in "ccminer-klaust", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $Config.Server + ":" + $Config.Port + " --user=" + $PoolUser + " --pass " + $PoolPass }
+		"ccminer-phi" { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $Config.Server + ":" + $Config.Port + " --user=" + $PoolUser + " --pass " + $PoolPass }
+		"dstm" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --telemetry --noreconnect" }
+		"ethminer" { $Args = "--cuda --stratum " + $Config.Server + ":" + $Config.Port + " --userpass " + $PoolUser + ":" + $PoolPass }
 		"excavator"
 		{
-			Initialize-Excavator
+			Initialize-Excavator $PoolUser
 			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json")
 		}
-		"vertminer" { $Args = "-o stratum+tcp://" + $Coins[$Config.Coin].Server + ":" + $Coins[$Config.Coin].Port + " -u " + $Config.User + "." + $Config.Worker + " -p x" }
-		"zecminer" { $Args = "--server " + $Coins[$Config.Coin].Server + " --user " + $Config.User + "." + $Config.Worker + " --pass x --port " + $Coins[$Config.Coin].Port + " --api" }
+		"vertminer" { $Args = "-o stratum+tcp://" + $Config.Server + ":" + $Config.Port + " -u " + $PoolUser + " -p " + $PoolPass }
+		"zecminer" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --api" }
 	}
+
 	return $Args
 }
 
@@ -514,7 +757,7 @@ function Measure-Profit ($HashRate, $Difficulty)
 {
 	$HashRate /= $WtmModifiers[$Config.Algo]
 	#$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&d=$Difficulty&p=" + $Config.Power + "&cost=" + $Config.ElectricityCost + "&fee=" + $Config.PoolFee + "&commit=Calculate"
-	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=$HashRate&d=$Difficulty&p=0&cost=0&fee=" + $Config.PoolFee + "&commit=Calculate"
+	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=$HashRate&d=$Difficulty&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
 
 	try
 	{
@@ -627,8 +870,9 @@ function Test-Tools ()
 	}
 }
 
-function Test-Miner ($Name)
+function Test-Miner ()
 {
+	$Name = $Config.Miner
 	$MinerDir = [io.path]::combine($MinersDir, $Name)
 	$MinerExe = [io.path]::combine($MinerDir, $Miners[$Name].ExeFile)
 
@@ -676,88 +920,43 @@ function Test-Miner ($Name)
 
 function Write-Stats ()
 {
-	$RigStats.HashRate = Get-HashRate
-	$RigStats.Difficulty = Get-Difficulty
-	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
 	# $Sep = " `u{25a0 | 25bc} "
 	$Sep = "  `u{2219}  "
 
-	#Clear-Host
-	Write-Pretty-Info ("Worker: " + $RigStats.Worker + $Sep + "Coin: " + $RigStats.Coin.ToUpper() + $Sep + "Algo: " + $RigStats.Algo + $Sep + "Miner: " + $RigStats.Miner)
-
-	if (-Not ($FirstRun) )
+	if ($Config.CoinMode)
 	{
+		$CoinStr = ("Coin: " + $Config.Coin.ToUpper() + $Sep)
+	}
+	else
+	{
+		$CoinStr = ""
+	}
+
+	if ($Pools[$Config.Pool].Authless)
+	{
+		Write-Pretty-Info ("Wallet: " + $Config.Wallet)
+		$WorkerStr = "Worker: " + $Config.Worker + $Sep
+	}
+	else
+	{
+		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
+	}
+
+	#Clear-Host
+	Write-Pretty-Info ("Pool: " + $Config.Pool + $Sep + $WorkerStr + $CoinStr + "Algo: " + $Config.Algo + $Sep + "Miner: " + $Config.Miner)
+
+	if (-Not ($FirstRun) -And $Config.CoinMode)
+	{
+		$RigStats.HashRate = Get-HashRate
+		$RigStats.Difficulty = Get-Difficulty
+		$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
+
 		Write-Pretty-Info ("Reported Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Network Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
 		Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
 	}
 }
 
-function Get-Support ()
-{
-	$Table = New-Object System.Data.DataTable
-	$Table.Columns.Add("Coin", "string") | Out-Null
-	$Table.Columns.Add("Algo", "string") | Out-Null
-
-	$Support = "Supported coins:"
-	foreach ($Key in $Coins.Keys)
-	{
-		$Row = $Table.NewRow()
-		$Row.Coin = $Key
-		$Algos = ""
-		$Algos += foreach ($Algo in $Coins[$Key].Algos) { $Algo }
-		$Row.Algo = $Algos
-		$Table.Rows.Add($Row)
-	}
-
-	# use Format-Table to force flushing to screen immediately
-	$Support += Out-String -InputObject ($Table | Format-Table)
-	$Table.Dispose()
-
-	$Table = New-Object System.Data.DataTable
-	$Table.Columns.Add("Miner", "string") | Out-Null
-	$Table.Columns.Add("Algo", "string") | Out-Null
-
-	$Support += "Supported miners:"
-	foreach ($Key in $Miners.Keys)
-	{
-		$Row = $Table.NewRow()
-		$Row.Miner = $Key
-		$Algos = ""
-		$Algos += foreach ($Algo in $Miners[$Key].Algos) { $Algo }
-		$Row.Algo = $Algos
-		$Table.Rows.Add($Row)
-	}
-
-	# use Format-Table to force flushing to screen immediately
-	$Support += Out-String -InputObject ($Table | Format-Table)
-	$Table.Dispose()
-	return $Support
-}
-
-function Test-Support ()
-{
-	$Match = $false
-
-	foreach ($CoinAlgo in $Coins[$Config.Coin].Algos)
-	{
-		foreach	($MinerAlgo in $Miners[$Config.Miner].Algos)
-		{
-			if (($CoinAlgo -eq $MinerAlgo) -And ($CoinAlgo -eq $Config.Algo))
-			{
-				$Match = $true
-			}
-		}
-	}
-
-	if (-Not ($Match))
-	{
-		Write-Pretty-Error ("Incompatible configuration! The selected coin cannot be mined with the selected miner and/or algo.")
-		Write-Pretty-Info (Get-Support)
-		Exit-RudeHash
-	}
-}
-
-function Start-Miner ($Name)
+function Start-Miner ()
 {
 	# restart automatically if the miner crashes
 	while (1)
@@ -766,8 +965,8 @@ function Start-Miner ($Name)
 
 		if ($FirstRun -or $Proc.HasExited)
 		{
-			$Exe = [io.path]::combine($MinersDir, $Name, $Miners[$Name].ExeFile)
-			$Args = Initialize-Miner-Args $Name
+			$Exe = [io.path]::combine($MinersDir, $Config.Miner, $Miners[$Config.Miner].ExeFile)
+			$Args = Initialize-Miner-Args
 
 			if ($Config.Debug -eq "true")
 			{
@@ -787,9 +986,8 @@ function Start-Miner ($Name)
 
 #Stop-Process $Proc
 Write-Pretty-Header
-Test-Properties
 Initialize-Temp
+Test-Properties
 Test-Tools
-Test-Support
-Test-Miner $Config.Miner
-Start-Miner $Config.Miner
+Test-Miner
+Start-Miner
