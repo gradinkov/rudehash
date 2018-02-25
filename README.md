@@ -11,6 +11,20 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 * Auto-restart upon miner crash
 * Coin mining earnings estimation, using WhatToMine numbers
 
+## Installation
+
+1. Download and install the latest release of:
+
+* [NVIDIA Driver](https://www.geforce.com/drivers)
+* [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
+* [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
+
+2. Download and extract the [latest release of RudeHash](https://github.com/gradinkov/rudehash/releases/latest). 
+
+3. Copy `rudehash.properties.example` to `rudehash.properties` and update the values as needed.
+
+4. Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`
+
 ## Support
 
 Algos:
@@ -43,16 +57,9 @@ Pools:
 | Mining Pool Hub | algo, coin |
 | zpool | algo |
 
-## Installation
+## Statistics
 
-1. Download and install the latest release of:
+For performance reports I recommend the incredibly awesome [MiningPoolHubStats](https://miningpoolhubstats.com/user).
+RudeHash adjusts the miner arguments so that you can easily identify your individual rigs, and it works well even if you mix pools.
 
-* [NVIDIA Driver](https://www.geforce.com/drivers)
-* [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
-* [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
-
-2. Download and extract the [latest release of RudeHash](https://github.com/gradinkov/rudehash/releases/latest). 
-
-3. Copy `rudehash.properties.example` to `rudehash.properties` and update the values as needed.
-
-4. Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`
+![MPHStats](https://i.imgur.com/NpcUbUd.png "MPHStats")
