@@ -589,12 +589,12 @@ function Start-Excavator ()
 	return $Proc
 }
 
-function Initialize-Json ($User, $Count)
+function Initialize-Json ($User, $Pass, $Count)
 {
 $ExcavatorJson = @"
 [
 	{"time":0,"commands":[
-		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Config.Port)","$($User)"]}
+		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Config.Port)","$($User):$($Pass)"]}
 	]},
 	{"time":3,"commands":[
 		$(for ($i = 0; $i -lt $Count; $i++)
@@ -624,13 +624,13 @@ $ExcavatorJson = @"
 	return $ExcavatorJson
 }
 
-function Initialize-Excavator ($User)
+function Initialize-Excavator ($User, $Pass)
 {
 	$Proc = Start-Excavator
 	$DevCount = Get-Device-Count
 	Stop-Process $Proc
 
-	$Json = Initialize-Json $User $DevCount
+	$Json = Initialize-Json $User $Pass $DevCount
 	$JsonFile = [io.path]::combine($TempDir, "excavator.json")
 
 	try
@@ -672,7 +672,7 @@ function Initialize-Miner-Args ()
 		"ethminer" { $Args = "--cuda --stratum " + $Config.Server + ":" + $Config.Port + " --userpass " + $PoolUser + ":" + $PoolPass }
 		"excavator"
 		{
-			Initialize-Excavator $PoolUser
+			Initialize-Excavator $PoolUser $PoolPass
 			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json")
 		}
 		"vertminer" { $Args = "-o stratum+tcp://" + $Config.Server + ":" + $Config.Port + " -u " + $PoolUser + " -p " + $PoolPass }
