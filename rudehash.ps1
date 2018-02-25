@@ -833,6 +833,7 @@ function Test-Tool ($Name)
 			Remove-Item -Recurse -Path $ToolDir
 		}
 
+		Write-Pretty-Info ("Downloading " + $Name + "...")
 		$ArchiveDir = (Get-Archive ($Tools[$Name].Url) ($Tools[$Name].ArchiveFile))
 
 		if ($Tools[$Name].FilesInRoot)
@@ -889,6 +890,7 @@ function Test-Miner ()
 			Remove-Item -Recurse -Path $MinerDir
 		}
 
+		Write-Pretty-Info ("Downloading " + $Config.Miner + "...")
 		$ArchiveDir = (Get-Archive ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
 
 		if ($Miners[$Name].FilesInRoot)
