@@ -25,7 +25,7 @@ function Write-Pretty-Header ()
 	$String += "`u{2219}" * $WindowWidth
 
 	Write-Pretty DarkCyan $String
-	Write-Pretty DarkCyan "RudeHash NVIDIA Coin Miner `u{00a9} gradinkov"
+	Write-Pretty DarkCyan "RudeHash NVIDIA Miner `u{00a9} gradinkov"
 	Write-Pretty DarkCyan $String
 }
 
@@ -921,10 +921,10 @@ function Test-Miner ()
 	}
 }
 
-function Write-Stats ()
+function Set-WindowTitle ()
 {
 	# $Sep = " `u{25a0 | 25bc} "
-	$Sep = "  `u{2219}  "
+	$Sep = " `u{2219} "
 
 	if ($Config.CoinMode)
 	{
@@ -937,26 +937,26 @@ function Write-Stats ()
 
 	if ($Pools[$Config.Pool].Authless)
 	{
-		Write-Pretty-Info ("Wallet: " + $Config.Wallet)
+		$WalletStr = "Wallet: " + $Config.Wallet + $Sep
 		$WorkerStr = "Worker: " + $Config.Worker + $Sep
 	}
 	else
 	{
+		$WalletStr = ""
 		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
 	}
 
-	#Clear-Host
-	Write-Pretty-Info ("Pool: " + $Config.Pool + $Sep + $WorkerStr + $CoinStr + "Algo: " + $Config.Algo + $Sep + "Miner: " + $Config.Miner)
+	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Config.Pool + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $Config.Algo + $Sep + "Miner: " + $Config.Miner
+}
 
-	if (-Not ($FirstRun) -And $Config.CoinMode)
-	{
-		$RigStats.HashRate = Get-HashRate
-		$RigStats.Difficulty = Get-Difficulty
-		$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
+function Write-Stats ()
+{
+	$RigStats.HashRate = Get-HashRate
+	$RigStats.Difficulty = Get-Difficulty
+	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
 
-		Write-Pretty-Info ("Reported Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Network Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
-		Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
-	}
+	Write-Pretty-Info ("Reported Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Network Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
+	Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
 }
 
 function Start-Miner ()
@@ -964,7 +964,10 @@ function Start-Miner ()
 	# restart automatically if the miner crashes
 	while (1)
 	{
-		Write-Stats
+		if (-Not ($FirstRun) -And $Config.CoinMode)
+		{
+			Write-Stats
+		}
 
 		if ($FirstRun -or $Proc.HasExited)
 		{
@@ -974,6 +977,11 @@ function Start-Miner ()
 			if ($Config.Debug -eq "true")
 			{
 				Write-Pretty-Debug ("$Exe $Args")
+			}
+
+			if ($Proc.HasExited)
+			{
+				Write-Pretty-Error ("Miner has crashed, restarting...")
 			}
 
 			$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
@@ -991,6 +999,7 @@ function Start-Miner ()
 Write-Pretty-Header
 Initialize-Temp
 Test-Properties
+Set-WindowTitle
 Test-Tools
 Test-Miner
 Start-Miner
