@@ -269,7 +269,7 @@ function Test-Property-Credentials ()
 	{
 		if (-Not ($Config.Wallet))
 		{
-			Write-Pretty-Error ("$Config.Pool is anonymous, wallet address must be set!")
+			Write-Pretty-Error ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
 			Exit-RudeHash
 		}
 		else
@@ -285,13 +285,13 @@ function Test-Property-Credentials ()
 	{
 		if (-Not ($Config.User))
 		{
-			Write-Pretty-Error ("$Config.Pool implements authentication, username must be set!")
+			Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, username must be set!")
 			Exit-RudeHash
 		}
 
 		if (-Not ($Config.ApiKey))
 		{
-			Write-Pretty-Error ("$Config.Pool implements authentication, API key must be set!")
+			Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, API key must be set!")
 			Exit-RudeHash
 		}
 	}
