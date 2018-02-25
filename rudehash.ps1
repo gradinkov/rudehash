@@ -5,6 +5,7 @@ function Exit-RudeHash ()
 	Read-Host -Prompt "Press Enter to exit..."
 	Exit
 }
+
 function Write-Pretty ($BgColor, $String)
 {
 	$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width
