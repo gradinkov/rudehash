@@ -63,3 +63,25 @@ For performance reports I recommend the incredibly awesome [MiningPoolHubStats](
 RudeHash adjusts the miner arguments so that you can easily identify your individual rigs, and it works well even if you mix pools.
 
 ![MPHStats](https://i.imgur.com/NpcUbUd.png "MPHStats")
+
+## FAQ
+
+* What's the point of this tool? I could mine with just a one line batch file!
+
+That's correct. But when you make your choice, you gotta find the stratum URL, the port number, the algo, the corresponding miner, the miner's specific command line arguments... and once you pick a different mining target, you can start it all over again. On all your rigs. This constant messing around quickly becomes a tedious burden.
+
+With RudeHash, you can forget about all of this. Just edit your config: select pool, algo and miner from a pre-defined, well-tested list, enter your credentials, and start mining!
+
+* Why algo/coin mining? I could increase my profits with a sophisticated algo-switching miner!
+
+Algo-switching is based on the idea of relatively short spikes in exchange rates of a particular coin. It kinda worked for a while on NiceHash, where the pool operates on a PPS scheme, _and_ you are credited in BTC within minutes. On other pools you're usually working in a PPLNS or similar scheme, and your earnings are on exchanges for _several hours_. Which totally defeats the whole purpose, i.e. quickly mining and exchanging a coin while it's hot.
+
+In fact, not even NiceHash' algo-switching works currently, because buyers are constantly manipulating the market with cancelled orders, and so most people end up disabling all but 1 or 2 algos.
+
+* Dev fee. What dev fee?
+
+I see no point in adding dev fee to an open source, plain text script. Anyone could remove it with 1 minute of work anyway. Instead, I'd greatly appreciate physical crypto coin gifts, [some](https://cdn.shopify.com/s/files/1/2143/9931/products/gold_2048x2048.jpg?v=1502697786) [of](http://physical-coin.com/wp-content/uploads/2018/01/s-l16005.jpg) [them](http://i.imgur.com/ctche9p.jpg) look pretty darn awesome.
+
+* AMD support?
+
+Actually, I'm not certain that RudeHash does _not_ work with AMD hardware. I just don't test it _at all_, because I have zero AMD hardware at hand, and by the look of things it will stay that way.
