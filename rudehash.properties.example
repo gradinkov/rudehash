@@ -11,6 +11,9 @@ Miner=excavator
 # Rig nickname
 Worker=rudehash
 
+# Price of electricity, $/kWh
+ElectricityCost=0.1
+
 # Possible values: false, true
 Debug=false
 
@@ -18,11 +21,8 @@ Debug=false
 # MPH
 ####################################################################################################
 
-# MPH user
+# MPH user name
 User=gradinkov
-
-# MPH API key
-ApiKey=wh29p4unl257lt18eucrzahuj5pswka74lu2gxn6utijyxbvered5ttf4v0lk926
 
 # Possible values: asia, europe, us-east
 Region=europe

@@ -64,6 +64,7 @@ $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 $FirstRun = $true
+$MinerPort = 28178
 
 $Pools =
 @{
@@ -99,26 +100,26 @@ $Pools =
 
 $Coins =
 @{
-	"btg" = [pscustomobject]@{ PoolPage = "bitcoin-gold"; WtmPage = "214-btg-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595; Algo = "equihash" }
-	"eth" = [pscustomobject]@{ PoolPage = "ethereum"; WtmPage = "151-eth-ethash"; Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535; Algo = "ethash" }
-	"ftc" = [pscustomobject]@{ PoolPage = "feathercoin"; WtmPage = "8-ftc-neoscrypt"; Server = "hub.miningpoolhub.com"; Port = 20510; Algo = "neoscrypt" }
-	"mona" = [pscustomobject]@{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algo = "lyra2v2" }
-	"vtc" = [pscustomobject]@{ PoolPage = "vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20507; Algo = "lyra2v2" }
-	"zcl" = [pscustomobject]@{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algo = "equihash" }
-	"zec" = [pscustomobject]@{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algo = "equihash" }
-	"zen" = [pscustomobject]@{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algo = "equihash" }
+	"btg" = @{ PoolPage = "bitcoin-gold"; WtmPage = "214-btg-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595; Algo = "equihash" }
+	"eth" = @{ PoolPage = "ethereum"; WtmPage = "151-eth-ethash"; Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535; Algo = "ethash" }
+	"ftc" = @{ PoolPage = "feathercoin"; WtmPage = "8-ftc-neoscrypt"; Server = "hub.miningpoolhub.com"; Port = 20510; Algo = "neoscrypt" }
+	"mona" = @{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algo = "lyra2v2" }
+	"vtc" = @{ PoolPage = "vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20507; Algo = "lyra2v2" }
+	"zcl" = @{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algo = "equihash" }
+	"zec" = @{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algo = "equihash" }
+	"zen" = @{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algo = "equihash" }
 }
 
 $Miners =
 @{
-	"ccminer-klaust" = [pscustomobject]@{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt") }
-	"ccminer-phi" = [pscustomobject]@{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi") }
-	"ccminer-tpruvot" = [pscustomobject]@{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt") }
-	"dstm" = [pscustomobject]@{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash") }
-	"ethminer" = [pscustomobject]@{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev1/ethminer-0.14.0.dev1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash") }
-	"excavator" = [pscustomobject]@{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt") }
-	"vertminer" = [pscustomobject]@{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2") }
-	"zecminer" = [pscustomobject]@{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash") }
+	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt"); Api = $true }
+	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt"); Api = $true }
+	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true }
+	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev1/ethminer-0.14.0.dev1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true }
+	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true }
+	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true }
+	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true }
 }
 
 $ExcavatorAlgos = 
@@ -298,11 +299,11 @@ function Test-Property-Credentials ()
 			Exit-RudeHash
 		}
 
-		if (-Not ($Config.ApiKey))
-		{
-			Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, API key must be set!")
-			Exit-RudeHash
-		}
+		# if (-Not ($Config.ApiKey))
+		# {
+		# 	Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, API key must be set!")
+		# 	Exit-RudeHash
+		# }
 	}
 }
 
@@ -478,6 +479,28 @@ function Test-Compatibility ()
 	}
 }
 
+function Test-Property-Cost ()
+{
+	if ($Miners[$Config.Miner].Api -And $Config.CoinMode)
+	{
+		if (-Not ($Config.ElectricityCost))
+		{
+			Write-Pretty-Error ("Electricity cost must be set!")
+			Exit-RudeHash
+		}
+
+		try
+		{
+			$Config.ElectricityCost = [System.Convert]::ToDouble($Config.ElectricityCost)
+		}
+		catch
+		{
+			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
+			Exit-RudeHash
+		}
+	}
+}
+
 function Test-Properties ()
 {
 	Test-Property-Pool
@@ -487,12 +510,15 @@ function Test-Properties ()
 	Test-Property-Miner
 	Test-Property-Algo
 	Test-Compatibility
+	Test-Property-Cost
 }
 
 $RigStats =
 [pscustomobject]@{
+	GpuCount = 0;
 	HashRate = 0;
 	Difficulty = 0;
+	PowerUsage = 0;
 	Profit = "";
 }
 
@@ -520,13 +546,13 @@ function Initialize-Temp ()
 	}
 }
 
-function Read-Miner-Api ($Port, $Request, $Critical)
+function Read-Miner-Api ($Request, $Critical)
 {
 	$Timeout = 10
 
 	try
 	{
-		$Client = New-Object System.Net.Sockets.TcpClient "127.0.0.1", $Port
+		$Client = New-Object System.Net.Sockets.TcpClient "127.0.0.1", $MinerPort
 		$Stream = $Client.GetStream()
 		$Writer = New-Object System.IO.StreamWriter $Stream
 		$Reader = New-Object System.IO.StreamReader $Stream
@@ -583,24 +609,124 @@ function Resolve-Pool-Ip ()
 	return $Ip
 }
 
-function Get-Device-Count ()
+function Get-GpuCount ()
 {
-	$Response = Read-Miner-Api 3456 '{"id":1,"method":"device.list","params":[]}' $true | ConvertFrom-Json
-	return $Response.devices.length
+	$ErrorStr = "Malformed miner API response."
+
+	switch ($Config.Miner)
+	{
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
+		{
+			$Response = Read-Miner-Api 'summary' $false
+
+			try 
+			{
+				$Count = $Response.Split("|")[0].Split(";")[4].Split("=")[1]
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"dstm"
+		{
+			# dstm accepts any string as request, let's use the same as ccminer
+			$ResponseRaw = Read-Miner-Api 'summary' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+				$Count = $Response.result.length
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		# api: https://github.com/ethereum-mining/ethminer/issues/295#issuecomment-353755310
+		"ethminer"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstat1"}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+				$Count = $Response.result[3].Split(";").length
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"excavator"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":1,"method":"device.list","params":[]}' $true
+			$Response = $ResponseRaw | ConvertFrom-Json
+			$Count = $Response.devices.length
+		}
+
+		"zecminer"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":"0", "method":"getstat"}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+				$Count = $Response.result.length
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+	}
+
+	$RigStats.GpuCount = $Count
 }
 
 function Start-Excavator ()
 {
 	$Excavator = [io.path]::combine($MinersDir, "excavator", "excavator.exe")
-	$Proc = Start-Process -FilePath $Excavator -PassThru -NoNewWindow -RedirectStandardOutput nul
-	Write-Pretty-Info "Waiting for Excavator to start..."
+	$Args = "-p $MinerPort"
+
+	if ($Config.Debug -eq "true")
+	{
+		Write-Pretty-Debug ("$Excavator $Args")
+	}
+
+	$Proc = Start-Process -FilePath $Excavator -ArgumentList $Args -PassThru -NoNewWindow -RedirectStandardOutput nul
+	Write-Pretty-Info "Determining the number of GPUs..."
 	Start-Sleep -Seconds 5
 	return $Proc
 }
 
-function Initialize-Json ($User, $Pass, $Count)
+function Initialize-Json ($User, $Pass)
 {
-$ExcavatorJson = @"
+	$Count = $RigStats.GpuCount
+	$ExcavatorJson = @"
 [
 	{"time":0,"commands":[
 		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Config.Port)","$($User):$($Pass)"]}
@@ -619,27 +745,30 @@ $ExcavatorJson = @"
 	{"time":10,"loop":20,"commands":[
 		$(for ($i = 0; $i -lt $Count; $i++)
 		{
-			$Line = "{""id"":1,""method"":""worker.print.speed"",""params"":[""$i""]},"
+			$Line = "{""id"":1,""method"":""worker.print.speed"",""params"":[""$i""]}"
 			if (($Count - $i) -gt 1)
 			{
-				$Line += "`r`n"
+				$Line += ",`r`n"
 			}
 			Write-Output $Line
 		})
-		{"id":1,"method":"algorithm.print.speeds","params":[]}
+		
 	]}
 ]
 "@
+	#{"id":1,"method":"algorithm.print.speeds","params":[]}
 	return $ExcavatorJson
 }
 
 function Initialize-Excavator ($User, $Pass)
 {
 	$Proc = Start-Excavator
-	$DevCount = Get-Device-Count
+	Get-GpuCount
 	Stop-Process $Proc
 
-	$Json = Initialize-Json $User $Pass $DevCount
+	Write-Pretty-Info ($RigStats.GpuCount.ToString() + " GPUs detected.")
+
+	$Json = Initialize-Json $User $Pass
 	$JsonFile = [io.path]::combine($TempDir, "excavator.json")
 
 	try
@@ -675,24 +804,23 @@ function Initialize-Miner-Args ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $Config.Server + ":" + $Config.Port + " --user=" + $PoolUser + " --pass " + $PoolPass }
-		"ccminer-phi" { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $Config.Server + ":" + $Config.Port + " --user=" + $PoolUser + " --pass " + $PoolPass }
-		"dstm" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --telemetry --noreconnect" }
-		"ethminer" { $Args = "--cuda --stratum " + $Config.Server + ":" + $Config.Port + " --userpass " + $PoolUser + ":" + $PoolPass }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $Config.Server + ":" + $Config.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"dstm" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
+		"ethminer" { $Args = "--cuda --stratum " + $Config.Server + ":" + $Config.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort }
 		"excavator"
 		{
 			Initialize-Excavator $PoolUser $PoolPass
-			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json")
+			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json") + " -p " + $MinerPort
 		}
-		"vertminer" { $Args = "-o stratum+tcp://" + $Config.Server + ":" + $Config.Port + " -u " + $PoolUser + " -p " + $PoolPass }
-		"zecminer" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --api" }
+		"vertminer" { $Args = "-o stratum+tcp://" + $Config.Server + ":" + $Config.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"zecminer" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
 
 	return $Args
 }
 
 # MPH API: https://github.com/miningpoolhub/php-mpos/wiki/API-Reference
-function Get-HashRate ()
+function Get-HashRate-Mph ()
 {
 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getuserworkers&api_key=" + $Config.ApiKey
 
@@ -719,26 +847,164 @@ function Get-HashRate ()
 		$HashRate = 0
 	}
 
-	return $HashRate
+	$RigStats.HashRate = ([math]::Round($HashRate, 0))
+}
+
+function Get-HashRate-Miner ()
+{
+	$HashRate = 0
+	$ErrorStr = "Malformed miner API response."
+
+	switch ($Config.Miner)
+	{
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
+		{
+			$Response = Read-Miner-Api 'threads' $false
+
+			try 
+			{
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$HashRate += $Response.Split("|")[$i].Split(";")[8].Split("=")[1]
+				}
+
+				# ccminer returns KH/s
+				$HashRate *= 1000
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"dstm"
+		{
+			# dstm accepts any string as request, let's use the same as ccminer
+			$ResponseRaw = Read-Miner-Api 'summary' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$HashRate += $Response.result[$i].sol_ps
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"ethminer"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstat1"}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$HashRate += $Response.result[3].Split(";")[$i]
+				}
+
+				# ethminer returns KH/s
+				$HashRate *= 1000
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"excavator"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":1,"method":"algorithm.list","params":[]}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
+
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$HashRate += $Response.algorithms.workers[$i].speed[0]
+				}
+			}
+			catch
+			{
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"zecminer"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":"0", "method":"getstat"}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$HashRate += $Response.result[$i].speed_sps
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+	}
+
+	$RigStats.HashRate = ([math]::Round($HashRate, 0))
+}
+
+function Get-HashRate ()
+{
+	Get-HashRate-Miner
 }
 
 function Get-HashRate-Pretty ($HashRate)
 {
 	if ($HashRate -ge 1000000)
 	{
-		return (($HashRate / 1000000).ToString() + " MH/s")
+		return (([math]::Round(($HashRate / 1000000), 2)).ToString() + " MH/s")
 	}
 	elseif ($HashRate -ge 1000)
 	{
-		return (($HashRate / 1000).ToString() + " kH/s")
+		return (([math]::Round(($HashRate / 1000), 2)).ToString() + " kH/s")
 	}
 	else
 	{
-		return ($HashRate.ToString() + " H/s")
+		return ([math]::Round($HashRate, 2).ToString() + " H/s")
 	}
 }
 
-function Get-Difficulty ()
+function Get-Difficulty-Mph ()
 {
 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
 
@@ -763,11 +1029,113 @@ function Get-Difficulty ()
 	return $Difficulty
 }
 
-function Measure-Profit ($HashRate, $Difficulty)
+function Get-PowerUsage ()
 {
-	$HashRate /= $WtmModifiers[$Config.Algo]
-	#$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&d=$Difficulty&p=" + $Config.Power + "&cost=" + $Config.ElectricityCost + "&fee=" + $Config.PoolFee + "&commit=Calculate"
-	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=$HashRate&d=$Difficulty&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
+	$PowerUsage = 0
+	$ErrorStr = "Malformed miner API response."
+
+	switch ($Config.Miner)
+	{
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
+		{
+			$Response = Read-Miner-Api 'threads' $false
+
+			try 
+			{
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$PowerUsage += $Response.Split("|")[$i].Split(";")[4].Split("=")[1]
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"dstm"
+		{
+			# dstm accepts any string as request, let's use the same as ccminer
+			$ResponseRaw = Read-Miner-Api 'summary' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$PowerUsage += $Response.result[$i].power_usage
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"excavator"
+		{
+			for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+			{
+				$ResponseRaw = Read-Miner-Api '{"id":1,"method":"device.get","params":["0"]}' $false
+
+				try
+				{
+					$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
+					$PowerUsage += ([math]::Round($Response.gpu_power_usage, 0))
+				}
+				catch
+				{
+					if ($Config.Debug -eq "true")
+					{
+						Write-Pretty-Debug $_.Exception
+					}
+				}
+			}
+		}
+
+		"zecminer"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":"0", "method":"getstat"}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$PowerUsage += $Response.result[$i].gpu_power_usage
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+	}
+
+	$RigStats.PowerUsage = $PowerUsage
+}
+
+function Measure-Profit ()
+{
+	$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
+	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&p=" + $RigStats.PowerUsage + "&cost=" + $Config.ElectricityCost + "&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
 
 	try
 	{
@@ -786,7 +1154,7 @@ function Measure-Profit ($HashRate, $Difficulty)
 	$WtmObj = $WtmHtml.Content -split "[`r`n]"
 	$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
 
-	return ($WtmObj | Select-Object -Index ($LineNo + 56)).Trim()
+	$RigStats.Profit = ($WtmObj | Select-Object -Index ($LineNo + 56)).Trim()
 }
 
 function Get-Archive ($Url, $FileName)
@@ -960,14 +1328,34 @@ function Set-WindowTitle ()
 
 function Write-Stats ()
 {
-	$Sep = " `u{2219} "
+	if ($Miners[$Config.Miner].Api)
+	{
+		if ($RigStats.GpuCount -eq 0)
+		{
+			Get-GpuCount
+		}
+		else
+		{
+			$Sep = " `u{2219} "
 
-	$RigStats.HashRate = Get-HashRate
-	$RigStats.Difficulty = Get-Difficulty
-	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
+			Get-HashRate
+			Get-PowerUsage
 
-	Write-Pretty-Info ("Reported Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $Sep + "Network Difficulty: "+ ([math]::Round($RigStats.Difficulty, 2)))
-	Write-Pretty-Earnings ("Estimated daily income: " + $RigStats.Profit)	
+			# ccminer often reports 0 watts
+			if ($RigStats.PowerUsage -gt 0)
+			{
+				$PowerUsageStr = $Sep + "Power Usage: " + $RigStats.PowerUsage + " W"
+			}
+
+			Write-Pretty-Info ("Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
+
+			if ($Config.CoinMode)
+			{
+				Measure-Profit
+				Write-Pretty-Earnings ("Estimated daily profit: " + $RigStats.Profit)
+			}
+		}	
+	}
 }
 
 function Start-Miner ()
@@ -975,9 +1363,14 @@ function Start-Miner ()
 	# restart automatically if the miner crashes
 	while (1)
 	{
-		if (-Not ($FirstRun) -And $Config.CoinMode)
+		# get GPU count quickly, but not on excavator, it knows the GPU count already
+		if ($FirstRun -And $Miners[$Config.Miner].Api -And (-Not($Config.Miner -eq "excavator")))
 		{
-			Write-Stats
+			$Delay = 15
+		}
+		else
+		{
+			$Delay = 60
 		}
 
 		if ($FirstRun -or $Proc.HasExited)
@@ -998,11 +1391,11 @@ function Start-Miner ()
 			$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
 		}
 
+		Start-Sleep -Seconds $Delay
+		Write-Stats
 		$FirstRun = $false
-		Start-Sleep -Seconds 60
 
 		#Register-EngineEvent PowerShell.Exiting –Action { Stop-Process $Proc }
-		#$MinerStats = Send-Tcp localhost 42000 '{"id":1, "method":"getstat"}\n' 10
 	}
 }
 
