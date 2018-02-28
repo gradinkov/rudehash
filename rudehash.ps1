@@ -951,6 +951,8 @@ function Set-WindowTitle ()
 
 function Write-Stats ()
 {
+	$Sep = " `u{2219} "
+
 	$RigStats.HashRate = Get-HashRate
 	$RigStats.Difficulty = Get-Difficulty
 	$RigStats.Profit = Measure-Profit $RigStats.HashRate $RigStats.Difficulty
