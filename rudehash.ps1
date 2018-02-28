@@ -150,6 +150,15 @@ $WtmModifiers =
 	"neoscrypt" = 1000
 }
 
+$AlgoNames =
+@{
+	"ethash" = "Ethash"
+	"equihash" = "Equihash"
+	"lyra2v2" = "Lyra2REv2"
+	"neoscrypt" = "NeoScrypt"
+	"phi" = "PHI1612"
+}
+
 function Get-Coin-Support ()
 {
 	$Table = New-Object System.Data.DataTable
@@ -946,7 +955,7 @@ function Set-WindowTitle ()
 		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
 	}
 
-	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Config.Pool + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $Config.Algo + $Sep + "Miner: " + $Config.Miner
+	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Config.Pool + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
 }
 
 function Write-Stats ()
