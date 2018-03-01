@@ -116,7 +116,7 @@ $Miners =
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true }
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.5.8/zm_0.5.8_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true }
-	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev1/ethminer-0.14.0.dev1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true }
+	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true }
 	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true }
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true }
@@ -919,18 +919,12 @@ function Get-HashRate-Miner ()
 
 		"ethminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstat1"}' $false
+			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstathr"}' $false
 
 			try
 			{
 				$Response = $ResponseRaw | ConvertFrom-Json
-				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
-				{
-					$HashRate += $Response.result[3].Split(";")[$i]
-				}
-
-				# ethminer returns KH/s
-				$HashRate *= 1000
+				$HashRate = $Response.result.ethhashrate
 			}
 			catch
 			{
@@ -1080,6 +1074,30 @@ function Get-PowerUsage ()
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
 					$PowerUsage += $Response.result[$i].power_usage
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error $ErrorStr
+
+				if ($Config.Debug -eq "true")
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+			}
+		}
+
+		"ethminer"
+		{
+			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstathr"}' $false
+
+			try
+			{
+				$Response = $ResponseRaw | ConvertFrom-Json
+
+				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
+				{
+					$PowerUsage += [math]::Round($Response.result.powerusages[$i], 0)
 				}
 			}
 			catch
