@@ -162,10 +162,10 @@ $AlgoNames =
 
 $NiceHashAlgos =
 @{
-	"equihash" = @{ Id = 24; Modifier = 1000 }
-	"ethash" = @{ Id = 20; Modifier = 1000000 }
-	"lyra2v2" = @{ Id = 14; Modifier = 1000000000 }
-	"neoscrypt" = @{ Id = 8; Modifier = 1000000 }
+	"equihash" = @{ Id = 24; Modifier = 1000000 }
+	"ethash" = @{ Id = 20; Modifier = 1000000000 }
+	"lyra2v2" = @{ Id = 14; Modifier = 1000000000000 }
+	"neoscrypt" = @{ Id = 8; Modifier = 1000000000 }
 }
 
 function Get-Coin-Support ()
@@ -1169,7 +1169,7 @@ function Measure-Earnings ()
 		try
 		{
 			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 47)).Trim())
-			$RigStats.Earnings = [math]::Round(($BtcEarnings) * 1000, 5)
+			$RigStats.Earnings = [math]::Round($BtcEarnings, 8)
 		}
 		catch
 		{
@@ -1190,7 +1190,7 @@ function Measure-Earnings ()
 			$ResponseRaw = Invoke-WebRequest -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
 			$Response = $ResponseRaw | ConvertFrom-Json
 			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price
-			$RigStats.Earnings = [math]::Round(($HashRate * $Price), 5)
+			$RigStats.Earnings = [math]::Round(($HashRate * $Price), 8)
 		}
 		catch
 		{
@@ -1400,7 +1400,7 @@ function Write-Stats ()
 			if ($Config.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
 			{
 				Measure-Earnings
-				Write-Pretty-Earnings ("Estimated daily earnings: " + $RigStats.Earnings + " mBTC")
+				Write-Pretty-Earnings ("Estimated daily earnings: " + $RigStats.Earnings + " BTC")
 			}
 		}	
 	}
