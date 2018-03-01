@@ -487,27 +487,27 @@ function Test-Compatibility ()
 	}
 }
 
-# function Test-Property-Cost ()
-# {
-# 	if ($Miners[$Config.Miner].Api -And $Config.CoinMode)
-# 	{
-# 		if (-Not ($Config.ElectricityCost))
-# 		{
-# 			Write-Pretty-Error ("Electricity cost must be set!")
-# 			Exit-RudeHash
-# 		}
+function Test-Property-Cost ()
+{
+	if ($Miners[$Config.Miner].Api)
+	{
+		if (-Not ($Config.ElectricityCost))
+		{
+			Write-Pretty-Error ("Electricity cost must be set!")
+			Exit-RudeHash
+		}
 
-# 		try
-# 		{
-# 			$Config.ElectricityCost = [System.Convert]::ToDouble($Config.ElectricityCost)
-# 		}
-# 		catch
-# 		{
-# 			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
-# 			Exit-RudeHash
-# 		}
-# 	}
-# }
+		try
+		{
+			$Config.ElectricityCost = [System.Convert]::ToDouble($Config.ElectricityCost)
+		}
+		catch
+		{
+			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
+			Exit-RudeHash
+		}
+	}
+}
 
 function Test-Properties ()
 {
@@ -518,7 +518,7 @@ function Test-Properties ()
 	Test-Property-Miner
 	Test-Property-Algo
 	Test-Compatibility
-	#Test-Property-Cost
+	Test-Property-Cost
 }
 
 $RigStats =
@@ -527,7 +527,9 @@ $RigStats =
 	HashRate = 0;
 	Difficulty = 0;
 	PowerUsage = 0;
-	Profit = "";
+	Earnings = 0;
+	Profit = 0;
+	ExchangeRate = 0;
 }
 
 function Initialize-Temp ()
@@ -1140,7 +1142,7 @@ function Get-PowerUsage ()
 	$RigStats.PowerUsage = $PowerUsage
 }
 
-function Measure-Profit ()
+function Measure-Earnings ()
 {
 	if ($Config.CoinMode)
 	{
@@ -1167,7 +1169,7 @@ function Measure-Profit ()
 		try
 		{
 			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 47)).Trim())
-			$RigStats.Profit = [math]::Round(($BtcEarnings) * 1000, 5)
+			$RigStats.Earnings = [math]::Round(($BtcEarnings) * 1000, 5)
 		}
 		catch
 		{
@@ -1188,7 +1190,7 @@ function Measure-Profit ()
 			$ResponseRaw = Invoke-WebRequest -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
 			$Response = $ResponseRaw | ConvertFrom-Json
 			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price
-			$RigStats.Profit = [math]::Round(($HashRate * $Price), 5)
+			$RigStats.Earnings = [math]::Round(($HashRate * $Price), 5)
 		}
 		catch
 		{
@@ -1397,8 +1399,8 @@ function Write-Stats ()
 			# use WTM for coins, NH for algos
 			if ($Config.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
 			{
-				Measure-Profit
-				Write-Pretty-Earnings ("Estimated daily earnings: " + $RigStats.Profit + " mBTC")
+				Measure-Earnings
+				Write-Pretty-Earnings ("Estimated daily earnings: " + $RigStats.Earnings + " mBTC")
 			}
 		}	
 	}
