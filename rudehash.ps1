@@ -65,6 +65,8 @@ $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 $FirstRun = $true
 $MinerPort = 28178
+$BlockchainUrl = "https://blockchain.info/ticker"
+$MinerApiErrorStr = "Malformed miner API response."
 
 $Pools =
 @{
@@ -167,6 +169,9 @@ $NiceHashAlgos =
 	"lyra2v2" = @{ Id = 14; Modifier = 1000000000000 }
 	"neoscrypt" = @{ Id = 8; Modifier = 1000000000 }
 }
+
+# we build this dynamically
+[System.Collections.Hashtable]$BtcRates = @{}
 
 function Get-Coin-Support ()
 {
@@ -315,6 +320,32 @@ function Test-Property-Credentials ()
 	}
 }
 
+function Test-Property-Region ()
+{
+	if ($Pools[$Config.Pool].Regions)
+	{
+		if (-Not ($Config.Region))
+		{
+			Write-Pretty-Error ("Region must be set!")
+			Exit-RudeHash
+		}
+
+		if (-Not ($Regions.Contains($Config.Region)))
+		{
+			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported!")
+			$Sep = "`u{00b7} "
+
+			Write-Pretty-Info "Supported regions:"
+			foreach ($Region in $Regions)
+			{
+				Write-Pretty-Info ($Sep + $Region)
+			}
+
+			Exit-RudeHash
+		}
+	}
+}
+
 function Test-Property-Coin ()
 {
 	if ($Config.Coin)
@@ -396,32 +427,6 @@ function Test-Property-Algo ()
 	}
 }
 
-function Test-Property-Region ()
-{
-	if ($Pools[$Config.Pool].Regions)
-	{
-		if (-Not ($Config.Region))
-		{
-			Write-Pretty-Error ("Region must be set!")
-			Exit-RudeHash
-		}
-
-		if (-Not ($Regions.Contains($Config.Region)))
-		{
-			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported!")
-			$Sep = "`u{00b7} "
-
-			Write-Pretty-Info "Supported regions:"
-			foreach ($Region in $Regions)
-			{
-				Write-Pretty-Info ($Sep + $Region)
-			}
-
-			Exit-RudeHash
-		}
-	}
-}
-
 function Test-Compatibility ()
 {
 	$Config.CoinMode = $false
@@ -440,18 +445,16 @@ function Test-Compatibility ()
 			$Config.CoinMode = $true
 		}
 	}
-
-	$MinerMatch = $false
-
-	foreach	($MinerAlgo in $Miners[$Config.Miner].Algos)
+	elseif (-Not $Config.Algo)
 	{
-		if ($Config.Algo -eq $MinerAlgo)
-		{
-			$MinerMatch = $true
-		}
+		Write-Pretty-Error ("You specified neither a coin nor an algo!")
+		Write-Pretty-Info (Get-Coin-Support)
+		Write-Pretty-Info (Get-Miner-Support)
+		Exit-RudeHash
 	}
 
-	if (-Not ($MinerMatch))
+
+	if (-Not ($Miners[$Config.Miner].Algos.Contains($Config.Algo)))
 	{
 		if ($Config.Coin)
 		{
@@ -485,11 +488,73 @@ function Test-Compatibility ()
 		$Config.Server = $Pools[$Config.Pool].Algos[$Config.Algo].Server
 		$Config.Port = $Pools[$Config.Pool].Algos[$Config.Algo].Port
 	}
+
+	if ($Miners[$Config.Miner].Api)
+	{
+		$Config.Monitored = $true
+	}
+}
+
+function Get-Currency-Support ()
+{
+	$Config.Rates = $false
+
+	try
+	{
+		$ResponseRaw = Invoke-WebRequest -Uri $BlockchainUrl -UseBasicParsing
+		$Response = $ResponseRaw | ConvertFrom-Json -AsHashtable
+
+		foreach ($Currency in $Response.Keys)
+		{
+			$BtcRates.Add($Currency, $Response[$Currency].buy)
+		}
+
+		$Config.Rates = $true
+	}
+	catch
+	{
+		Write-Pretty-Error "Error obtaining BTC exchange rates! BTC to Fiat conversion is disabled."
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+	}
+}
+
+function Test-Property-Currency ()
+{
+	Get-Currency-Support
+
+	if ($Config.Monitored -And $Config.Rates)
+	{
+		if (-Not ($Config.Currency))
+		{
+			Write-Pretty-Error ("Currency must be set!")
+			Exit-RudeHash
+		}
+
+		$Config.Currency = $Config.Currency.ToUpper()
+
+		if (-Not ($BtcRates.Contains($Config.Currency)))
+		{
+			Write-Pretty-Error ("The """ + $Config.Currency + """ currency is not supported!")
+			$Sep = "`u{00b7} "
+
+			Write-Pretty-Info "Supported currencies:"
+			foreach ($Currency in $BtcRates.Keys)
+			{
+				Write-Pretty-Info ($Sep + $Currency)
+			}
+
+			Exit-RudeHash
+		}
+	}
 }
 
 function Test-Property-Cost ()
 {
-	if ($Miners[$Config.Miner].Api)
+	if ($Config.Monitored -And $Config.Rates)
 	{
 		if (-Not ($Config.ElectricityCost))
 		{
@@ -518,6 +583,7 @@ function Test-Properties ()
 	Test-Property-Miner
 	Test-Property-Algo
 	Test-Compatibility
+	Test-Property-Currency
 	Test-Property-Cost
 }
 
@@ -527,7 +593,8 @@ $RigStats =
 	HashRate = 0;
 	Difficulty = 0;
 	PowerUsage = 0;
-	Earnings = 0;
+	EarningsBtc = 0;
+	EarningsFiat = 0;
 	Profit = 0;
 	ExchangeRate = 0;
 }
@@ -584,6 +651,7 @@ function Read-Miner-Api ($Request, $Critical)
 
 		if ($Critical -eq "true")
 		{
+			Write-Pretty-Error "Critical error, RudeHash cannot continue."
 			Exit-RudeHash
 		}
 	}
@@ -621,8 +689,6 @@ function Resolve-Pool-Ip ()
 
 function Get-GpuCount ()
 {
-	$ErrorStr = "Malformed miner API response."
-
 	switch ($Config.Miner)
 	{
 		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
@@ -635,7 +701,7 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -656,7 +722,7 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -677,7 +743,7 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -704,7 +770,7 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -863,7 +929,6 @@ function Get-HashRate-Mph ()
 function Get-HashRate-Miner ()
 {
 	$HashRate = 0
-	$ErrorStr = "Malformed miner API response."
 
 	switch ($Config.Miner)
 	{
@@ -875,7 +940,16 @@ function Get-HashRate-Miner ()
 			{
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
-					$HashRate += $Response.Split("|")[$i].Split(";")[8].Split("=")[1]
+					$GpuStr = $Response.Split("|")[$i]
+					[System.Collections.Hashtable]$GpuStats = @{}
+
+					foreach ($Item in $GpuStr.Split(";"))
+					{
+						$GpuStats.Add($Item.Split("=")[0], $Item.Split("=")[1])
+					}
+
+					$HashRate += $GpuStats["KHS"]
+					$GpuStats.Clear()
 				}
 
 				# ccminer returns KH/s
@@ -883,7 +957,7 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -908,7 +982,7 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -928,7 +1002,7 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -974,7 +1048,7 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -1036,7 +1110,6 @@ function Get-Difficulty-Mph ()
 function Get-PowerUsage ()
 {
 	$PowerUsage = 0
-	$ErrorStr = "Malformed miner API response."
 
 	switch ($Config.Miner)
 	{
@@ -1048,12 +1121,28 @@ function Get-PowerUsage ()
 			{
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
-					$PowerUsage += $Response.Split("|")[$i].Split(";")[4].Split("=")[1]
+					$GpuStr = $Response.Split("|")[$i]
+					[System.Collections.Hashtable]$GpuStats = @{}
+
+					foreach ($Item in $GpuStr.Split(";"))
+					{
+						$GpuStats.Add($Item.Split("=")[0], $Item.Split("=")[1])
+					}
+
+					$PowerUsage += $GpuStats["POWER"]
+					$GpuStats.Clear()
+				}
+
+				# these two return mW instead of W, because reasons
+				# in fact, ccminer-phi might also return mW, but I really don't know coz it always returns 0 lol
+				if ($Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-tpruvot")
+				{
+					$PowerUsage /= 1000
 				}
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -1078,7 +1167,7 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -1102,7 +1191,7 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -1147,7 +1236,7 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $ErrorStr
+				Write-Pretty-Error $MinerApiErrorStr
 
 				if ($Config.Debug -eq "true")
 				{
@@ -1173,7 +1262,7 @@ function Measure-Earnings ()
 		}
 		catch
 		{
-			Write-Pretty-Error "WhatToMine request failed!"
+			Write-Pretty-Error "WhatToMine request failed! Is your network connection working?"
 	
 			if ($Config.Debug -eq "true")
 			{
@@ -1187,7 +1276,12 @@ function Measure-Earnings ()
 		try
 		{
 			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 47)).Trim())
-			$RigStats.Earnings = [math]::Round($BtcEarnings, 8)
+			$RigStats.EarningsBtc = [math]::Round($BtcEarnings, 8)
+
+			if ($Config.Rates)
+			{
+				$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+			}
 		}
 		catch
 		{
@@ -1208,11 +1302,16 @@ function Measure-Earnings ()
 			$ResponseRaw = Invoke-WebRequest -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
 			$Response = $ResponseRaw | ConvertFrom-Json
 			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price
-			$RigStats.Earnings = [math]::Round(($HashRate * $Price), 8)
+			$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price), 8)
+
+			if ($Config.Rates)
+			{
+				$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+			}
 		}
 		catch
 		{
-			Write-Pretty-Error "NiceHash request failed!"
+			Write-Pretty-Error "NiceHash request failed! Is your network connection working?"
 	
 			if ($Config.Debug -eq "true")
 			{
@@ -1220,6 +1319,35 @@ function Measure-Earnings ()
 			}
 		}
 	}
+}
+
+function Update-ExchangeRates ()
+{
+	try
+	{
+		$ResponseRaw = Invoke-WebRequest -Uri $BlockchainUrl -UseBasicParsing
+		$Response = $ResponseRaw | ConvertFrom-Json -AsHashtable
+
+		foreach ($Currency in $Response.Keys)
+		{
+			$BtcRates[$Currency] = $Response[$Currency].buy
+		}
+	}
+	catch
+	{
+		Write-Pretty-Error "Error updating BTC exchange rates! Is your network connection working?"
+
+		if ($Config.Debug -eq "true")
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+	}
+}
+
+function Measure-Profit ()
+{
+	Update-ExchangeRates
+	$RigStats.Profit = [math]::Round($RigStats.EarningsFiat - ($Config.ElectricityCost * $RigStats.PowerUsage * 24 / 1000), 2)
 }
 
 function Get-Archive ($Url, $FileName)
@@ -1393,7 +1521,7 @@ function Set-WindowTitle ()
 
 function Write-Stats ()
 {
-	if ($Miners[$Config.Miner].Api)
+	if ($Config.Monitored)
 	{
 		if ($RigStats.GpuCount -eq 0)
 		{
@@ -1406,7 +1534,7 @@ function Write-Stats ()
 			Get-HashRate
 			Get-PowerUsage
 
-			# ccminer often reports 0 watts
+			# ccminer-phi seems to always report 0 watts
 			if ($RigStats.PowerUsage -gt 0)
 			{
 				$PowerUsageStr = $Sep + "Power Usage: " + $RigStats.PowerUsage + " W"
@@ -1418,7 +1546,22 @@ function Write-Stats ()
 			if ($Config.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
 			{
 				Measure-Earnings
-				Write-Pretty-Earnings ("Estimated daily earnings: " + $RigStats.Earnings + " BTC")
+
+				# we could keep trying to obtain exchange rates, but if it would eventually succeed and the
+				# list didn't contain the currency specified in the config, it'd result in indexing errors
+				# or we could re-check the property, but then it'd cause mining to stop; neither is desirable
+				if ($Config.Rates)
+				{
+					$FiatStr = " / " + $RigStats.EarningsFiat + " " + $Config.Currency
+
+					if ($RigStats.PowerUsage -gt 0)
+					{
+						Measure-Profit
+						$ProfitStr = $Sep + "Daily profit: " + $RigStats.Profit + " " + $Config.Currency
+					}
+				}
+
+				Write-Pretty-Earnings ("Daily earnings: " + $RigStats.EarningsBtc + " BTC" + $FiatStr + $ProfitStr)
 			}
 		}	
 	}
@@ -1430,7 +1573,7 @@ function Start-Miner ()
 	while (1)
 	{
 		# get GPU count quickly, but not on excavator, it knows the GPU count already
-		if ($FirstRun -And $Miners[$Config.Miner].Api -And (-Not($Config.Miner -eq "excavator")))
+		if ($FirstRun -And $Config.Monitored -And (-Not($Config.Miner -eq "excavator")))
 		{
 			$Delay = 15
 		}

@@ -11,7 +11,10 @@ Miner=excavator
 # Rig nickname
 Worker=rudehash
 
-# Price of electricity, $/kWh
+# Possible values: https://blockchain.info/api/exchange_rates_api
+Currency=USD
+
+# Price of electricity, 1 currency unit/kWh
 ElectricityCost=0.1
 
 # Possible values: false, true
