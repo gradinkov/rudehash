@@ -804,7 +804,7 @@ function Initialize-Miner-Args ()
 	if ($Pools[$Config.Pool].Authless)
 	{
 		$PoolUser = $Config.Wallet
-		$PoolPass = "c=BTC," + $Config.Worker
+		$PoolPass = "c=BTC,ID=" + $Config.Worker
 	}
 	else
 	{
