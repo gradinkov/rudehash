@@ -1345,6 +1345,11 @@ function Write-Stats ()
 			if ($RigStats.PowerUsage -gt 0)
 			{
 				$PowerUsageStr = $Sep + "Power Usage: " + $RigStats.PowerUsage + " W"
+				$EstimateStr = "profit"
+			}
+			else
+			{
+				$EstimateStr = "earnings"
 			}
 
 			Write-Pretty-Info ("Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
@@ -1352,7 +1357,7 @@ function Write-Stats ()
 			if ($Config.CoinMode)
 			{
 				Measure-Profit
-				Write-Pretty-Earnings ("Estimated daily profit: " + $RigStats.Profit)
+				Write-Pretty-Earnings ("Estimated daily " + $EstimateStr + ": " + $RigStats.Profit)
 			}
 		}	
 	}
