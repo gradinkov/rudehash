@@ -11,9 +11,6 @@ Miner=excavator
 # Rig nickname
 Worker=rudehash
 
-# Price of electricity, $/kWh
-ElectricityCost=0.1
-
 # Possible values: false, true
 Debug=false
 

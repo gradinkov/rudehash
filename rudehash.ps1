@@ -160,6 +160,14 @@ $AlgoNames =
 	"phi" = "PHI1612"
 }
 
+$NiceHashAlgos =
+@{
+	"equihash" = @{ Id = 24; Modifier = 1000 }
+	"ethash" = @{ Id = 20; Modifier = 1000000 }
+	"lyra2v2" = @{ Id = 14; Modifier = 1000000000 }
+	"neoscrypt" = @{ Id = 8; Modifier = 1000000 }
+}
+
 function Get-Coin-Support ()
 {
 	$Table = New-Object System.Data.DataTable
@@ -479,27 +487,27 @@ function Test-Compatibility ()
 	}
 }
 
-function Test-Property-Cost ()
-{
-	if ($Miners[$Config.Miner].Api -And $Config.CoinMode)
-	{
-		if (-Not ($Config.ElectricityCost))
-		{
-			Write-Pretty-Error ("Electricity cost must be set!")
-			Exit-RudeHash
-		}
+# function Test-Property-Cost ()
+# {
+# 	if ($Miners[$Config.Miner].Api -And $Config.CoinMode)
+# 	{
+# 		if (-Not ($Config.ElectricityCost))
+# 		{
+# 			Write-Pretty-Error ("Electricity cost must be set!")
+# 			Exit-RudeHash
+# 		}
 
-		try
-		{
-			$Config.ElectricityCost = [System.Convert]::ToDouble($Config.ElectricityCost)
-		}
-		catch
-		{
-			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
-			Exit-RudeHash
-		}
-	}
-}
+# 		try
+# 		{
+# 			$Config.ElectricityCost = [System.Convert]::ToDouble($Config.ElectricityCost)
+# 		}
+# 		catch
+# 		{
+# 			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
+# 			Exit-RudeHash
+# 		}
+# 	}
+# }
 
 function Test-Properties ()
 {
@@ -510,7 +518,7 @@ function Test-Properties ()
 	Test-Property-Miner
 	Test-Property-Algo
 	Test-Compatibility
-	Test-Property-Cost
+	#Test-Property-Cost
 }
 
 $RigStats =
@@ -1134,27 +1142,64 @@ function Get-PowerUsage ()
 
 function Measure-Profit ()
 {
-	$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
-	$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&p=" + $RigStats.PowerUsage + "&cost=" + $Config.ElectricityCost + "&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
-
-	try
+	if ($Config.CoinMode)
 	{
-		$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
-	}
-	catch
-	{
-		Write-Pretty-Error "WhatToMine request failed!"
-
-		if ($Config.Debug -eq "true")
+		$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
+		$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
+	
+		try
 		{
-			Write-Pretty-Debug $_.Exception
+			$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
+		}
+		catch
+		{
+			Write-Pretty-Error "WhatToMine request failed!"
+	
+			if ($Config.Debug -eq "true")
+			{
+				Write-Pretty-Debug $_.Exception
+			}
+		}
+		
+		$WtmObj = $WtmHtml.Content -split "[`r`n]"
+		$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
+
+		try
+		{
+			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 47)).Trim())
+			$RigStats.Profit = [math]::Round(($BtcEarnings) * 1000, 5)
+		}
+		catch
+		{
+			Write-Pretty-Error "Malformed WhatToMine response."
+	
+			if ($Config.Debug -eq "true")
+			{
+				Write-Pretty-Debug $_.Exception
+			}
 		}
 	}
-	
-	$WtmObj = $WtmHtml.Content -split "[`r`n]"
-	$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
+	else
+	{
+		$HashRate = $RigStats.HashRate / $NiceHashAlgos[$Config.Algo].Modifier
 
-	$RigStats.Profit = ($WtmObj | Select-Object -Index ($LineNo + 56)).Trim()
+		try
+		{
+			$ResponseRaw = Invoke-WebRequest -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
+			$Response = $ResponseRaw | ConvertFrom-Json
+			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price
+			$RigStats.Profit = [math]::Round(($HashRate * $Price), 5)
+		}
+		catch
+		{
+			Write-Pretty-Error "NiceHash request failed!"
+	
+			if ($Config.Debug -eq "true")
+			{
+				Write-Pretty-Debug $_.Exception
+			}
+		}
+	}
 }
 
 function Get-Archive ($Url, $FileName)
@@ -1345,19 +1390,15 @@ function Write-Stats ()
 			if ($RigStats.PowerUsage -gt 0)
 			{
 				$PowerUsageStr = $Sep + "Power Usage: " + $RigStats.PowerUsage + " W"
-				$EstimateStr = "profit"
-			}
-			else
-			{
-				$EstimateStr = "earnings"
 			}
 
 			Write-Pretty-Info ("Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
 
-			if ($Config.CoinMode)
+			# use WTM for coins, NH for algos
+			if ($Config.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
 			{
 				Measure-Profit
-				Write-Pretty-Earnings ("Estimated daily " + $EstimateStr + ": " + $RigStats.Profit)
+				Write-Pretty-Earnings ("Estimated daily earnings: " + $RigStats.Profit + " mBTC")
 			}
 		}	
 	}
