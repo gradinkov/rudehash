@@ -51,7 +51,21 @@ function Write-Pretty-Earnings ($String)
 
 if (Test-Path "$PSScriptRoot/rudehash.properties")
 {
-	$Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)
+	try
+	{
+		$Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)	
+	}
+	catch [System.Management.Automation.PSInvalidOperationException]
+	{
+		Write-Pretty-Error "Error parsing 'rudehash.properties'! Do you have an option set multiple times?"
+		Exit-RudeHash
+	}
+	catch
+	{
+		Write-Pretty-Error "Error accessing 'rudehash.properties'! Make sure the RudeHash main directory is writable!"
+		Exit-RudeHash
+	}
+	
 }
 else
 {
