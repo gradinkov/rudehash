@@ -1,3 +1,13 @@
+$ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.properties") 
+$MinersDir = [io.path]::combine($PSScriptRoot, "miners")
+$ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
+$TempDir = [io.path]::combine($PSScriptRoot, "temp")
+$FirstRun = $true
+$MinerPort = 28178
+$BlockchainUrl = "https://blockchain.info/ticker"
+$MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
+$MinerApiErrorStr = "Malformed miner API response."
+
 Clear-Host
 
 function Exit-RudeHash ()
@@ -49,39 +59,31 @@ function Write-Pretty-Earnings ($String)
 	Write-Pretty DarkGreen $String
 }
 
-if (Test-Path "$PSScriptRoot/rudehash.properties")
+if (Test-Path $ConfigFile)
 {
 	try
 	{
-		$Config = ConvertFrom-StringData(Get-Content "$PSScriptRoot/rudehash.properties" -raw)	
+		$ConfigFileContent = Get-Content $ConfigFile -raw
+		$Config = ConvertFrom-StringData($ConfigFileContent)
 	}
 	catch [System.Management.Automation.PSInvalidOperationException]
 	{
-		Write-Pretty-Error "Error parsing 'rudehash.properties'! Do you have an option set multiple times?"
+		Write-Pretty-Error "Error parsing '$ConfigFile'! Do you have an option set multiple times?"
 		Exit-RudeHash
 	}
 	catch
 	{
-		Write-Pretty-Error "Error accessing 'rudehash.properties'!"
+		Write-Pretty-Error "Error accessing '$ConfigFile'!"
 		Exit-RudeHash
 	}
 	
 }
 else
 {
-	Write-Pretty-Error ("Properties file 'rudehash.properties' not found! Please create it. Example:")
-	Write-Pretty-Info (Get-Content "$PSScriptRoot/rudehash.properties.example")
+	Write-Pretty-Error ("Properties file '$ConfigFile' not found! Please create it. Example:")
+	Write-Pretty-Info (Get-Content "$($ConfigFile).example")
 	Exit-RudeHash
 }
-
-$MinersDir = [io.path]::combine($PSScriptRoot, "miners")
-$ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
-$TempDir = [io.path]::combine($PSScriptRoot, "temp")
-$FirstRun = $true
-$MinerPort = 28178
-$BlockchainUrl = "https://blockchain.info/ticker"
-$MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
-$MinerApiErrorStr = "Malformed miner API response."
 
 $Pools =
 @{
@@ -675,6 +677,66 @@ function Test-Properties ()
 	Test-Compatibility
 	Test-Property-Currency
 	Test-Property-Cost
+}
+
+function Set-Property ($Key, $Value, $Force)
+{
+	# we will flush memory values to disk, so set memory value first
+	$Config.$Key = $Value
+	$ConfigStr = ""
+	$Match = $false
+	$Props = $ConfigFileContent.Split("`r`n")
+
+	for ($i = 0; $i -lt $Props.Length; $i++)
+	{
+		$Line = $Props[$i]
+
+		# key=value pairs that were parsed by ConvertFrom-StringData
+		if ($Line -match "^.*=.*")
+		{
+			$CurrentKey = $Line.Split("=")[0]
+
+			# the key we want to set already exists in the config file
+			if ($CurrentKey -eq $Key)
+			{
+				$Match = $true
+			}
+
+			# replace config file entries with in-memory entries
+			if ($Config.ContainsKey($CurrentKey))
+			{
+				$ConfigStr += $Line -replace "^$($CurrentKey)=.*", "$($CurrentKey)=$($Config[$CurrentKey])"
+			}
+		}
+		# everything else
+		else
+		{
+			$ConfigStr += "$Line"
+		}
+
+		# don't add extra newline on last line, file would grow eternally
+		# why 3? who knows, who cares?
+		if ($i -le ($Props.Length - 3))
+		{
+			$ConfigStr += "`r`n"
+		}
+	}
+
+	# if it wasn't found in the config file and we force the set, we have to add it manually to the list
+	if ($Force -And (-Not $Match))
+	{
+		$ConfigStr += "`r`n$($Key)=$($Value)"
+	}
+
+	try
+	{
+		$ConfigStr | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
+	}
+	catch
+	{
+		Write-Pretty-Error "Error accessing '$ConfigFile'! Make sure it has the appropriate permissions."
+		Exit-RudeHash
+	}
 }
 
 $RigStats =
