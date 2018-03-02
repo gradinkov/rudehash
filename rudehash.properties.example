@@ -27,6 +27,9 @@ Debug=false
 # If you want monitoring, get a key from https://multipoolminer.io/monitor/
 #MonitoringKey=e956c743-341f-4ec5-b47e-c5ce9463d7d7
 
+# Specify any extra miner arguments you need
+#ExtraArgs=
+
 ####################################################################################################
 # MiningPoolHub, NiceHash
 ####################################################################################################

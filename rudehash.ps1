@@ -985,6 +985,11 @@ function Initialize-Miner-Args ()
 		"zecminer" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
 
+	if ($Config.ExtraArgs)
+	{
+		Args += " " + $Config.ExtraArgs
+	}
+
 	return $Args
 }
 
