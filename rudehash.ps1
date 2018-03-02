@@ -1728,7 +1728,17 @@ function Ping-Monitoring ()
 	{
 		Update-MinerUptime
 		$ActiveStr = "$($RigStats.Uptime.Days) d $($RigStats.Uptime.Hours) h $($RigStats.Uptime.Minutes) m"
-		$MinerJson = ConvertTo-Json @( @{ Name = $Config.Miner; Path = $Miners[$Config.Miner].ExeFile; PID = $RigStats.Pid ; Active = $ActiveStr; Algorithm = $AlgoNames[$Config.Algo]; Pool = $Config.Pool; CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate; EstimatedSpeed = Get-HashRate-Pretty $RigStats.HashRate; 'BTC/day' = $RigStats.EarningsBtc } )
+		$MinerJson = ConvertTo-Json @( @{
+			Name = $Config.Miner
+			Path = $Miners[$Config.Miner].ExeFile
+			PID = $RigStats.Pid
+			Active = $ActiveStr
+			Algorithm = $AlgoNames[$Config.Algo]
+			Pool = $Config.Pool
+			CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate
+			EstimatedSpeed = Get-HashRate-Pretty $RigStats.HashRate
+			'BTC/day' = $RigStats.EarningsBtc
+		} )
 	
 		try
 		{
