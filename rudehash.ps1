@@ -348,6 +348,16 @@ function Test-Property-Credentials ()
 		Write-Pretty-Error ("Worker must be set!")
 		Exit-RudeHash
 	}
+	else
+	{
+		$Pattern = "^[a-zA-Z0-9]{1,15}$"
+
+		if (-Not ($Config.Worker -match $Pattern))
+		{
+			Write-Pretty-Error ("Worker name is in invalid format! Use a maximum of 15 letters and numbers!")
+			Exit-RudeHash
+		}
+	}
 
 	if ($Pools[$Config.Pool].Authless)
 	{
