@@ -259,6 +259,38 @@ function Get-Pool-Support ()
 	return $Support
 }
 
+function Test-Property-Debug ()
+{
+	try
+	{
+		$Config.Debug = [System.Convert]::ToBoolean($Config.Debug)
+	}
+	catch
+	{
+		Write-Pretty-Error ("'Debug' property is in incorrect format, it must be 'true' or 'false'!")
+		Exit-RudeHash
+	}
+}
+
+function Test-Property-Watchdog ()
+{
+	try
+	{
+		$Config.Watchdog = [System.Convert]::ToBoolean($Config.Watchdog)
+	}
+	catch
+	{
+		Write-Pretty-Error ("'Watchdog' property is in incorrect format, it must be 'true' or 'false'!")
+
+		if ($Config.Debug)
+		{
+			Write-Pretty-Debug $_.Exception	
+		}
+
+		Exit-RudeHash
+	}
+}
+
 function Test-Property-Pool ()
 {
 	if (-Not ($Config.Pool))
@@ -529,7 +561,7 @@ function Get-Currency-Support ()
 	{
 		Write-Pretty-Error "Error obtaining BTC exchange rates! BTC to Fiat conversion is disabled."
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -590,6 +622,8 @@ function Test-Property-Cost ()
 
 function Test-Properties ()
 {
+	Test-Property-Debug
+	Test-Property-Watchdog
 	Test-Property-Pool
 	Test-Property-Credentials
 	Test-Property-Region
@@ -611,6 +645,7 @@ $RigStats =
 	EarningsFiat = 0;
 	Profit = 0;
 	ExchangeRate = 0;
+	FailedChecks = 0;
 }
 
 function Initialize-Temp ()
@@ -628,7 +663,7 @@ function Initialize-Temp ()
 	{
 		Write-Pretty-Error "Error setting up temporary directory! Do we have write access?"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -658,7 +693,7 @@ function Read-Miner-Api ($Request, $Critical)
 	{
 		Write-Pretty-Error "Error connecting to miner API!"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -690,7 +725,7 @@ function Resolve-Pool-Ip ()
 	{
 		Write-Pretty-Error "Error resolving pool IP addess! Is your network connection working?"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -717,7 +752,7 @@ function Get-GpuCount ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -731,14 +766,14 @@ function Get-GpuCount ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 				$Count = $Response.result.length
 			}
 			catch
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -752,14 +787,14 @@ function Get-GpuCount ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 				$Count = $Response.result[3].Split(";").length
 			}
 			catch
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -769,7 +804,7 @@ function Get-GpuCount ()
 		"excavator"
 		{
 			$ResponseRaw = Read-Miner-Api '{"id":1,"method":"device.list","params":[]}' $true
-			$Response = $ResponseRaw | ConvertFrom-Json
+			$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 			$Count = $Response.devices.length
 		}
 
@@ -779,14 +814,14 @@ function Get-GpuCount ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 				$Count = $Response.result.length
 			}
 			catch
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -802,7 +837,7 @@ function Start-Excavator ()
 	$Excavator = [io.path]::combine($MinersDir, "excavator", "excavator.exe")
 	$Args = "-p $MinerPort"
 
-	if ($Config.Debug -eq "true")
+	if ($Config.Debug)
 	{
 		Write-Pretty-Debug ("$Excavator $Args")
 	}
@@ -869,7 +904,7 @@ function Initialize-Excavator ($User, $Pass)
 	{
 		Write-Pretty-Error "Error writing Excavator JSON file! Make sure the file is not locked by another process!"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -926,7 +961,7 @@ function Get-HashRate-Mph ()
 		$HashRate = 0
 		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -973,7 +1008,7 @@ function Get-HashRate-Miner ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -987,7 +1022,7 @@ function Get-HashRate-Miner ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -998,7 +1033,7 @@ function Get-HashRate-Miner ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1011,14 +1046,14 @@ function Get-HashRate-Miner ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 				$HashRate = $Response.result.ethhashrate
 			}
 			catch
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1040,7 +1075,7 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1053,7 +1088,7 @@ function Get-HashRate-Miner ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -1064,7 +1099,7 @@ function Get-HashRate-Miner ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1112,7 +1147,7 @@ function Get-Difficulty-Mph ()
 		$Difficulty = 0
 		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -1158,7 +1193,7 @@ function Get-PowerUsage ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1172,7 +1207,7 @@ function Get-PowerUsage ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -1183,7 +1218,7 @@ function Get-PowerUsage ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1196,7 +1231,7 @@ function Get-PowerUsage ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -1207,7 +1242,7 @@ function Get-PowerUsage ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1227,7 +1262,7 @@ function Get-PowerUsage ()
 				}
 				catch
 				{
-					if ($Config.Debug -eq "true")
+					if ($Config.Debug)
 					{
 						Write-Pretty-Debug $_.Exception
 					}
@@ -1241,7 +1276,7 @@ function Get-PowerUsage ()
 
 			try
 			{
-				$Response = $ResponseRaw | ConvertFrom-Json
+				$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -1252,7 +1287,7 @@ function Get-PowerUsage ()
 			{
 				Write-Pretty-Error $MinerApiErrorStr
 
-				if ($Config.Debug -eq "true")
+				if ($Config.Debug)
 				{
 					Write-Pretty-Debug $_.Exception
 				}
@@ -1278,7 +1313,7 @@ function Measure-Earnings ()
 		{
 			Write-Pretty-Error "WhatToMine request failed! Is your network connection working?"
 	
-			if ($Config.Debug -eq "true")
+			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
 			}
@@ -1301,7 +1336,7 @@ function Measure-Earnings ()
 		{
 			Write-Pretty-Error "Malformed WhatToMine response."
 	
-			if ($Config.Debug -eq "true")
+			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
 			}
@@ -1327,7 +1362,7 @@ function Measure-Earnings ()
 		{
 			Write-Pretty-Error "NiceHash request failed! Is your network connection working?"
 	
-			if ($Config.Debug -eq "true")
+			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
 			}
@@ -1351,7 +1386,7 @@ function Update-ExchangeRates ()
 	{
 		Write-Pretty-Error "Error updating BTC exchange rates! Is your network connection working?"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -1377,7 +1412,7 @@ function Get-Archive ($Url, $FileName)
 	{
 		Write-Pretty-Error "Error downloading package! Is your network connection working?"
 
-		if ($Config.Debug -eq "true")
+		if ($Config.Debug)
 		{
 			Write-Pretty-Debug $_.Exception
 		}
@@ -1583,6 +1618,47 @@ function Write-Stats ()
 
 function Start-Miner ()
 {
+	$Exe = [io.path]::combine($MinersDir, $Config.Miner, $Miners[$Config.Miner].ExeFile)
+	$Args = Initialize-Miner-Args
+
+	if ($Config.Debug)
+	{
+		Write-Pretty-Debug ("$Exe $Args")
+	}
+
+	return Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
+}
+
+function Ping-Miner ($Proc)
+{
+	if ($Config.Monitored -And $Config.Watchdog)
+	{
+		if ($RigStats.HashRate -eq 0)
+		{
+			$RigStats.FailedChecks += 1
+
+			if ($Config.Debug)
+			{
+				Write-Pretty-Debug ("Watchdog detected zero hash rate " + $RigStats.FailedChecks + " times.")
+			}
+		}
+
+		if ($RigStats.FailedChecks -ge 5)
+		{
+			Write-Pretty-Error "Watchdog detected zero hash rate, restarting miner..."
+			Stop-Process $Proc
+			# let the dust settle
+			Start-Sleep 5
+			$Proc = Start-Miner
+			$RigStats.FailedChecks = 0
+		}	
+	}
+
+	return $Proc
+}
+
+function Start-RudeHash ()
+{
 	# restart automatically if the miner crashes
 	while (1)
 	{
@@ -1598,35 +1674,26 @@ function Start-Miner ()
 
 		if ($FirstRun -or $Proc.HasExited)
 		{
-			$Exe = [io.path]::combine($MinersDir, $Config.Miner, $Miners[$Config.Miner].ExeFile)
-			$Args = Initialize-Miner-Args
-
-			if ($Config.Debug -eq "true")
-			{
-				Write-Pretty-Debug ("$Exe $Args")
-			}
-
 			if ($Proc.HasExited)
 			{
 				Write-Pretty-Error ("Miner has crashed, restarting...")
 			}
 
-			$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
+			$Proc = Start-Miner
 		}
 
 		Start-Sleep -Seconds $Delay
 		Write-Stats
-		$FirstRun = $false
+		$Proc = Ping-Miner $Proc
 
-		#Register-EngineEvent PowerShell.Exiting –Action { Stop-Process $Proc }
+		$FirstRun = $false
 	}
 }
 
-#Stop-Process $Proc
 Write-Pretty-Header
 Initialize-Temp
 Test-Properties
 Set-WindowTitle
 Test-Tools
 Test-Miner
-Start-Miner
+Start-RudeHash
