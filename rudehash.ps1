@@ -580,7 +580,7 @@ function Test-Compatibility ()
 
 	if ($Miners[$Config.Miner].Api)
 	{
-		$Config.Monitored = $true
+		$Config.Api = $true
 	}
 }
 
@@ -615,7 +615,7 @@ function Test-Property-Currency ()
 {
 	Get-Currency-Support
 
-	if ($Config.Monitored -And $Config.Rates)
+	if ($Config.Api -And $Config.Rates)
 	{
 		if (-Not ($Config.Currency))
 		{
@@ -643,7 +643,7 @@ function Test-Property-Currency ()
 
 function Test-Property-Cost ()
 {
-	if ($Config.Monitored -And $Config.Rates)
+	if ($Config.Api -And $Config.Rates)
 	{
 		if (-Not ($Config.ElectricityCost))
 		{
@@ -1682,7 +1682,7 @@ function Set-WindowTitle ()
 
 function Write-Stats ()
 {
-	if ($Config.Monitored)
+	if ($Config.Api)
 	{
 		if ($RigStats.GpuCount -eq 0)
 		{
@@ -1745,7 +1745,7 @@ function Start-Miner ()
 
 function Ping-Miner ($Proc)
 {
-	if ($Config.Monitored -And $Config.Watchdog)
+	if ($Config.Api -And $Config.Watchdog)
 	{
 		if ($RigStats.HashRate -eq 0)
 		{
@@ -1835,7 +1835,7 @@ function Start-RudeHash ()
 	while (1)
 	{
 		# get GPU count quickly, but not on excavator, it knows the GPU count already
-		if ($FirstRun -And $Config.Monitored -And (-Not($Config.Miner -eq "excavator")))
+		if ($FirstRun -And $Config.Api -And (-Not($Config.Miner -eq "excavator")))
 		{
 			$Delay = 15
 		}
