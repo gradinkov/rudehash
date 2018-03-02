@@ -62,7 +62,7 @@ if (Test-Path "$PSScriptRoot/rudehash.properties")
 	}
 	catch
 	{
-		Write-Pretty-Error "Error accessing 'rudehash.properties'! Make sure the RudeHash main directory is writable!"
+		Write-Pretty-Error "Error accessing 'rudehash.properties'!"
 		Exit-RudeHash
 	}
 	
