@@ -80,6 +80,7 @@ $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 $FirstRun = $true
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
+$MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
 $MinerApiErrorStr = "Malformed miner API response."
 
 $Pools =
@@ -303,6 +304,18 @@ function Test-Property-Watchdog ()
 		}
 
 		Exit-RudeHash
+	}
+}
+
+function Test-Property-MonitoringKey ()
+{
+	if ($Config.MonitoringKey)
+	{
+		if (-Not ([Guid]::TryParse($Config.MonitoringKey, [ref]($Uuid = New-Guid))))
+		{
+			Write-Pretty-Error ("Monitoring key is in incorrect format, get a new one here: https://multipoolminer.io/monitor/")
+			Exit-RudeHash
+		}
 	}
 }
 
@@ -652,6 +665,7 @@ function Test-Properties ()
 {
 	Test-Property-Debug
 	Test-Property-Watchdog
+	Test-Property-MonitoringKey
 	Test-Property-Pool
 	Test-Property-Credentials
 	Test-Property-Region
@@ -674,6 +688,8 @@ $RigStats =
 	Profit = 0;
 	ExchangeRate = 0;
 	FailedChecks = 0;
+	Pid = 0;
+	Uptime = New-TimeSpan;
 }
 
 function Initialize-Temp ()
@@ -1655,7 +1671,9 @@ function Start-Miner ()
 		Write-Pretty-Debug ("$Exe $Args")
 	}
 
-	return Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
+	$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
+	$RigStats.Pid = $Proc.Id
+	return $Proc
 }
 
 function Ping-Miner ($Proc)
@@ -1686,6 +1704,54 @@ function Ping-Miner ($Proc)
 	return $Proc
 }
 
+function Update-MinerUptime ()
+{
+	try
+	{
+		$Proc = Get-Process -Id $RigStats.Pid
+		$RigStats.Uptime = New-TimeSpan -Start $Proc.StartTime -End (Get-Date)
+	}
+	catch
+	{
+		Write-Pretty-Error "Error while checking the miner's uptime!"
+
+		if ($Config.Debug)
+		{
+			Write-Pretty-Debug $_.Exception
+		}
+	}
+}
+
+function Ping-Monitoring ()
+{
+	if ($Config.MonitoringKey)
+	{
+		Update-MinerUptime
+		$ActiveStr = "$($RigStats.Uptime.Days) d $($RigStats.Uptime.Hours) h $($RigStats.Uptime.Minutes) m"
+		$MinerJson = ConvertTo-Json @( @{ Name = $Config.Miner; Path = $Miners[$Config.Miner].ExeFile; PID = $RigStats.Pid ; Active = $ActiveStr; Algorithm = $AlgoNames[$Config.Algo]; Pool = $Config.Pool; CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate; EstimatedSpeed = Get-HashRate-Pretty $RigStats.HashRate; 'BTC/day' = $RigStats.EarningsBtc } )
+	
+		try
+		{
+			$Response = Invoke-RestMethod -Uri $MonitoringUrl -Method Post -Body @{ address = $Config.MonitoringKey; workername = $Config.Worker; miners = $MinerJson; profit = $RigStats.EarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+	
+			if ($Config.Debug)
+			{
+				#Write-Pretty-Debug $MinerJson
+				Write-Pretty-Debug ("Monitoring server response: $Response")
+			}
+		}
+		catch
+		{
+			Write-Pretty-Error "Error while pinging the monitoring server!"
+	
+			if ($Config.Debug)
+			{
+				Write-Pretty-Debug $_.Exception
+			}
+		}		
+	}
+}
+
 function Start-RudeHash ()
 {
 	# restart automatically if the miner crashes
@@ -1714,6 +1780,7 @@ function Start-RudeHash ()
 		Start-Sleep -Seconds $Delay
 		Write-Stats
 		$Proc = Ping-Miner $Proc
+		Ping-Monitoring
 
 		$FirstRun = $false
 	}
