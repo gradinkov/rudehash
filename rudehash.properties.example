@@ -1,5 +1,5 @@
-# Possible values: mph, zpool
-Pool=mph
+# Possible values: miningpoolhub, nicehash, zpool
+Pool=nicehash
 
 # Possible values: ethash, equihash, lyra2v2, neoscrypt, phi
 # Ignored if Coin is specified
@@ -25,22 +25,28 @@ Watchdog=true
 Debug=false
 
 ####################################################################################################
-# MPH
+# MiningPoolHub, NiceHash
+####################################################################################################
+
+# Possible values:
+# MPH: asia, europe, us-east
+# NH: br, eu, hk, in, jp, usa
+Region=usa
+
+####################################################################################################
+# NiceHash, zpool
+####################################################################################################
+
+# BTC wallet address
+Wallet=3Gfmm5iAYvu8wf2pLyUjKBcGWsXZ8EEubi
+
+####################################################################################################
+# MiningPoolHub
 ####################################################################################################
 
 # MPH user name
 User=gradinkov
 
-# Possible values: asia, europe, us-east
-Region=europe
-
 # Possible values: btg, eth, ftc, mona, vtc, zcl, zec, zen
 # Only set this if you don't want to use algo mining
 #Coin=zec
-
-####################################################################################################
-# zpool
-####################################################################################################
-
-# BTC wallet address
-Wallet=1NDFEvsAT66yX2fMsfVn9kwMvaH7WeWBBH

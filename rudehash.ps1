@@ -84,7 +84,7 @@ $MinerApiErrorStr = "Malformed miner API response."
 
 $Pools =
 @{
-	"mph" =
+	"miningpoolhub" =
 	@{
 		PoolFee = 1.1
 		Authless = $false
@@ -98,6 +98,22 @@ $Pools =
 			"neoscrypt" = @{ Server = "hub.miningpoolhub.com"; Port = 17012 }
 		}
 	}
+
+	"nicehash" =
+	@{
+		PoolFee = 2
+		Authless = $true
+		CoinMining = $false
+		Regions = $true
+		Algos =
+		@{
+			"ethash" = @{ Server = "daggerhashimoto." + $Config.Region + ".nicehash.com"; Port = 3353 }
+			"equihash" = @{ Server = "equihash." + $Config.Region + ".nicehash.com"; Port = 3357 }
+			"lyra2v2" = @{ Server = "lyra2rev2." + $Config.Region + ".nicehash.com"; Port = 3347 }
+			"neoscrypt" = @{ Server = "neoscrypt." + $Config.Region + ".nicehash.com"; Port = 3341 }
+		}
+	}
+
 	"zpool" =
 	@{
 		PoolFee = 2
@@ -152,11 +168,10 @@ $Tools =
 }
 
 $Regions =
-@(
-	"asia"
-	"europe"
-	"us-east"
-)
+@{
+	"miningpoolhub" = @("asia", "europe", "us-east")
+	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
+}
 
 # MPH returns all hashrates in kH/s but WTM uses different magnitudes for different algos
 $WtmModifiers =
@@ -376,13 +391,14 @@ function Test-Property-Region ()
 			Exit-RudeHash
 		}
 
-		if (-Not ($Regions.Contains($Config.Region)))
+		if (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
 		{
-			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported!")
+			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			$Sep = "`u{00b7} "
 
 			Write-Pretty-Info "Supported regions:"
-			foreach ($Region in $Regions)
+
+			foreach ($Region in $Regions[$Config.Pool])
 			{
 				Write-Pretty-Info ($Sep + $Region)
 			}
@@ -404,6 +420,7 @@ function Test-Property-Coin ()
 			$Sep = "`u{00b7} "
 
 			Write-Pretty-Info "Supported coins:"
+
 			foreach ($Coin in $Coins.Keys)
 			{
 				Write-Pretty-Info ($Sep + $Coin.ToUpper())
@@ -428,6 +445,7 @@ function Test-Property-Miner ()
 		$Sep = "`u{00b7} "
 
 		Write-Pretty-Info "Supported miners:"
+
 		foreach ($Miner in $Miners.Keys)
 		{
 			Write-Pretty-Info ($Sep + $Miner)
@@ -918,7 +936,7 @@ function Initialize-Miner-Args ()
 {
 	if ($Pools[$Config.Pool].Authless)
 	{
-		$PoolUser = $Config.Wallet
+		$PoolUser = $Config.Wallet + "." + $Config.Worker
 		$PoolPass = "c=BTC,ID=" + $Config.Worker
 	}
 	else
@@ -1350,7 +1368,8 @@ function Measure-Earnings ()
 		{
 			$ResponseRaw = Invoke-WebRequest -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
 			$Response = $ResponseRaw | ConvertFrom-Json
-			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price
+			$Multiplier = 1 - ($Pools[$Config.Pool].PoolFee / 100)
+			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price * $Multiplier
 			$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price), 8)
 
 			if ($Config.Rates)
