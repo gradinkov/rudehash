@@ -3,4 +3,5 @@ temp/*
 tools/*
 .vscode/*
 firmware.bin
+rudehash.ini
 rudehash.properties

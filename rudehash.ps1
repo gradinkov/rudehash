@@ -1,7 +1,9 @@
-$ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.properties") 
+$ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.ini")
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
+$Config = @{}
+$FirstRun = $false
 $FirstLoop = $true
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
@@ -24,7 +26,7 @@ function Write-Pretty ($BgColor, $String)
 	{
 		$SpaceCount = $WindowWidth - ($Line.length % $WindowWidth)
 		$Line += " " * $SpaceCount
-	
+
 		Write-Host -ForegroundColor White -BackgroundColor $BgColor $Line
 	}
 }
@@ -64,7 +66,17 @@ if (Test-Path $ConfigFile)
 	try
 	{
 		$ConfigFileContent = Get-Content $ConfigFile -raw
-		$Config = ConvertFrom-StringData($ConfigFileContent)
+
+		# make sure we don't fail if the file is empty
+		if ($ConfigFileContent -gt 0)
+		{
+			$Config = ConvertFrom-StringData($ConfigFileContent)
+		}
+		else
+		{
+			$FirstRun = $true
+		}
+
 	}
 	catch [System.Management.Automation.PSInvalidOperationException]
 	{
@@ -76,13 +88,20 @@ if (Test-Path $ConfigFile)
 		Write-Pretty-Error "Error accessing '$ConfigFile'!"
 		Exit-RudeHash
 	}
-	
 }
 else
 {
-	Write-Pretty-Error ("Properties file '$ConfigFile' not found! Please create it. Example:")
-	Write-Pretty-Info (Get-Content "$($ConfigFile).example")
-	Exit-RudeHash
+	$FirstRun = $true
+
+	try
+	{
+		New-Item $ConfigFile -ItemType File | Out-Null
+	}
+	catch
+	{
+		Write-Pretty-Error "Error creating '$ConfigFile'!"
+		Exit-RudeHash
+	}
 }
 
 $Pools =
@@ -157,7 +176,7 @@ $Miners =
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true }
 }
 
-$ExcavatorAlgos = 
+$ExcavatorAlgos =
 @{
 	"ethash" = "daggerhashimoto"
 	"equihash" = "equihash"
@@ -204,6 +223,85 @@ $NiceHashAlgos =
 
 # we build this dynamically
 [System.Collections.Hashtable]$BtcRates = @{}
+
+function Set-Property ($Name, $Value, $Force)
+{
+	# we will flush memory values to disk, so set memory value first
+	$Config.$Name = $Value
+	$ConfigStr = ""
+	$Match = $false
+	$NeedsWrite = $false
+
+	$CurrentConfig = Get-Content $ConfigFile -raw
+
+	# don't fail on empty file
+	if ($CurrentConfig.Length -gt 0)
+	{
+		$Props = $CurrentConfig.Split("`r`n")
+
+		for ($i = 0; $i -lt $Props.Length; $i++)
+		{
+			$Line = $Props[$i]
+
+			# key=value pairs that are parsed by ConvertFrom-StringData
+			if ($Line -match "^.*=.*")
+			{
+				$CurrentKey = $Line.Split("=")[0]
+
+				# the key we want to set already exists in the config file
+				if ($CurrentKey -eq $Name)
+				{
+					$Match = $true
+					$ConfigStr += $Line -replace "^$($Name)=.*", "$($Name)=$($Config[$CurrentKey])"
+					$NeedsWrite = $true
+				}
+				# all the other key=value pairs, don't touch those
+				else
+				{
+					$ConfigStr += "$Line"
+				}
+			}
+			# don't touch anything else either
+			else
+			{
+				$ConfigStr += "$Line"
+			}
+
+			# don't add extra newline, file would grow eternally
+			# why 3? who knows, who cares?
+			if ($i -le ($Props.Length - 3))
+			{
+				$ConfigStr += "`r`n"
+			}
+		}
+
+		$Prefix = "`r`n"
+	}
+	else
+	{
+		$Prefix = ""
+	}
+
+	# if it wasn't found in the config file and we force the set, we have to add it manually to the list
+	if ($Force -And (-Not $Match) -And (-Not [string]::IsNullOrEmpty($Value)))
+	{
+		$ConfigStr += "$($Prefix)$($Name)=$($Value)"
+		$NeedsWrite = $true
+	}
+
+	if ($NeedsWrite)
+	{
+		try
+		{
+			$ConfigStr | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
+		}
+		catch
+		{
+			Write-Pretty-Error "Error accessing '$ConfigFile'! Make sure it has the appropriate permissions."
+			Exit-RudeHash
+		}
+	}
+}
 
 function Get-Coin-Support ()
 {
@@ -277,24 +375,26 @@ function Get-Pool-Support ()
 	return $Support
 }
 
-function Test-Property-Debug ()
+function Test-DebugProperty ()
 {
 	try
 	{
 		$Config.Debug = [System.Convert]::ToBoolean($Config.Debug)
+		return $true
 	}
 	catch
 	{
 		Write-Pretty-Error ("'Debug' property is in incorrect format, it must be 'true' or 'false'!")
-		Exit-RudeHash
+		return $false
 	}
 }
 
-function Test-Property-Watchdog ()
+function Test-WatchdogProperty ()
 {
 	try
 	{
 		$Config.Watchdog = [System.Convert]::ToBoolean($Config.Watchdog)
+		return $true
 	}
 	catch
 	{
@@ -302,34 +402,46 @@ function Test-Property-Watchdog ()
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception	
+			Write-Pretty-Debug $_.Exception
 		}
 
-		Exit-RudeHash
+		return $false
 	}
 }
 
-function Test-Property-MonitoringKey ()
+function Test-MonitoringKeyProperty ()
 {
+	# if the user presses enter, the key will be deleted altogether
+	# we can't do much here without making the key mandatory
 	if ($Config.MonitoringKey)
 	{
-		if (-Not ([Guid]::TryParse($Config.MonitoringKey, [ref]($Uuid = New-Guid))))
+		$Uuid = New-Guid
+		$Res = [Guid]::TryParse($Config.MonitoringKey, [ref]$Uuid)
+
+		if (-Not $Res)
 		{
 			Write-Pretty-Error ("Monitoring key is in incorrect format, get a new one here: https://multipoolminer.io/monitor/")
-			Exit-RudeHash
+			return $false
 		}
+		else
+		{
+			return $true
+		}
+	}
+	else
+	{
+		return $true
 	}
 }
 
-function Test-Property-Pool ()
+function Test-PoolProperty ()
 {
 	if (-Not ($Config.Pool))
 	{
 		Write-Pretty-Error ("Pool must be set!")
-		Exit-RudeHash
+		return $false
 	}
-
-	if (-Not ($Pools.ContainsKey($Config.Pool)))
+	elseif (-Not ($Pools.ContainsKey($Config.Pool)))
 	{
 		Write-Pretty-Error ("The """ + $Config.Pool + """ pool is not supported!")
 		$Sep = "`u{00b7} "
@@ -340,83 +452,112 @@ function Test-Property-Pool ()
 			Write-Pretty-Info ($Sep + $Pool)
 		}
 
-		Exit-RudeHash
+		return $false
 	}
-}
-
-function Test-BtcWallet ($Address)
-{
-	if ($Address.StartsWith("1") -Or $Address.StartsWith("3") -Or $Address.StartsWith("bc1"))
+	else
 	{
 		return $true
 	}
-	else
-	{
-		return $false
-	}
 }
 
-function Test-Property-Credentials ()
+function Test-WorkerProperty ()
 {
+	$Pattern = "^[a-zA-Z0-9]{1,15}$"
+
 	if (-Not ($Config.Worker))
 	{
 		Write-Pretty-Error ("Worker must be set!")
-		Exit-RudeHash
+		return $false
+	}
+	elseif (-Not ($Config.Worker -match $Pattern))
+	{
+			Write-Pretty-Error ("Worker name is in invalid format! Use a maximum of 15 letters and numbers!")
+			return $false
 	}
 	else
 	{
-		$Pattern = "^[a-zA-Z0-9]{1,15}$"
+		return $true
+	}
+}
 
-		if (-Not ($Config.Worker -match $Pattern))
+function Test-Wallet ($Address, $Symbol)
+{
+	switch ($Symbol)
+	{
+		"BTC"
 		{
-			Write-Pretty-Error ("Worker name is in invalid format! Use a maximum of 15 letters and numbers!")
-			Exit-RudeHash
+			if ((-Not ($Address.length -lt 26)) -And (-Not ($Address.length -gt 34)) -And ($Address.StartsWith("1") -Or $Address.StartsWith("3") -Or $Address.StartsWith("bc1")))
+			{
+				return $true
+			}
+			else
+			{
+				return $false
+			}
 		}
+		Default { return $false }
 	}
 
+}
+
+function Test-WalletProperty ()
+{
 	if ($Pools[$Config.Pool].Authless)
 	{
 		if (-Not ($Config.Wallet))
 		{
 			Write-Pretty-Error ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
-			Exit-RudeHash
+			return $false
+		}
+		elseif (-Not (Test-Wallet $Config.Wallet "BTC"))
+		{
+				Write-Pretty-Error ("Bitcoin wallet address is in incorrect format, please check it!")
+				return $false
 		}
 		else
 		{
-			if (-Not (Test-BtcWallet $Config.Wallet))
-			{
-				Write-Pretty-Error ("Bitcoin wallet address is in incorrect format, please check it!")
-				Exit-RudeHash
-			}
+			return $true
 		}
 	}
 	else
 	{
-		if (-Not ($Config.User))
-		{
-			Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, username must be set!")
-			Exit-RudeHash
-		}
-
-		# if (-Not ($Config.ApiKey))
-		# {
-		# 	Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, API key must be set!")
-		# 	Exit-RudeHash
-		# }
+		return $true
 	}
 }
 
-function Test-Property-Region ()
+function Test-UserProperty ()
+{
+	if ($Pools[$Config.Pool].Authless)
+	{
+		return $true
+	}
+	elseif (-Not ($Config.User))
+	{
+		Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, username must be set!")
+		return $false
+	}
+	else
+	{
+		return $true
+	}
+
+	# if (-Not ($Config.ApiKey))
+	# {
+	# 	Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, API key must be set!")
+	# 	Exit-RudeHash
+	# }
+}
+
+function Test-RegionProperty ()
 {
 	if ($Pools[$Config.Pool].Regions)
 	{
 		if (-Not ($Config.Region))
 		{
 			Write-Pretty-Error ("Region must be set!")
-			Exit-RudeHash
+			return $false
 		}
-
-		if (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
+		elseif (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			$Sep = "`u{00b7} "
@@ -428,12 +569,20 @@ function Test-Property-Region ()
 				Write-Pretty-Info ($Sep + $Region)
 			}
 
-			Exit-RudeHash
+			return $false
 		}
+		else
+		{
+			return $true
+		}
+	}
+	else
+	{
+		return $true
 	}
 }
 
-function Test-Property-Coin ()
+function Test-CoinProperty ()
 {
 	if ($Config.Coin)
 	{
@@ -451,20 +600,27 @@ function Test-Property-Coin ()
 				Write-Pretty-Info ($Sep + $Coin.ToUpper())
 			}
 
-			Exit-RudeHash
+			return $false
 		}
+		else
+		{
+			return $true
+		}
+	}
+	else
+	{
+		return $true
 	}
 }
 
-function Test-Property-Miner ()
+function Test-MinerProperty ()
 {
 	if (-Not ($Config.Miner))
 	{
 		Write-Pretty-Error ("Miner must be set!")
-		Exit-RudeHash
+		return $false
 	}
-
-	if (-Not ($Miners.ContainsKey($Config.Miner)))
+	elseif (-Not ($Miners.ContainsKey($Config.Miner)))
 	{
 		Write-Pretty-Error ("The """ + $Config.Miner + """ miner is not supported!")
 		$Sep = "`u{00b7} "
@@ -476,11 +632,15 @@ function Test-Property-Miner ()
 			Write-Pretty-Info ($Sep + $Miner)
 		}
 
-		Exit-RudeHash
+		return $false
+	}
+	else
+	{
+		return $true
 	}
 }
 
-function Test-Property-Algo ()
+function Test-AlgoProperty ()
 {
 	if ($Config.Algo)
 	{
@@ -511,8 +671,71 @@ function Test-Property-Algo ()
 				Write-Pretty-Info ($Sep + $Algo)
 			}
 
-			Exit-RudeHash
+			return $false
 		}
+		else
+		{
+			return $true
+		}
+	}
+	else
+	{
+		return $true
+	}
+}
+
+function Receive-Choice ($A, $B)
+{
+	$Name = ""
+
+	while (-Not ($Name.Equals($A) -Or $Name.Equals($B)))
+	{
+		$Name = Read-Host "Please specify the property you want to modify ('$($A)' or '$($B)')"
+
+		# capitalization
+		if ($Name.Length -gt 1)
+		{
+			$Name = ($Name.Substring(0,1).ToUpper() + $Name.Substring(1).ToLower())
+		}
+		else
+		{
+			$Name = $Name.ToUpper()
+		}
+	}
+
+	return $Name
+}
+
+function Receive-Property ($Name, $Mandatory)
+{
+	if ($Mandatory)
+	{
+		return Read-Host "Enter value for ""$($Name)"""
+	}
+	else
+	{
+		return Read-Host "Enter value for ""$($Name)"" (or press Return to delete)"
+	}
+}
+
+function Initialize-Property ($Name, $Mandatory, $Force)
+{
+	if ($Config.Debug)
+	{
+		Write-Pretty-Debug "Evaluating $Name property..."
+	}
+
+	if ($Force)
+	{
+		$Ret = Receive-Property $Name $Mandatory
+		Set-Property $Name $Ret $Force
+	}
+
+	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
+	while (-Not (& (Get-ChildItem "Function:Test-$($Name)Property")))
+	{
+		$Ret = Receive-Property $Name $Mandatory
+		Set-Property $Name $Ret $Mandatory
 	}
 }
 
@@ -524,8 +747,13 @@ function Test-Compatibility ()
 	{
 		if (-Not ($Pools[$Config.Pool].CoinMining))
 		{
-			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """, please unset the 'Coin' property!")
-			Exit-RudeHash
+			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """!")
+			Write-Pretty-Info (Get-Coin-Support)
+			Write-Pretty-Info (Get-Pool-Support)
+			$Choice = Receive-Choice "Coin" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
 		}
 		else
 		{
@@ -539,31 +767,43 @@ function Test-Compatibility ()
 		Write-Pretty-Error ("You specified neither a coin nor an algo!")
 		Write-Pretty-Info (Get-Coin-Support)
 		Write-Pretty-Info (Get-Miner-Support)
-		Exit-RudeHash
+		$Choice = Receive-Choice "Coin" "Algo"
+		$Config.$Choice = ""
+		Initialize-Property $Choice $true $true
+		Test-Compatibility
 	}
-
 
 	if (-Not ($Miners[$Config.Miner].Algos.Contains($Config.Algo)))
 	{
 		if ($Config.Coin)
 		{
-			Write-Pretty-Error ("Incompatible configuration! """ + $Config.Coin.ToUpper() + """ cannot be mined with """ + $Config.Miner + """.")
+			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Coin.ToUpper() + """ coin cannot be mined with """ + $Config.Miner + """.")
 			Write-Pretty-Info (Get-Coin-Support)
+			Write-Pretty-Info (Get-Miner-Support)
+			$Choice = Receive-Choice "Coin" "Miner"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
 		}
 		else
 		{
-			Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined with """ + $Config.Miner + """.")
+			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Algo + """ algo cannot be mined with """ + $Config.Miner + """.")
+			Write-Pretty-Info (Get-Miner-Support)
+			$Choice = Receive-Choice "Algo" "Miner"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
 		}
-
-		Write-Pretty-Info (Get-Miner-Support)
-		Exit-RudeHash
 	}
 
 	if (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
 	{
 		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
 		Write-Pretty-Info (Get-Pool-Support)
-		Exit-RudeHash
+		$Choice = Receive-Choice "Algo" "Pool"
+		$Config.$Choice = ""
+		Initialize-Property $Choice $true $true
+		Test-Compatibility
 	}
 
 	# configuration is good, let's set up globals
@@ -611,16 +851,19 @@ function Get-Currency-Support ()
 	}
 }
 
-function Test-Property-Currency ()
+function Test-CurrencyProperty ()
 {
-	Get-Currency-Support
+	if (-Not $Config.Rates)
+	{
+		Get-Currency-Support
+	}
 
 	if ($Config.Api -And $Config.Rates)
 	{
 		if (-Not ($Config.Currency))
 		{
 			Write-Pretty-Error ("Currency must be set!")
-			Exit-RudeHash
+			return $false
 		}
 
 		$Config.Currency = $Config.Currency.ToUpper()
@@ -636,107 +879,69 @@ function Test-Property-Currency ()
 				Write-Pretty-Info ($Sep + $Currency)
 			}
 
-			Exit-RudeHash
+			return $false
 		}
+		else
+		{
+			return $true
+		}
+	}
+	else
+	{
+		return $true
 	}
 }
 
-function Test-Property-Cost ()
+function Test-ElectricityCostProperty ()
 {
 	if ($Config.Api -And $Config.Rates)
 	{
 		if (-Not ($Config.ElectricityCost))
 		{
 			Write-Pretty-Error ("Electricity cost must be set!")
-			Exit-RudeHash
+			return $false
 		}
 
 		try
 		{
 			$Config.ElectricityCost = [System.Convert]::ToDouble($Config.ElectricityCost)
+			return $true
 		}
 		catch
 		{
 			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
-			Exit-RudeHash
+			return $false
 		}
+	}
+	else
+	{
+		return $true
 	}
 }
 
-function Test-Properties ()
+function Initialize-Properties ()
 {
-	Test-Property-Debug
-	Test-Property-Watchdog
-	Test-Property-MonitoringKey
-	Test-Property-Pool
-	Test-Property-Credentials
-	Test-Property-Region
-	Test-Property-Coin
-	Test-Property-Miner
-	Test-Property-Algo
+	if ($FirstRun)
+	{
+		Write-Pretty-Info "Welcome to RudeHash! Let's set up your configuration."
+	}
+
+	Initialize-Property "Debug" $true $FirstRun
+	Initialize-Property "Watchdog" $true $FirstRun
+	Initialize-Property "MonitoringKey" $false $FirstRun
+	Initialize-Property "Pool" $true $FirstRun
+	Initialize-Property "Worker" $true $FirstRun
+	Initialize-Property "Wallet" $true $FirstRun
+	Initialize-Property "User" $true $FirstRun
+	Initialize-Property "Region" $true $FirstRun
+	Initialize-Property "Coin" $false $FirstRun
+	Initialize-Property "Miner" $true $FirstRun
+	Initialize-Property "Algo" $false $FirstRun
+
 	Test-Compatibility
-	Test-Property-Currency
-	Test-Property-Cost
-}
 
-function Set-Property ($Key, $Value, $Force)
-{
-	# we will flush memory values to disk, so set memory value first
-	$Config.$Key = $Value
-	$ConfigStr = ""
-	$Match = $false
-	$Props = $ConfigFileContent.Split("`r`n")
-
-	for ($i = 0; $i -lt $Props.Length; $i++)
-	{
-		$Line = $Props[$i]
-
-		# key=value pairs that were parsed by ConvertFrom-StringData
-		if ($Line -match "^.*=.*")
-		{
-			$CurrentKey = $Line.Split("=")[0]
-
-			# the key we want to set already exists in the config file
-			if ($CurrentKey -eq $Key)
-			{
-				$Match = $true
-			}
-
-			# replace config file entries with in-memory entries
-			if ($Config.ContainsKey($CurrentKey))
-			{
-				$ConfigStr += $Line -replace "^$($CurrentKey)=.*", "$($CurrentKey)=$($Config[$CurrentKey])"
-			}
-		}
-		# everything else
-		else
-		{
-			$ConfigStr += "$Line"
-		}
-
-		# don't add extra newline on last line, file would grow eternally
-		# why 3? who knows, who cares?
-		if ($i -le ($Props.Length - 3))
-		{
-			$ConfigStr += "`r`n"
-		}
-	}
-
-	# if it wasn't found in the config file and we force the set, we have to add it manually to the list
-	if ($Force -And (-Not $Match))
-	{
-		$ConfigStr += "`r`n$($Key)=$($Value)"
-	}
-
-	try
-	{
-		$ConfigStr | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
-	}
-	catch
-	{
-		Write-Pretty-Error "Error accessing '$ConfigFile'! Make sure it has the appropriate permissions."
-		Exit-RudeHash
-	}
+	Initialize-Property "Currency" $true $FirstRun
+	Initialize-Property "ElectricityCost" $true $FirstRun
 }
 
 $RigStats =
@@ -825,7 +1030,7 @@ function Resolve-Pool-Ip ()
 {
 	try
 	{
-		$Ip = ([System.Net.DNS]::GetHostEntry($Config.Server).AddressList[0].IPAddressToString)	
+		$Ip = ([System.Net.DNS]::GetHostEntry($Config.Server).AddressList[0].IPAddressToString)
 	}
 	catch
 	{
@@ -838,7 +1043,7 @@ function Resolve-Pool-Ip ()
 
 		Exit-RudeHash
 	}
-	
+
 	return $Ip
 }
 
@@ -850,7 +1055,7 @@ function Get-GpuCount ()
 		{
 			$Response = Read-Miner-Api 'summary' $false
 
-			try 
+			try
 			{
 				$Count = $Response.Split("|")[0].Split(";")[4].Split("=")[1]
 			}
@@ -983,7 +1188,6 @@ function Initialize-Json ($User, $Pass)
 			}
 			Write-Output $Line
 		})
-		
 	]}
 ]
 "@
@@ -1017,7 +1221,6 @@ function Initialize-Excavator ($User, $Pass)
 
 		Exit-RudeHash
 	}
-	
 }
 
 function Initialize-Miner-Args ()
@@ -1277,7 +1480,7 @@ function Get-PowerUsage ()
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
-			try 
+			try
 			{
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -1415,7 +1618,7 @@ function Measure-Earnings ()
 	{
 		$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
 		$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
-	
+
 		try
 		{
 			$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
@@ -1423,13 +1626,13 @@ function Measure-Earnings ()
 		catch
 		{
 			Write-Pretty-Error "WhatToMine request failed! Is your network connection working?"
-	
+
 			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
 			}
 		}
-		
+
 		$WtmObj = $WtmHtml.Content -split "[`r`n]"
 		$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
 
@@ -1446,7 +1649,7 @@ function Measure-Earnings ()
 		catch
 		{
 			Write-Pretty-Error "Malformed WhatToMine response."
-	
+
 			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
@@ -1473,7 +1676,7 @@ function Measure-Earnings ()
 		catch
 		{
 			Write-Pretty-Error "NiceHash request failed! Is your network connection working?"
-	
+
 			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
@@ -1724,7 +1927,7 @@ function Write-Stats ()
 
 				Write-Pretty-Earnings ("Daily earnings: " + $RigStats.EarningsBtc + " BTC" + $FiatStr + $ProfitStr)
 			}
-		}	
+		}
 	}
 }
 
@@ -1765,7 +1968,7 @@ function Ping-Miner ($Proc)
 			Start-Sleep 5
 			$Proc = Start-Miner
 			$RigStats.FailedChecks = 0
-		}	
+		}
 	}
 
 	return $Proc
@@ -1806,11 +2009,11 @@ function Ping-Monitoring ()
 			EstimatedSpeed = Get-HashRate-Pretty $RigStats.HashRate
 			'BTC/day' = $RigStats.EarningsBtc
 		} )
-	
+
 		try
 		{
 			$Response = Invoke-RestMethod -Uri $MonitoringUrl -Method Post -Body @{ address = $Config.MonitoringKey; workername = $Config.Worker; miners = $MinerJson; profit = $RigStats.EarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
-	
+
 			if ($Config.Debug)
 			{
 				#Write-Pretty-Debug $MinerJson
@@ -1820,12 +2023,12 @@ function Ping-Monitoring ()
 		catch
 		{
 			Write-Pretty-Error "Error while pinging the monitoring server!"
-	
+
 			if ($Config.Debug)
 			{
 				Write-Pretty-Debug $_.Exception
 			}
-		}		
+		}
 	}
 }
 
@@ -1865,7 +2068,7 @@ function Start-RudeHash ()
 
 Write-Pretty-Header
 Initialize-Temp
-Test-Properties
+Initialize-Properties
 Set-WindowTitle
 Test-Tools
 Test-Miner
