@@ -55,6 +55,7 @@ Pools:
 | Pool | Mining modes |
 |---|---|
 | Mining Pool Hub | algo, coin |
+| NiceHash | algo |
 | zpool | algo |
 
 ## Statistics
