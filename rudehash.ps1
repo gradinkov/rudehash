@@ -2,7 +2,7 @@ $ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.properties")
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
-$FirstRun = $true
+$FirstLoop = $true
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
@@ -1835,7 +1835,7 @@ function Start-RudeHash ()
 	while (1)
 	{
 		# get GPU count quickly, but not on excavator, it knows the GPU count already
-		if ($FirstRun -And $Config.Api -And (-Not($Config.Miner -eq "excavator")))
+		if ($FirstLoop -And $Config.Api -And (-Not($Config.Miner -eq "excavator")))
 		{
 			$Delay = 15
 		}
@@ -1844,7 +1844,7 @@ function Start-RudeHash ()
 			$Delay = 60
 		}
 
-		if ($FirstRun -or $Proc.HasExited)
+		if ($FirstLoop -or $Proc.HasExited)
 		{
 			if ($Proc.HasExited)
 			{
@@ -1859,7 +1859,7 @@ function Start-RudeHash ()
 		$Proc = Ping-Miner $Proc
 		Ping-Monitoring
 
-		$FirstRun = $false
+		$FirstLoop = $false
 	}
 }
 
