@@ -987,7 +987,7 @@ function Initialize-Miner-Args ()
 
 	if ($Config.ExtraArgs)
 	{
-		Args += " " + $Config.ExtraArgs
+		$Args += " " + $Config.ExtraArgs
 	}
 
 	return $Args
