@@ -167,13 +167,13 @@ $Coins =
 $Miners =
 @{
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt"); Api = $true }
-	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true }
-	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt"); Api = $true }
-	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true }
-	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true }
-	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true }
-	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true }
-	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true }
+	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "2.2.4" }
+	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
+	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev3" }
+	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
+	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true; Version = "1.0.1" }
+	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true; Version = "0.3.4b" }
 }
 
 $ExcavatorAlgos =
@@ -972,7 +972,7 @@ function Initialize-Temp ()
 	{
 		if (Test-Path $TempDir -ErrorAction Stop)
 		{
-			Remove-Item -Recurse -Path $TempDir -ErrorAction Stop
+			Remove-Item -Recurse -Force -Path $TempDir -ErrorAction Stop
 		}
 
 		New-Item -ItemType Directory -Path $TempDir -Force -ErrorAction Stop | Out-Null
@@ -1813,25 +1813,95 @@ function Test-Tools ()
 	}
 }
 
+function Get-MinerOutput ($Exe, $Argus)
+{
+	$ProcInfo = New-Object System.Diagnostics.ProcessStartInfo
+	$ProcInfo.FileName = $Exe
+	# stupid PowerShell, $Args is a reserved word
+	$ProcInfo.Arguments = $Argus
+	$ProcInfo.RedirectStandardOutput = $true
+	#$ProcInfo.RedirectStandardError = $true
+	$ProcInfo.UseShellExecute = $false
+
+	$Proc = New-Object System.Diagnostics.Process
+	$Proc.StartInfo = $ProcInfo
+	$Proc.Start() | Out-Null
+	$Proc.WaitForExit()
+	$Str = $Proc.StandardOutput.ReadToEnd()
+	#$Str += $Proc.StandardError.ReadToEnd()
+
+	return $Str
+}
+
+function Get-MinerVersion ($Exe)
+{
+	switch ($Config.Miner)
+	{
+		# klaust messes up stdio, can't determine version reliably
+		#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
+		"ccminer-phi" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split("-")[1] }
+		"ccminer-tpruvot" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
+		"dstm" { $VersionStr = (Get-MinerOutput $Exe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
+		"ethminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
+		"excavator" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
+		"vertminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
+		"zecminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
+	}
+
+	return $VersionStr
+}
+
 function Test-Miner ()
 {
 	$Name = $Config.Miner
 	$MinerDir = [io.path]::combine($MinersDir, $Name)
 	$MinerExe = [io.path]::combine($MinerDir, $Miners[$Name].ExeFile)
 
+	# create main miners dir if missing
 	if (-Not (Test-Path -LiteralPath $MinersDir))
 	{
 		New-Item -ItemType Directory -Path $MinersDir | Out-Null
 	}
 
-	if (-Not (Test-Path -LiteralPath $MinerExe))
+	$MinerExists = Test-Path -LiteralPath $MinerExe
+
+	# update check
+	if ($MinerExists -And $Miners[$Config.Miner].Version)
+	{
+		$CurrentVer = Get-MinerVersion $MinerExe
+		$LatestVer = $Miners[$Config.Miner].Version
+		$VersionStr = " v" + $LatestVer
+
+		if (-Not ($LatestVer -eq $CurrentVer))
+		{
+			Write-Pretty-Info ($Config.Miner + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
+
+			try
+			{
+				Remove-Item -Recurse -Force -Path $MinerDir
+			}
+			catch
+			{
+				Write-Pretty-Error ("Error removing " + $Config.Miner + " v" + $CurrentVer + "!")
+				Exit-RudeHash
+			}
+
+			$MinerExists = $false
+		}
+		elseif ($Config.Debug)
+		{
+			Write-Pretty-Debug ($Config.Miner + " v" + $CurrentVer + " found, it is the latest version.")
+		}
+	}
+
+	if (-Not $MinerExists)
 	{
 		if (Test-Path -LiteralPath $MinerDir)
 		{
-			Remove-Item -Recurse -Path $MinerDir
+			Remove-Item -Recurse -Force -Path $MinerDir
 		}
 
-		Write-Pretty-Info ("Downloading " + $Config.Miner + "...")
+		Write-Pretty-Info ("Downloading " + $Config.Miner + $VersionStr + "...")
 		$ArchiveDir = (Get-Archive ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
 
 		if ($Miners[$Name].FilesInRoot)
