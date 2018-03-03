@@ -1,0 +1,16 @@
+{
+  "Pool": "nicehash",
+  "Algo": "equihash",
+  "Miner": "excavator",
+  "Worker": "rudehash",
+  "Currency": "USD",
+  "ElectricityCost": 0.1,
+  "Watchdog": true,
+  "Debug": false,
+  "MonitoringKey": "",
+  "ExtraArgs": "",
+  "Wallet": "3Gfmm5iAYvu8wf2pLyUjKBcGWsXZ8EEubi",
+  "User": "",
+  "Region": "usa",
+  "Coin": ""
+}

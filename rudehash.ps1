@@ -1,8 +1,9 @@
-$ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.ini")
+$ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.json")
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
-$Config = @{}
+[System.Collections.Hashtable]$Config = @{}
+[System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
 $MinerPort = 28178
@@ -65,18 +66,14 @@ if (Test-Path $ConfigFile)
 {
 	try
 	{
-		$ConfigFileContent = Get-Content $ConfigFile -raw
+		$Config = Get-Content -Path $ConfigFile -Raw | ConvertFrom-Json -AsHashtable
 
 		# make sure we don't fail if the file is empty
-		if ($ConfigFileContent -gt 0)
+		if (-Not ($Config))
 		{
-			$Config = ConvertFrom-StringData($ConfigFileContent)
-		}
-		else
-		{
+			[System.Collections.Hashtable]$Config = @{}
 			$FirstRun = $true
 		}
-
 	}
 	catch [System.Management.Automation.PSInvalidOperationException]
 	{
@@ -226,81 +223,8 @@ $NiceHashAlgos =
 
 function Set-Property ($Name, $Value, $Force)
 {
-	# we will flush memory values to disk, so set memory value first
 	$Config.$Name = $Value
-	$ConfigStr = ""
-	$Match = $false
-	$NeedsWrite = $false
-
-	$CurrentConfig = Get-Content $ConfigFile -raw
-
-	# don't fail on empty file
-	if ($CurrentConfig.Length -gt 0)
-	{
-		$Props = $CurrentConfig.Split("`r`n")
-
-		for ($i = 0; $i -lt $Props.Length; $i++)
-		{
-			$Line = $Props[$i]
-
-			# key=value pairs that are parsed by ConvertFrom-StringData
-			if ($Line -match "^.*=.*")
-			{
-				$CurrentKey = $Line.Split("=")[0]
-
-				# the key we want to set already exists in the config file
-				if ($CurrentKey -eq $Name)
-				{
-					$Match = $true
-					$ConfigStr += $Line -replace "^$($Name)=.*", "$($Name)=$($Config[$CurrentKey])"
-					$NeedsWrite = $true
-				}
-				# all the other key=value pairs, don't touch those
-				else
-				{
-					$ConfigStr += "$Line"
-				}
-			}
-			# don't touch anything else either
-			else
-			{
-				$ConfigStr += "$Line"
-			}
-
-			# don't add extra newline, file would grow eternally
-			# why 3? who knows, who cares?
-			if ($i -le ($Props.Length - 3))
-			{
-				$ConfigStr += "`r`n"
-			}
-		}
-
-		$Prefix = "`r`n"
-	}
-	else
-	{
-		$Prefix = ""
-	}
-
-	# if it wasn't found in the config file and we force the set, we have to add it manually to the list
-	if ($Force -And (-Not $Match) -And (-Not [string]::IsNullOrEmpty($Value)))
-	{
-		$ConfigStr += "$($Prefix)$($Name)=$($Value)"
-		$NeedsWrite = $true
-	}
-
-	if ($NeedsWrite)
-	{
-		try
-		{
-			$ConfigStr | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
-		}
-		catch
-		{
-			Write-Pretty-Error "Error accessing '$ConfigFile'! Make sure it has the appropriate permissions."
-			Exit-RudeHash
-		}
-	}
+	$Config | ConvertTo-Json | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
 }
 
 function Get-Coin-Support ()
@@ -741,7 +665,7 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 
 function Test-Compatibility ()
 {
-	$Config.CoinMode = $false
+	$SessionConfig.CoinMode = $false
 
 	if ($Config.Coin)
 	{
@@ -759,7 +683,7 @@ function Test-Compatibility ()
 		{
 			# use coin algo if coin is specified
 			$Config.Algo = $Coins[$Config.Coin].Algo
-			$Config.CoinMode = $true
+			$SessionConfig.CoinMode = $true
 		}
 	}
 	elseif (-Not $Config.Algo)
@@ -807,26 +731,26 @@ function Test-Compatibility ()
 	}
 
 	# configuration is good, let's set up globals
-	if ($Config.CoinMode)
+	if ($SessionConfig.CoinMode)
 	{
-		$Config.Server = $Coins[$Config.Coin].Server
-		$Config.Port = $Coins[$Config.Coin].Port
+		$SessionConfig.Server = $Coins[$Config.Coin].Server
+		$SessionConfig.Port = $Coins[$Config.Coin].Port
 	}
 	else
 	{
-		$Config.Server = $Pools[$Config.Pool].Algos[$Config.Algo].Server
-		$Config.Port = $Pools[$Config.Pool].Algos[$Config.Algo].Port
+		$SessionConfig.Server = $Pools[$Config.Pool].Algos[$Config.Algo].Server
+		$SessionConfig.Port = $Pools[$Config.Pool].Algos[$Config.Algo].Port
 	}
 
 	if ($Miners[$Config.Miner].Api)
 	{
-		$Config.Api = $true
+		$SessionConfig.Api = $true
 	}
 }
 
 function Get-Currency-Support ()
 {
-	$Config.Rates = $false
+	$SessionConfig.Rates = $false
 
 	try
 	{
@@ -838,7 +762,7 @@ function Get-Currency-Support ()
 			$BtcRates.Add($Currency, $Response[$Currency].buy)
 		}
 
-		$Config.Rates = $true
+		$SessionConfig.Rates = $true
 	}
 	catch
 	{
@@ -853,12 +777,12 @@ function Get-Currency-Support ()
 
 function Test-CurrencyProperty ()
 {
-	if (-Not $Config.Rates)
+	if (-Not $SessionConfig.Rates)
 	{
 		Get-Currency-Support
 	}
 
-	if ($Config.Api -And $Config.Rates)
+	if ($SessionConfig.Api -And $SessionConfig.Rates)
 	{
 		if (-Not ($Config.Currency))
 		{
@@ -894,7 +818,7 @@ function Test-CurrencyProperty ()
 
 function Test-ElectricityCostProperty ()
 {
-	if ($Config.Api -And $Config.Rates)
+	if ($SessionConfig.Api -And $SessionConfig.Rates)
 	{
 		if (-Not ($Config.ElectricityCost))
 		{
@@ -1037,7 +961,7 @@ function Resolve-Pool-Ip ()
 {
 	try
 	{
-		$Ip = ([System.Net.DNS]::GetHostEntry($Config.Server).AddressList[0].IPAddressToString)
+		$Ip = ([System.Net.DNS]::GetHostEntry($SessionConfig.Server).AddressList[0].IPAddressToString)
 	}
 	catch
 	{
@@ -1172,7 +1096,7 @@ function Initialize-Json ($User, $Pass)
 	$ExcavatorJson = @"
 [
 	{"time":0,"commands":[
-		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($Config.Port)","$($User):$($Pass)"]}
+		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($SessionConfig.Port)","$($User):$($Pass)"]}
 	]},
 	{"time":3,"commands":[
 		$(for ($i = 0; $i -lt $Count; $i++)
@@ -1245,16 +1169,16 @@ function Initialize-Miner-Args ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $Config.Server + ":" + $Config.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
-		"dstm" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
-		"ethminer" { $Args = "--cuda --stratum " + $Config.Server + ":" + $Config.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"dstm" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
+		"ethminer" { $Args = "--cuda --stratum " + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort }
 		"excavator"
 		{
 			Initialize-Excavator $PoolUser $PoolPass
 			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json") + " -p " + $MinerPort
 		}
-		"vertminer" { $Args = "-o stratum+tcp://" + $Config.Server + ":" + $Config.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
-		"zecminer" { $Args = "--server " + $Config.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $Config.Port + " --api 127.0.0.1:" + $MinerPort }
+		"vertminer" { $Args = "-o stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"zecminer" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
 
 	if ($Config.ExtraArgs)
@@ -1621,7 +1545,7 @@ function Get-PowerUsage ()
 
 function Measure-Earnings ()
 {
-	if ($Config.CoinMode)
+	if ($SessionConfig.CoinMode)
 	{
 		$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
 		$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
@@ -1648,7 +1572,7 @@ function Measure-Earnings ()
 			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 47)).Trim())
 			$RigStats.EarningsBtc = [math]::Round($BtcEarnings, 8)
 
-			if ($Config.Rates)
+			if ($SessionConfig.Rates)
 			{
 				$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
 			}
@@ -1675,7 +1599,7 @@ function Measure-Earnings ()
 			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price * $Multiplier
 			$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price), 8)
 
-			if ($Config.Rates)
+			if ($SessionConfig.Rates)
 			{
 				$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
 			}
@@ -1937,7 +1861,7 @@ function Set-WindowTitle ()
 	# $Sep = " `u{25a0 | 25bc} "
 	$Sep = " `u{2219} "
 
-	if ($Config.CoinMode)
+	if ($SessionConfig.CoinMode)
 	{
 		$CoinStr = ("Coin: " + $Config.Coin.ToUpper() + $Sep)
 	}
@@ -1962,7 +1886,7 @@ function Set-WindowTitle ()
 
 function Write-Stats ()
 {
-	if ($Config.Api)
+	if ($SessionConfig.Api)
 	{
 		if ($RigStats.GpuCount -eq 0)
 		{
@@ -1984,14 +1908,14 @@ function Write-Stats ()
 			Write-Pretty-Info ("Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
-			if ($Config.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
+			if ($SessionConfig.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
 			{
 				Measure-Earnings
 
 				# we could keep trying to obtain exchange rates, but if it would eventually succeed and the
 				# list didn't contain the currency specified in the config, it'd result in indexing errors
 				# or we could re-check the property, but then it'd cause mining to stop; neither is desirable
-				if ($Config.Rates)
+				if ($SessionConfig.Rates)
 				{
 					$FiatStr = " / " + $RigStats.EarningsFiat + " " + $Config.Currency
 
@@ -2025,7 +1949,7 @@ function Start-Miner ()
 
 function Ping-Miner ($Proc)
 {
-	if ($Config.Api -And $Config.Watchdog)
+	if ($SessionConfig.Api -And $Config.Watchdog)
 	{
 		if ($RigStats.HashRate -eq 0)
 		{
@@ -2115,7 +2039,7 @@ function Start-RudeHash ()
 	while (1)
 	{
 		# get GPU count quickly, but not on excavator, it knows the GPU count already
-		if ($FirstLoop -And $Config.Api -And (-Not($Config.Miner -eq "excavator")))
+		if ($FirstLoop -And $SessionConfig.Api -And (-Not($Config.Miner -eq "excavator")))
 		{
 			$Delay = 15
 		}
