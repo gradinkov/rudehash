@@ -2004,7 +2004,7 @@ function Ping-Monitoring ()
 	if ($Config.MonitoringKey)
 	{
 		Update-MinerUptime
-		$ActiveStr = "$($RigStats.Uptime.Days) d $($RigStats.Uptime.Hours) h $($RigStats.Uptime.Minutes) m"
+		$ActiveStr = "$($RigStats.Uptime.Days)d $($RigStats.Uptime.Hours)h $($RigStats.Uptime.Minutes)m"
 		$MinerJson = ConvertTo-Json @( @{
 			Name = $Config.Miner
 			Path = $Miners[$Config.Miner].ExeFile
