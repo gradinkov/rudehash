@@ -919,6 +919,12 @@ function Test-ElectricityCostProperty ()
 	}
 }
 
+function Test-ExtraArgsProperty ()
+{
+	# we don't care what the user enters, impossible to check
+	return $true
+}
+
 function Initialize-Properties ()
 {
 	if ($FirstRun)
@@ -942,6 +948,7 @@ function Initialize-Properties ()
 
 	Initialize-Property "Currency" $true $FirstRun
 	Initialize-Property "ElectricityCost" $true $FirstRun
+	Initialize-Property "ExtraArgs" $false $FirstRun
 }
 
 $RigStats =
