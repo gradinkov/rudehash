@@ -1771,7 +1771,7 @@ function Test-Tool ($Name)
 	{
 		if (Test-Path -LiteralPath $ToolDir)
 		{
-			Remove-Item -Recurse -Path $ToolDir
+			Remove-Item -Recurse -Force -Path $ToolDir
 		}
 
 		Write-Pretty-Info ("Downloading " + $Name + "...")
