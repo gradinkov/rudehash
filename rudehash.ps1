@@ -143,9 +143,11 @@ $Pools =
 		Algos =
 		@{
 			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142 }
+			"hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433 }
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533 }
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333 }
+			"poly" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463 }
 		}
 	}
 }
@@ -166,10 +168,12 @@ $Miners =
 @{
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt"); Api = $true }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
+	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("poly"); Api = $true }
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "2.2.4" }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev3" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
+	"hsrminer" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $false; Version = "1.0" }
 	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true; Version = "1.0.1" }
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true; Version = "0.3.4b" }
 }
@@ -206,9 +210,11 @@ $AlgoNames =
 @{
 	"ethash" = "Ethash"
 	"equihash" = "Equihash"
+	"hsr" = "HSR"
 	"lyra2v2" = "Lyra2REv2"
 	"neoscrypt" = "NeoScrypt"
 	"phi" = "PHI1612"
+	"poly" = "Polytimos"
 }
 
 $NiceHashAlgos =
@@ -469,7 +475,7 @@ function Test-UserProperty ()
 
 function Test-RegionProperty ()
 {
-	if ($Config.Region)
+	if ($Config.Region -And $Pools[$Config.Pool].Regions)
 	{
 		if ($Regions[$Config.Pool].Contains($Config.Region))
 		{
@@ -1015,7 +1021,7 @@ function Get-GpuCount ()
 {
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'summary' $false
 
@@ -1202,7 +1208,7 @@ function Initialize-Miner-Args ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort }
 		"excavator"
@@ -1210,6 +1216,7 @@ function Initialize-Miner-Args ()
 			Initialize-Excavator $PoolUser $PoolPass
 			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json") + " -p " + $MinerPort
 		}
+		"hsrminer" { $Args = "--url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass=" + $PoolUser + ":" + $PoolPass }
 		"vertminer" { $Args = "-o stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"zecminer" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
@@ -1259,11 +1266,11 @@ function Get-HashRate-Miner ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
-			try 
+			try
 			{
 				for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 				{
@@ -1440,7 +1447,7 @@ function Get-PowerUsage ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1801,6 +1808,7 @@ function Get-MinerVersion ($Exe)
 		"dstm" { $VersionStr = (Get-MinerOutput $Exe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
 		"ethminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
 		"excavator" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
+		"hsrminer" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[17].Trim().Split(" ")[3] }
 		"vertminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
 		"zecminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
 	}
@@ -1823,31 +1831,35 @@ function Test-Miner ()
 	$MinerExists = Test-Path -LiteralPath $MinerExe
 
 	# update check
-	if ($MinerExists -And $Miners[$Config.Miner].Version)
+	if ($Miners[$Config.Miner].Version)
 	{
-		$CurrentVer = Get-MinerVersion $MinerExe
 		$LatestVer = $Miners[$Config.Miner].Version
 		$VersionStr = " v" + $LatestVer
 
-		if (-Not ($LatestVer -eq $CurrentVer))
+		if ($MinerExists)
 		{
-			Write-Pretty-Info ($Config.Miner + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
+			$CurrentVer = Get-MinerVersion $MinerExe
 
-			try
+			if (-Not ($LatestVer -eq $CurrentVer))
 			{
-				Remove-Item -Recurse -Force -Path $MinerDir
-			}
-			catch
-			{
-				Write-Pretty-Error ("Error removing " + $Config.Miner + " v" + $CurrentVer + "!")
-				Exit-RudeHash
-			}
+				Write-Pretty-Info ($Config.Miner + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
 
-			$MinerExists = $false
-		}
-		elseif ($Config.Debug)
-		{
-			Write-Pretty-Debug ($Config.Miner + " v" + $CurrentVer + " found, it is the latest version.")
+				try
+				{
+					Remove-Item -Recurse -Force -Path $MinerDir
+				}
+				catch
+				{
+					Write-Pretty-Error ("Error removing " + $Config.Miner + " v" + $CurrentVer + "!")
+					Exit-RudeHash
+				}
+
+				$MinerExists = $false
+			}
+			elseif ($Config.Debug)
+			{
+				Write-Pretty-Debug ($Config.Miner + " v" + $CurrentVer + " found, it is the latest version.")
+			}
 		}
 	}
 
