@@ -6,6 +6,7 @@ $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 [System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
+$RegionChange = $false
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
@@ -680,6 +681,12 @@ function Test-Compatibility ()
 			Write-Pretty-Error ("Region must be set for the """ + $Config.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
+
+			if ($Choice.ToLower() -eq "region")
+			{
+				$RegionChange = $true
+			}
+
 			Initialize-Property $Choice $true $true
 			Test-Compatibility
 		}
@@ -765,6 +772,12 @@ function Test-Compatibility ()
 	if ($Miners[$Config.Miner].Api)
 	{
 		$SessionConfig.Api = $true
+	}
+
+	if ($RegionChange)
+	{
+		Write-Pretty-Info ("Region has changed, please restart RudeHash for the changes to take effect!")
+		Exit-RudeHash
 	}
 }
 
