@@ -1988,9 +1988,14 @@ function Ping-Miner ($Proc)
 		{
 			$RigStats.FailedChecks += 1
 
+			if ($RigStats.FailedChecks -ge 2)
+			{
+				$Suffix = "s"
+			}
+
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug ("Watchdog detected zero hash rate " + $RigStats.FailedChecks + " times.")
+				Write-Pretty-Debug ("Watchdog detected zero hash rate " + $RigStats.FailedChecks + " time" + $Suffix + ".")
 			}
 		}
 
