@@ -110,6 +110,7 @@ $Pools =
 		Authless = $false
 		CoinMining = $true
 		Regions = $true
+		StratumProto = 0
 		Algos =
 		@{
 			"ethash" = @{ Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 17020 }
@@ -125,6 +126,7 @@ $Pools =
 		Authless = $true
 		CoinMining = $false
 		Regions = $true
+		StratumProto = 2
 		Algos =
 		@{
 			"ethash" = @{ Server = "daggerhashimoto." + $Config.Region + ".nicehash.com"; Port = 3353 }
@@ -140,6 +142,7 @@ $Pools =
 		Authless = $true
 		CoinMining = $false
 		Regions = $false
+		StratumProto = 0
 		Algos =
 		@{
 			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142 }
@@ -475,21 +478,44 @@ function Test-UserProperty ()
 
 function Test-RegionProperty ()
 {
-	if ($Config.Region -And $Pools[$Config.Pool].Regions)
+	if ($Config.Region)
 	{
-		if ($Regions[$Config.Pool].Contains($Config.Region))
+		# make the array of dynamic size
+		[System.Collections.ArrayList]$ValidRegions = @()
+
+		# build a list of available regions
+		foreach ($Pool in $Regions.Keys)
+		{
+			foreach ($Region in $Regions[$Pool])
+			{
+				if (-Not ($ValidRegions.Contains($Region)))
+				{
+					$ValidRegions.Add($Region) | Out-Null
+				}
+			}
+		}
+
+		if ($ValidRegions.Contains($Config.Region))
 		{
 			return $true
 		}
 		else
 		{
+			Write-Pretty-Error ("The """ + $Config.Region + """ region does not exist!")
 			$Sep = "`u{00b7} "
-			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
-			Write-Pretty-Info "Supported regions:"
 
-			foreach ($Region in $Regions[$Config.Pool])
+			Write-Pretty-Info "Supported regions:"
+			foreach ($Pool in $Pools.Keys)
 			{
-				Write-Pretty-Info ($Sep + $Region)
+				if ($Pools[$Pool].Regions)
+				{
+					Write-Pretty-Info ($Pool + ":")
+
+					foreach ($Region in $Regions[$Pool])
+					{
+						Write-Pretty-Info ($Sep + $Region)
+					}
+				}
 			}
 
 			return $false
@@ -685,6 +711,20 @@ function Test-Compatibility ()
 		if (-Not ($Config.Region))
 		{
 			Write-Pretty-Error ("Region must be set for the """ + $Config.Pool + """ pool!")
+			$Choice = Receive-Choice "Region" "Pool"
+			$Config.$Choice = ""
+
+			if ($Choice.ToLower() -eq "region")
+			{
+				$RegionChange = $true
+			}
+
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+		if (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
+		{
+			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
 
@@ -1210,7 +1250,7 @@ function Initialize-Miner-Args ()
 	{
 		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
-		"ethminer" { $Args = "--cuda --stratum " + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort }
+		"ethminer" { $Args = "--cuda --stratum " + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
 		"excavator"
 		{
 			Initialize-Excavator $PoolUser $PoolPass
