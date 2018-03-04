@@ -426,21 +426,16 @@ function Test-Wallet ($Address, $Symbol)
 
 function Test-WalletProperty ()
 {
-	if ($Pools[$Config.Pool].Authless)
+	if ($Config.Wallet)
 	{
-		if (-Not ($Config.Wallet))
+		if (Test-Wallet $Config.Wallet "BTC")
 		{
-			Write-Pretty-Error ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
-			return $false
-		}
-		elseif (-Not (Test-Wallet $Config.Wallet "BTC"))
-		{
-				Write-Pretty-Error ("Bitcoin wallet address is in incorrect format, please check it!")
-				return $false
+			return $true
 		}
 		else
 		{
-			return $true
+			Write-Pretty-Error ("Bitcoin wallet address is in incorrect format, please check it!")
+			return $false
 		}
 	}
 	else
@@ -451,41 +446,38 @@ function Test-WalletProperty ()
 
 function Test-UserProperty ()
 {
-	if ($Pools[$Config.Pool].Authless)
+	if ($Config.User)
 	{
-		return $true
-	}
-	elseif (-Not ($Config.User))
-	{
-		Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, username must be set!")
-		return $false
+		$Pattern = "^[a-zA-Z0-9]{1,20}$"
+
+		if ($Config.User -match $Pattern)
+		{
+			return $true
+		}
+		else
+		{
+			Write-Pretty-Error ("User name is in invalid format! Use a maximum of 20 letters and numbers!")
+			return $false
+		}
 	}
 	else
 	{
 		return $true
 	}
-
-	# if (-Not ($Config.ApiKey))
-	# {
-	# 	Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, API key must be set!")
-	# 	Exit-RudeHash
-	# }
 }
 
 function Test-RegionProperty ()
 {
-	if ($Pools[$Config.Pool].Regions)
+	if ($Config.Region)
 	{
-		if (-Not ($Config.Region))
+		if ($Regions[$Config.Pool].Contains($Config.Region))
 		{
-			Write-Pretty-Error ("Region must be set!")
-			return $false
+			return $true
 		}
-		elseif (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
+		else
 		{
-			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			$Sep = "`u{00b7} "
-
+			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			Write-Pretty-Info "Supported regions:"
 
 			foreach ($Region in $Regions[$Config.Pool])
@@ -494,10 +486,6 @@ function Test-RegionProperty ()
 			}
 
 			return $false
-		}
-		else
-		{
-			return $true
 		}
 	}
 	else
@@ -665,6 +653,38 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 
 function Test-Compatibility ()
 {
+	if ($Pools[$Config.Pool].Authless)
+	{
+		if (-Not ($Config.Wallet))
+		{
+			Write-Pretty-Error ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
+			$Choice = Receive-Choice "Wallet" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+	}
+	elseif (-Not ($Config.User))
+	{
+		Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, user name must be set!")
+		$Choice = Receive-Choice "User" "Pool"
+		$Config.$Choice = ""
+		Initialize-Property $Choice $true $true
+		Test-Compatibility
+	}
+
+	if ($Pools[$Config.Pool].Regions)
+	{
+		if (-Not ($Config.Region))
+		{
+			Write-Pretty-Error ("Region must be set for the """ + $Config.Pool + """ pool!")
+			$Choice = Receive-Choice "Region" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+	}
+
 	$SessionConfig.CoinMode = $false
 
 	if ($Config.Coin)
@@ -861,9 +881,9 @@ function Initialize-Properties ()
 	Initialize-Property "MonitoringKey" $false $FirstRun
 	Initialize-Property "Pool" $true $FirstRun
 	Initialize-Property "Worker" $true $FirstRun
-	Initialize-Property "Wallet" $true $FirstRun
-	Initialize-Property "User" $true $FirstRun
-	Initialize-Property "Region" $true $FirstRun
+	Initialize-Property "Wallet" $false $FirstRun
+	Initialize-Property "User" $false $FirstRun
+	Initialize-Property "Region" $false $FirstRun
 	Initialize-Property "Coin" $false $FirstRun
 	Initialize-Property "Miner" $true $FirstRun
 	Initialize-Property "Algo" $false $FirstRun
