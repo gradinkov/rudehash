@@ -1,5 +1,25 @@
 # RudeHash Changelog
 
+## RudeHash 4.0 (2018-03-04)
+
+* Add support for NiceHash pool
+* Add power usage and hash rate monitoring
+* Add profit estimation for coins
+* Add earnings and profit estimation for algos via NiceHash API
+* Add support for fiat currency conversion
+* Add watchdog to restart if hash rate is repeatedly zero
+* Add interactive config validation and first run wizard
+* Add support for MultiPoolMiner's monitoring service
+* Add support for extra miner paremeters
+* Add support for ccminer-polytimos
+* Add support for hsrminer
+* Check downloaded miners' versions and update if needed
+* Update DSTM to v0.6
+* Update ethminer to v0.14.0.dev3
+* Change config file format to JSON
+* Fix pool fee not being deducted from earnings for algos
+* Improved error handling
+
 ## RudeHash 3.0 (2018-02-26)
 
 * Add support for algo mining
