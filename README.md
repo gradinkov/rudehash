@@ -34,11 +34,12 @@ Algos:
 |---|---|
 | Ethash | ethminer, Excavator |
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
-| HSR | hsrminer |
+| HSR | ccminer-tpruvot, hsrminer |
+| Keccak-C | ccminer-tpruvot |
 | Lyra2v2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
-| PHI1612 | ccminer-phi |
-| Polytimos | ccminer-polytimos |
+| PHI1612 | ccminer-phi, ccminer-tpruvot |
+| Polytimos | ccminer-polytimos, ccminer-tpruvot |
 
 Coins:
 
