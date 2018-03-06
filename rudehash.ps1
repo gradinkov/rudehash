@@ -1971,8 +1971,33 @@ function Set-WindowTitle ()
 	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Config.Pool + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
 }
 
+function Update-MinerUptime ()
+{
+	try
+	{
+		$Proc = Get-Process -Id $RigStats.Pid -ErrorVariable Err -ErrorAction SilentlyContinue
+		$RigStats.Uptime = New-TimeSpan -Start $Proc.StartTime -End (Get-Date)
+	}
+	catch
+	{
+		Write-Pretty-Error "Error while checking the miner's uptime!"
+
+		if ($Config.Debug)
+		{
+			Write-Pretty-Debug $Err
+		}
+	}
+}
+
+function Get-PrettyUptime ()
+{
+	return "$($RigStats.Uptime.Days)d $($RigStats.Uptime.Hours)h $($RigStats.Uptime.Minutes)m"
+}
+
 function Write-Stats ()
 {
+	Update-MinerUptime
+
 	if ($SessionConfig.Api)
 	{
 		if ($RigStats.GpuCount -eq 0)
@@ -1992,7 +2017,7 @@ function Write-Stats ()
 				$PowerUsageStr = $Sep + "Power Usage: " + $RigStats.PowerUsage + " W"
 			}
 
-			Write-Pretty-Info ("Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
+			Write-Pretty-Info ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
 			if ($SessionConfig.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
@@ -2067,35 +2092,15 @@ function Ping-Miner ($Proc)
 	return $Proc
 }
 
-function Update-MinerUptime ()
-{
-	try
-	{
-		$Proc = Get-Process -Id $RigStats.Pid
-		$RigStats.Uptime = New-TimeSpan -Start $Proc.StartTime -End (Get-Date)
-	}
-	catch
-	{
-		Write-Pretty-Error "Error while checking the miner's uptime!"
-
-		if ($Config.Debug)
-		{
-			Write-Pretty-Debug $_.Exception
-		}
-	}
-}
-
 function Ping-Monitoring ()
 {
 	if ($Config.MonitoringKey)
 	{
-		Update-MinerUptime
-		$ActiveStr = "$($RigStats.Uptime.Days)d $($RigStats.Uptime.Hours)h $($RigStats.Uptime.Minutes)m"
 		$MinerJson = ConvertTo-Json @( @{
 			Name = $Config.Miner
 			Path = $Miners[$Config.Miner].ExeFile
 			PID = $RigStats.Pid
-			Active = $ActiveStr
+			Active = Get-PrettyUptime
 			Algorithm = $AlgoNames[$Config.Algo]
 			Pool = $Config.Pool
 			CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate
@@ -2149,11 +2154,14 @@ function Start-RudeHash ()
 
 			$Proc = Start-Miner
 		}
+		else
+		{
+			Write-Stats
+			$Proc = Ping-Miner $Proc
+			Ping-Monitoring
+		}
 
 		Start-Sleep -Seconds $Delay
-		Write-Stats
-		$Proc = Ping-Miner $Proc
-		Ping-Monitoring
 
 		$FirstLoop = $false
 	}
