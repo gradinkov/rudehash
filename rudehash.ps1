@@ -151,7 +151,7 @@ $Pools =
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533 }
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333 }
-			"poly" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463 }
+			"polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463 }
 		}
 	}
 }
@@ -172,8 +172,8 @@ $Miners =
 @{
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt"); Api = $true }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
-	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("poly"); Api = $true }
-	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi"); Api = $true; Version = "2.2.4" }
+	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev3" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
@@ -219,7 +219,7 @@ $AlgoNames =
 	"lyra2v2" = "Lyra2REv2"
 	"neoscrypt" = "NeoScrypt"
 	"phi" = "PHI1612"
-	"poly" = "Polytimos"
+	"polytimos" = "Polytimos"
 }
 
 $NiceHashAlgos =
@@ -1254,7 +1254,8 @@ function Initialize-MinerArgs ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"ccminer-polytimos" { $Args = "--algo=polytimos --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
 		"excavator"
