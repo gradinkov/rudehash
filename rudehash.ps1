@@ -1845,18 +1845,24 @@ function Get-MinerOutput ($Exe, $Argus)
 
 function Get-MinerVersion ($Exe)
 {
-	switch ($Config.Miner)
+	try {
+		switch ($Config.Miner)
+		{
+			# klaust messes up stdio, can't determine version reliably
+			#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
+			"ccminer-phi" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split("-")[1] }
+			"ccminer-tpruvot" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
+			"dstm" { $VersionStr = (Get-MinerOutput $Exe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
+			"ethminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
+			"excavator" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
+			"hsrminer" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[17].Trim().Split(" ")[3] }
+			"vertminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
+			"zecminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
+		}
+	}
+	catch
 	{
-		# klaust messes up stdio, can't determine version reliably
-		#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
-		"ccminer-phi" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split("-")[1] }
-		"ccminer-tpruvot" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
-		"dstm" { $VersionStr = (Get-MinerOutput $Exe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
-		"ethminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
-		"excavator" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
-		"hsrminer" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[17].Trim().Split(" ")[3] }
-		"vertminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
-		"zecminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
+		$VersionStr = "UNKNOWN"
 	}
 
 	return $VersionStr
@@ -1888,7 +1894,14 @@ function Test-Miner ()
 
 			if (-Not ($LatestVer -eq $CurrentVer))
 			{
-				Write-Pretty-Info ($Config.Miner + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
+				if ($CurrentVer -eq "UNKNOWN")
+				{
+					Write-Pretty-Info ("Unknown " + $Config.Miner + " version found, it will be replaced with v" + $LatestVer + ".")
+				}
+				else
+				{
+					Write-Pretty-Info ($Config.Miner + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
+				}
 
 				try
 				{
