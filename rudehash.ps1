@@ -1038,7 +1038,7 @@ function Read-Miner-Api ($Request, $Critical)
 	return $Response
 }
 
-function Resolve-Pool-Ip ()
+function Resolve-PoolIp ()
 {
 	try
 	{
@@ -1053,7 +1053,8 @@ function Resolve-Pool-Ip ()
 			Write-Pretty-Debug $_.Exception
 		}
 
-		Exit-RudeHash
+		# it's better than nothing, it might start working during stratum connection
+		$Ip = $SessionConfig.Server
 	}
 
 	return $Ip
@@ -1177,7 +1178,7 @@ function Initialize-Json ($User, $Pass)
 	$ExcavatorJson = @"
 [
 	{"time":0,"commands":[
-		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-Pool-Ip):$($SessionConfig.Port)","$($User):$($Pass)"]}
+		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-PoolIp):$($SessionConfig.Port)","$($User):$($Pass)"]}
 	]},
 	{"time":3,"commands":[
 		$(for ($i = 0; $i -lt $Count; $i++)
@@ -1235,7 +1236,7 @@ function Initialize-Excavator ($User, $Pass)
 	}
 }
 
-function Initialize-Miner-Args ()
+function Initialize-MinerArgs ()
 {
 	if ($Pools[$Config.Pool].Authless)
 	{
@@ -1248,19 +1249,22 @@ function Initialize-Miner-Args ()
 		$PoolPass = "x"
 	}
 
+	# always update the IP, the miner could've crashed because of an IP change to begin with
+	$PoolIp = Resolve-PoolIp
+
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
-		"dstm" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
-		"ethminer" { $Args = "--cuda --stratum " + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
+		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
 		"excavator"
 		{
 			Initialize-Excavator $PoolUser $PoolPass
 			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json") + " -p " + $MinerPort
 		}
-		"hsrminer" { $Args = "--url=stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " --userpass=" + $PoolUser + ":" + $PoolPass }
-		"vertminer" { $Args = "-o stratum+tcp://" + $SessionConfig.Server + ":" + $SessionConfig.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
-		"zecminer" { $Args = "--server " + $SessionConfig.Server + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --api 127.0.0.1:" + $MinerPort }
+		"hsrminer" { $Args = "--url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --userpass=" + $PoolUser + ":" + $PoolPass }
+		"vertminer" { $Args = "-o stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		"zecminer" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
 
 	if ($Config.ExtraArgs)
@@ -2047,11 +2051,12 @@ function Write-Stats ()
 function Start-Miner ()
 {
 	$Exe = [io.path]::combine($MinersDir, $Config.Miner, $Miners[$Config.Miner].ExeFile)
-	$Args = Initialize-Miner-Args
+	$Args = Initialize-MinerArgs
 
 	if ($Config.Debug)
 	{
-		Write-Pretty-Debug ("$Exe $Args")
+		Write-Pretty-Debug ("Stratum address: " + $SessionConfig.Server + ":" + $SessionConfig.Port)
+		Write-Pretty-Debug ("Miner command line: $Exe $Args")
 	}
 
 	$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
