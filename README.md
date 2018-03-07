@@ -16,15 +16,13 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 
 ## Installation
 
-1. Download and install the latest release of:
-
-* [NVIDIA Driver](https://www.geforce.com/drivers)
-* [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
-* [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
-
-2. Download and extract the [latest release of RudeHash](https://github.com/gradinkov/rudehash/releases/latest).
-
-3. Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`, then start it. The first run wizard will guide you through the options.
+* Download and install the latest release of:
+  * [NVIDIA Driver](https://www.geforce.com/drivers)
+  * [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
+  * [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
+* Download and extract the [latest release of RudeHash](https://github.com/gradinkov/rudehash/releases/latest).
+  * Alternatively, for the latest features and goodies, download the [development version](https://github.com/gradinkov/rudehash/archive/master.zip), but be warned, this code is less stable, and things might get shaky!
+* Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`, then start it. The first run wizard will guide you through the options.
 
 **Important:** on Suprnova you need to manually create your workers on the pool website beforehand. Make sure to always set the password to **x**, otherwise authentication will fail!
 
