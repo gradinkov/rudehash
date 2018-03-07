@@ -4,7 +4,7 @@
 
 * Add Suprnova support
 * Add Keccak-C, X16R support
-* Add Bitcoin Private, Ravencoin support
+* Add Bitcoin Private, Ravencoin, Kreds support
 * Add miner's uptime to statistics
 * Use IP address to connect to pool and update upon miner crash
 * Fix erroneous stat requests during miner crashes

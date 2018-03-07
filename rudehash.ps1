@@ -157,6 +157,7 @@ $Pools =
 			"btg" = @{ Server = "btg.suprnova.cc"; Port = 8816 }
 			"eth" = @{ Server = "eth.suprnova.cc"; Port = 5000 }
 			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
+			"kreds" = @{ Server = "kreds.suprnova.cc"; Port = 7196 }
 			"rvn" = @{ Server = "rvn.suprnova.cc"; Port = 6667 }
 			"vtc" = @{ Server = "vtc.suprnova.cc"; Port = 5678 }
 			"zcl" = @{ Server = "zcl.suprnova.cc"; Port = 4042 }
@@ -191,6 +192,7 @@ $Coins =
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
 	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
+	"kreds" = @{ Algo = "lyra2v2" }
 	"rvn" = @{ Algo = "x16r" }
 	"vtc" = @{ WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
 	"zcl" = @{ WtmPage = "167-zcl-equihash"; Algo = "equihash" }

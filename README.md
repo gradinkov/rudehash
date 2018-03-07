@@ -51,6 +51,7 @@ Coins:
 | ETH | Ethash |
 | FTC | NeoScrypt |
 | MONA | Lyra2v2 |
+| KREDS | Lyra2v2 |
 | RVN | X16R |
 | VTC | Lyra2v2 |
 | ZCL | EquiHash |
