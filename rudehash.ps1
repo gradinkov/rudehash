@@ -1732,7 +1732,7 @@ function Measure-Earnings ()
 
 		try
 		{
-			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 47)).Trim())
+			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 46)).Trim())
 			$RigStats.EarningsBtc = [math]::Round($BtcEarnings, 8)
 
 			if ($SessionConfig.Rates)

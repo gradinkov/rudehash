@@ -9,6 +9,7 @@
 * Use IP address to connect to pool and update upon miner crash
 * Fix erroneous stat requests during miner crashes
 * Fix potential miner version check errors
+* Fix failing WhatToMine estimates due to their changed formatting
 
 ## RudeHash 4.0 (2018-03-04)
 
