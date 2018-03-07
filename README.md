@@ -24,7 +24,9 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 
 2. Download and extract the [latest release of RudeHash](https://github.com/gradinkov/rudehash/releases/latest).
 
-3. Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`
+3. Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`, then start it. The first run wizard will guide you through the options.
+
+**Important:** on Suprnova you need to manually create your workers on the pool website beforehand. Make sure to always set the password to **x**, otherwise authentication will fail!
 
 ## Support
 
