@@ -254,6 +254,14 @@ $AlgoNames =
 	"x16r" = "X16R"
 }
 
+$PoolNames =
+@{
+	"miningpoolhub" = "Mining Pool Hub"
+	"nicehash" = "NiceHash"
+	"suprnova" = "Suprnova"
+	"zpool" = "zpool"
+}
+
 $NiceHashAlgos =
 @{
 	"equihash" = @{ Id = 24; Modifier = 1000000 }
@@ -2062,7 +2070,7 @@ function Set-WindowTitle ()
 		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
 	}
 
-	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Config.Pool + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
+	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $PoolNames[$Config.Pool] + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
 }
 
 function Update-MinerUptime ()
@@ -2197,7 +2205,7 @@ function Ping-Monitoring ()
 			PID = $RigStats.Pid
 			Active = Get-PrettyUptime
 			Algorithm = $AlgoNames[$Config.Algo]
-			Pool = $Config.Pool
+			Pool = $PoolNames[$Config.Pool]
 			CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate
 			EstimatedSpeed = Get-HashRate-Pretty $RigStats.HashRate
 			'BTC/day' = $RigStats.EarningsBtc
