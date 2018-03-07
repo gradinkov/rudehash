@@ -97,10 +97,6 @@ Algo-switching is based on the idea of relatively short spikes in exchange rates
 
 In fact, not even NiceHash' algo-switching works currently, because buyers are constantly manipulating the market with cancelled orders, and so most people end up disabling all but 1 or 2 algos.
 
-* Dev fee. What dev fee?
-
-I see no point in adding dev fee to an open source, plain text script. Anyone could remove it with 1 minute of work anyway. Instead, I'd greatly appreciate physical crypto coin gifts, [some](https://cdn.shopify.com/s/files/1/2143/9931/products/gold_2048x2048.jpg?v=1502697786) [of](http://physical-coin.com/wp-content/uploads/2018/01/s-l16005.jpg) [them](http://i.imgur.com/ctche9p.jpg) look pretty darn awesome.
-
 * AMD support?
 
 Actually, I'm not certain that RudeHash does _not_ work with AMD hardware. I just don't test it _at all_, because I have zero AMD hardware at hand, and by the look of things it will stay that way.
