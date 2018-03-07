@@ -3,6 +3,7 @@ $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 [System.Collections.Hashtable]$Config = @{}
+[System.Collections.Hashtable]$FileConfig = @{}
 [System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
@@ -1069,6 +1070,7 @@ $RigStats =
 	Profit = 0;
 	ExchangeRate = 0;
 	FailedChecks = 0;
+	DevMinutes = 0;
 	Pid = 0;
 	Uptime = New-TimeSpan;
 }
@@ -1946,21 +1948,24 @@ function Get-MinerOutput ($Exe, $Argus)
 	return $Str
 }
 
-function Get-MinerVersion ($Exe)
+function Get-MinerVersion ($Name)
 {
+	$MinerDir = [io.path]::combine($MinersDir, $Name)
+	$MinerExe = [io.path]::combine($MinerDir, $Miners[$Name].ExeFile)
+
 	try {
-		switch ($Config.Miner)
+		switch ($Name)
 		{
 			# klaust messes up stdio, can't determine version reliably
-			#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
-			"ccminer-phi" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split("-")[1] }
-			{$_ -in "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
-			"dstm" { $VersionStr = (Get-MinerOutput $Exe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
-			"ethminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
-			"excavator" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
-			"hsrminer" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[17].Trim().Split(" ")[3] }
-			"vertminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
-			"zecminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
+			#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
+			"ccminer-phi" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split("-")[1] }
+			{$_ -in "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			"dstm" { $VersionStr = (Get-MinerOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
+			"ethminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
+			"excavator" { $VersionStr = (Get-MinerOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
+			"hsrminer" { $VersionStr = (Get-MinerOutput $MinerExe "-h").Split("`r`n")[17].Trim().Split(" ")[3] }
+			"vertminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			"zecminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
 		}
 	}
 	catch
@@ -1971,9 +1976,8 @@ function Get-MinerVersion ($Exe)
 	return $VersionStr
 }
 
-function Test-Miner ()
+function Test-Miner ($Name)
 {
-	$Name = $Config.Miner
 	$MinerDir = [io.path]::combine($MinersDir, $Name)
 	$MinerExe = [io.path]::combine($MinerDir, $Miners[$Name].ExeFile)
 
@@ -1986,24 +1990,24 @@ function Test-Miner ()
 	$MinerExists = Test-Path -LiteralPath $MinerExe
 
 	# update check
-	if ($Miners[$Config.Miner].Version)
+	if ($Miners[$Name].Version)
 	{
-		$LatestVer = $Miners[$Config.Miner].Version
+		$LatestVer = $Miners[$Name].Version
 		$VersionStr = " v" + $LatestVer
 
 		if ($MinerExists)
 		{
-			$CurrentVer = Get-MinerVersion $MinerExe
+			$CurrentVer = Get-MinerVersion $Name
 
 			if (-Not ($LatestVer -eq $CurrentVer))
 			{
 				if ($CurrentVer -eq "UNKNOWN")
 				{
-					Write-Pretty-Info ("Unknown " + $Config.Miner + " version found, it will be replaced with v" + $LatestVer + ".")
+					Write-Pretty-Info ("Unknown " + $Name + " version found, it will be replaced with v" + $LatestVer + ".")
 				}
 				else
 				{
-					Write-Pretty-Info ($Config.Miner + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
+					Write-Pretty-Info ($Name + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
 				}
 
 				try
@@ -2012,7 +2016,7 @@ function Test-Miner ()
 				}
 				catch
 				{
-					Write-Pretty-Error ("Error removing " + $Config.Miner + " v" + $CurrentVer + "!")
+					Write-Pretty-Error ("Error removing " + $Name + " v" + $CurrentVer + "!")
 					Exit-RudeHash
 				}
 
@@ -2020,7 +2024,7 @@ function Test-Miner ()
 			}
 			elseif ($Config.Debug)
 			{
-				Write-Pretty-Debug ($Config.Miner + " v" + $CurrentVer + " found, it is the latest version.")
+				Write-Pretty-Debug ($Name + " v" + $CurrentVer + " found, it is the latest version.")
 			}
 		}
 	}
@@ -2032,7 +2036,7 @@ function Test-Miner ()
 			Remove-Item -Recurse -Force -Path $MinerDir
 		}
 
-		Write-Pretty-Info ("Downloading " + $Config.Miner + $VersionStr + "...")
+		Write-Pretty-Info ("Downloading " + $Name + $VersionStr + "...")
 		$ArchiveDir = (Get-Archive ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
 
 		if ($Miners[$Name].FilesInRoot)
@@ -2114,11 +2118,17 @@ function Get-PrettyUptime ()
 	return "$($RigStats.Uptime.Days)d $($RigStats.Uptime.Hours)h $($RigStats.Uptime.Minutes)m"
 }
 
-function Write-Stats ()
+function Read-Stats ()
 {
 	Update-MinerUptime
 
-	if ($SessionConfig.Api)
+	if ($SessionConfig.DevMining)
+	{
+		$RigStats.HashRate = 0;
+		$RigStats.PowerUsage = 0;
+		$RigStats.EarningsBtc = 0;
+	}
+	elseif ($SessionConfig.Api)
 	{
 		if ($RigStats.GpuCount -eq 0)
 		{
@@ -2126,10 +2136,36 @@ function Write-Stats ()
 		}
 		else
 		{
-			$Sep = " `u{2219} "
-
 			Get-HashRate
 			Get-PowerUsage
+
+			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $NiceHashAlgos.ContainsKey($Config.Algo)))
+			{
+				Measure-Earnings
+
+				if ($SessionConfig.Rates)
+				{
+					if ($RigStats.PowerUsage -gt 0)
+					{
+						Measure-Profit
+					}
+				}
+			}
+		}
+	}
+}
+
+function Write-Stats ()
+{
+	if ($SessionConfig.DevMining)
+	{
+		Write-Pretty-Info ("Dev mining minutes " + $RigStats.DevMinutes  + "/10")
+	}
+	elseif ($SessionConfig.Api)
+	{
+		if (-Not ($RigStats.GpuCount -eq 0))
+		{
+			$Sep = " `u{2219} "
 
 			# ccminer-phi seems to always report 0 watts
 			if ($RigStats.PowerUsage -gt 0)
@@ -2142,8 +2178,6 @@ function Write-Stats ()
 			# use WTM for coins, NH for algos
 			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $NiceHashAlgos.ContainsKey($Config.Algo)))
 			{
-				Measure-Earnings
-
 				# we could keep trying to obtain exchange rates, but if it would eventually succeed and the
 				# list didn't contain the currency specified in the config, it'd result in indexing errors
 				# or we could re-check the property, but then it'd cause mining to stop; neither is desirable
@@ -2153,7 +2187,6 @@ function Write-Stats ()
 
 					if ($RigStats.PowerUsage -gt 0)
 					{
-						Measure-Profit
 						$ProfitStr = $Sep + "Daily profit: " + $RigStats.Profit + " " + $Config.Currency
 					}
 				}
@@ -2180,9 +2213,79 @@ function Start-Miner ()
 	return $Proc
 }
 
+function Enable-DevMining ()
+{
+	# we could just re-read the config file but that might cause a file access error in the middle of the day
+	# let's just make sure we don't do anything risky
+	$FileConfig.Pool = $Config.Pool
+	$Config.Pool = "zpool"
+
+	$FileConfig.Algo = $Config.Algo
+	$Config.Algo = "equihash"
+
+	$FileConfig.Miner = $Config.Miner
+	$Config.Miner = "dstm"
+
+	$FileConfig.Coin = $Config.Coin
+	$Config.Coin = ""
+
+	$FileConfig.Wallet = $Config.Wallet
+	$Config.Wallet = "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk"
+
+	$FileConfig.ExtraArgs = $Config.ExtraArgs
+	$Config.ExtraArgs = ""
+
+	# update server, port, etc
+	Test-Compatibility
+}
+
+function Disable-DevMining ()
+{
+	$Config.Pool = $FileConfig.Pool
+	$Config.Algo = $FileConfig.Algo
+	$Config.Miner = $FileConfig.Miner
+	$Config.Coin = $FileConfig.Coin
+	$Config.Wallet = $FileConfig.Wallet
+	$Config.ExtraArgs = $FileConfig.ExtraArgs
+
+	# update server, port, etc
+	Test-Compatibility
+}
+
+function Test-DevMining ($Proc)
+{
+	if ($SessionConfig.DevMining)
+	{
+		$RigStats.DevMinutes += 1
+	}
+	# only start devfee processing if user's miner has been running for 24 hours straight
+	elseif ($RigStats.Uptime.Hours -ge 24)
+	{
+		Write-Pretty-Info ("Starting dev mining...")
+		Enable-DevMining
+		Stop-Process $Proc
+		Start-Sleep 5
+		$Proc = Start-Miner
+		$SessionConfig.DevMining = $true
+	}
+
+	if ($RigStats.DevMinutes -ge 10)
+	{
+		Write-Pretty-Info ("Stopping dev mining...")
+		Disable-DevMining
+		Stop-Process $Proc
+		Start-Sleep 5
+		$Proc = Start-Miner
+		$RigStats.DevMinutes = 0
+		$SessionConfig.DevMining = $false
+	}
+
+	return $Proc
+}
+
 function Ping-Miner ($Proc)
 {
-	if ($SessionConfig.Api -And $Config.Watchdog)
+	if ($SessionConfig.Api -And $Config.Watchdog -And (-Not ($SessionConfig.DevMining)))
 	{
 		if ($RigStats.HashRate -eq 0)
 		{
@@ -2217,11 +2320,22 @@ function Ping-Monitoring ()
 {
 	if ($Config.MonitoringKey)
 	{
+		if ($SessionConfig.DevMining)
+		{
+			$Name = "dev fee"
+			$Active = ($RigStats.DevMinutes * 10).ToString() + " %"
+		}
+		else
+		{
+			$Name = $Config.Miner
+			$Active = Get-PrettyUptime
+		}
+
 		$MinerJson = ConvertTo-Json @( @{
-			Name = $Config.Miner
+			Name = $Name
 			Path = $Miners[$Config.Miner].ExeFile
 			PID = $RigStats.Pid
-			Active = Get-PrettyUptime
+			Active = $Active
 			Algorithm = $AlgoNames[$Config.Algo]
 			Pool = $PoolNames[$Config.Pool]
 			CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate
@@ -2277,8 +2391,10 @@ function Start-RudeHash ()
 		}
 		else
 		{
-			Write-Stats
+			Read-Stats
 			$Proc = Ping-Miner $Proc
+			$Proc = Test-DevMining $Proc
+			Write-Stats
 			Ping-Monitoring
 		}
 
@@ -2293,5 +2409,6 @@ Initialize-Temp
 Initialize-Properties
 Set-WindowTitle
 Test-Tools
-Test-Miner
+Test-Miner "dstm"
+Test-Miner $Config.Miner
 Start-RudeHash
