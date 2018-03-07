@@ -36,7 +36,7 @@ Algos:
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
 | HSR | ccminer-tpruvot, hsrminer |
 | Keccak-C | ccminer-tpruvot |
-| Lyra2v2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
+| Lyra2REv2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
@@ -50,10 +50,10 @@ Coins:
 | BTG | EquiHash |
 | ETH | Ethash |
 | FTC | NeoScrypt |
-| MONA | Lyra2v2 |
-| KREDS | Lyra2v2 |
+| MONA | Lyra2REv2 |
+| KREDS | Lyra2REv2 |
 | RVN | X16R |
-| VTC | Lyra2v2 |
+| VTC | Lyra2REv2 |
 | ZCL | EquiHash |
 | ZEC | EquiHash |
 | ZEN | EquiHash |
