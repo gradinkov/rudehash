@@ -275,10 +275,26 @@ $NiceHashAlgos =
 # we build this dynamically
 [System.Collections.Hashtable]$BtcRates = @{}
 
-function Set-Property ($Name, $Value, $Force)
+function Set-Property ($Name, $Value, $Permanent)
 {
 	$Config.$Name = $Value
-	$Config | ConvertTo-Json | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
+
+	if ($Permanent)
+	{
+		try
+		{
+			$Config | ConvertTo-Json | Out-File -FilePath $ConfigFile -Encoding utf8NoBOM
+		}
+		catch
+		{
+			Write-Pretty-Error "Error writing '$ConfigFile'!"
+
+			if ($Config.Debug)
+			{
+				Write-Pretty-Debug $_.Exception
+			}
+		}
+	}
 }
 
 function Get-Coin-Support ()
@@ -742,14 +758,14 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 	if ($Force)
 	{
 		$Ret = Receive-Property $Name $Mandatory
-		Set-Property $Name $Ret $Force
+		Set-Property $Name $Ret $true
 	}
 
 	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
 	while (-Not (& (Get-ChildItem "Function:Test-$($Name)Property")))
 	{
 		$Ret = Receive-Property $Name $Mandatory
-		Set-Property $Name $Ret $Mandatory
+		Set-Property $Name $Ret $true
 	}
 }
 
