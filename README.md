@@ -40,15 +40,18 @@ Algos:
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
+| X16R | ccminer-rvn |
 
 Coins:
 
 | Coin | Algo |
 |---|---|
+| BTCP | EquiHash |
 | BTG | EquiHash |
 | ETH | Ethash |
 | FTC | NeoScrypt |
 | MONA | Lyra2v2 |
+| RVN | X16R |
 | VTC | Lyra2v2 |
 | ZCL | EquiHash |
 | ZEC | EquiHash |
@@ -60,6 +63,7 @@ Pools:
 |---|---|
 | Mining Pool Hub | algo, coin |
 | NiceHash | algo |
+| Suprnova | coin |
 | zpool | algo |
 
 ## Monitoring

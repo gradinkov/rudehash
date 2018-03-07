@@ -108,7 +108,6 @@ $Pools =
 	@{
 		PoolFee = 1.1
 		Authless = $false
-		CoinMining = $true
 		Regions = $true
 		StratumProto = 0
 		Algos =
@@ -118,13 +117,23 @@ $Pools =
 			"lyra2v2" = @{ Server = "hub.miningpoolhub.com"; Port = 17018 }
 			"neoscrypt" = @{ Server = "hub.miningpoolhub.com"; Port = 17012 }
 		}
+		Coins =
+		@{
+			"btg" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595 }
+			"eth" = @{ Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535 }
+			"ftc" = @{ Server = "hub.miningpoolhub.com"; Port = 20510 }
+			"mona" = @{ Server = "hub.miningpoolhub.com"; Port = 20593 }
+			"vtc" = @{ Server = "hub.miningpoolhub.com"; Port = 20507 }
+			"zcl" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575 }
+			"zec" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570 }
+			"zen" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594 }
+		}
 	}
 
 	"nicehash" =
 	@{
 		PoolFee = 2
 		Authless = $true
-		CoinMining = $false
 		Regions = $true
 		StratumProto = 2
 		Algos =
@@ -136,11 +145,30 @@ $Pools =
 		}
 	}
 
+	"suprnova" =
+	@{
+		PoolFee = 1.0
+		Authless = $false
+		Regions = $false
+		StratumProto = 2
+		Coins =
+		@{
+			"btcp" = @{ Server = "btcp.suprnova.cc"; Port = 6822 }
+			"btg" = @{ Server = "btg.suprnova.cc"; Port = 8816 }
+			"eth" = @{ Server = "eth.suprnova.cc"; Port = 5000 }
+			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
+			"rvn" = @{ Server = "rvn.suprnova.cc"; Port = 6667 }
+			"vtc" = @{ Server = "vtc.suprnova.cc"; Port = 5678 }
+			"zcl" = @{ Server = "zcl.suprnova.cc"; Port = 4042 }
+			"zec" = @{ Server = "zec.suprnova.cc"; Port = 2142 }
+			"zen" = @{ Server = "zen.suprnova.cc"; Port = 3618 }
+		}
+	}
+
 	"zpool" =
 	@{
 		PoolFee = 2
 		Authless = $true
-		CoinMining = $false
 		Regions = $false
 		StratumProto = 0
 		Algos =
@@ -158,20 +186,23 @@ $Pools =
 
 $Coins =
 @{
-	"btg" = @{ PoolPage = "bitcoin-gold"; WtmPage = "214-btg-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595; Algo = "equihash" }
-	"eth" = @{ PoolPage = "ethereum"; WtmPage = "151-eth-ethash"; Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535; Algo = "ethash" }
-	"ftc" = @{ PoolPage = "feathercoin"; WtmPage = "8-ftc-neoscrypt"; Server = "hub.miningpoolhub.com"; Port = 20510; Algo = "neoscrypt" }
-	"mona" = @{ PoolPage = "monacoin"; WtmPage = "148-mona-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20593; Algo = "lyra2v2" }
-	"vtc" = @{ PoolPage = "vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Server = "hub.miningpoolhub.com"; Port = 20507; Algo = "lyra2v2" }
-	"zcl" = @{ PoolPage = "zclassic"; WtmPage = "167-zcl-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575; Algo = "equihash" }
-	"zec" = @{ PoolPage = "zcash"; WtmPage = "166-zec-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570; Algo = "equihash" }
-	"zen" = @{ PoolPage = "zencash"; WtmPage = "185-zen-equihash"; Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594; Algo = "equihash" }
+	"btcp" = @{ Algo = "equihash" }
+	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
+	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
+	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
+	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
+	"rvn" = @{ Algo = "x16r" }
+	"vtc" = @{ WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
+	"zcl" = @{ WtmPage = "167-zcl-equihash"; Algo = "equihash" }
+	"zec" = @{ WtmPage = "166-zec-equihash"; Algo = "equihash" }
+	"zen" = @{ WtmPage = "185-zen-equihash"; Algo = "equihash" }
 }
 
 $Miners =
 @{
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt"); Api = $true }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
+	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
@@ -220,6 +251,7 @@ $AlgoNames =
 	"neoscrypt" = "NeoScrypt"
 	"phi" = "PHI1612"
 	"polytimos" = "Polytimos"
+	"x16r" = "X16R"
 }
 
 $NiceHashAlgos =
@@ -296,12 +328,37 @@ function Get-Pool-Support ()
 	$Support += "Supported pools and algos:"
 	foreach ($Key in $Pools.Keys)
 	{
-		$Row = $Table.NewRow()
-		$Row.Pool = $Key
-		$Algos = ""
-		$Algos += foreach ($Algo in $Pools[$Key].Algos.Keys) { $Algo }
-		$Row.Algo = $Algos
-		$Table.Rows.Add($Row)
+		if ($Pools[$Key].Algos)
+		{
+			$Row = $Table.NewRow()
+			$Row.Pool = $Key
+			$Algos = ""
+			$Algos += foreach ($Algo in $Pools[$Key].Algos.Keys) { $Algo }
+			$Row.Algo = $Algos
+			$Table.Rows.Add($Row)
+		}
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Pool", "string") | Out-Null
+	$Table.Columns.Add("Coin", "string") | Out-Null
+
+	$Support += "Supported pools and coins:"
+	foreach ($Key in $Pools.Keys)
+	{
+		if ($Pools[$Key].Coins)
+		{
+			$Row = $Table.NewRow()
+			$Row.Pool = $Key
+			$Coins = ""
+			$Coins += foreach ($Coin in $Pools[$Key].Coins.Keys) { $Coin }
+			$Row.Coin = $Coins
+			$Table.Rows.Add($Row)
+		}
 	}
 
 	# use Format-Table to force flushing to screen immediately
@@ -744,9 +801,19 @@ function Test-Compatibility ()
 
 	if ($Config.Coin)
 	{
-		if (-Not ($Pools[$Config.Pool].CoinMining))
+		if (-Not ($Pools[$Config.Pool].Coins))
 		{
 			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """!")
+			Write-Pretty-Info (Get-Coin-Support)
+			Write-Pretty-Info (Get-Pool-Support)
+			$Choice = Receive-Choice "Coin" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+		elseif (-Not ($Pools[$Config.Pool].Coins.ContainsKey($Config.Coin)))
+		{
+			Write-Pretty-Error ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
 			Write-Pretty-Info (Get-Coin-Support)
 			Write-Pretty-Info (Get-Pool-Support)
 			$Choice = Receive-Choice "Coin" "Pool"
@@ -767,6 +834,25 @@ function Test-Compatibility ()
 		Write-Pretty-Info (Get-Coin-Support)
 		Write-Pretty-Info (Get-Miner-Support)
 		$Choice = Receive-Choice "Coin" "Algo"
+		$Config.$Choice = ""
+		Initialize-Property $Choice $true $true
+		Test-Compatibility
+	}
+	elseif (-Not ($Pools[$Config.Pool].Algos))
+	{
+		Write-Pretty-Error ("Algo mining is not supported on """ + $Config.Pool + """!")
+		Write-Pretty-Info (Get-Pool-Support)
+		$Choice = Receive-Choice "Coin" "Pool"
+		$Config.$Choice = ""
+		Initialize-Property $Choice $true $true
+		Test-Compatibility
+	}
+	# reason for elseif: if the coin is supported on the pool, its algo doesn't need to be checked
+	elseif (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
+	{
+		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
+		Write-Pretty-Info (Get-Pool-Support)
+		$Choice = Receive-Choice "Algo" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
 		Test-Compatibility
@@ -795,21 +881,11 @@ function Test-Compatibility ()
 		}
 	}
 
-	if (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
-	{
-		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
-		Write-Pretty-Info (Get-Pool-Support)
-		$Choice = Receive-Choice "Algo" "Pool"
-		$Config.$Choice = ""
-		Initialize-Property $Choice $true $true
-		Test-Compatibility
-	}
-
 	# configuration is good, let's set up globals
 	if ($SessionConfig.CoinMode)
 	{
-		$SessionConfig.Server = $Coins[$Config.Coin].Server
-		$SessionConfig.Port = $Coins[$Config.Coin].Port
+		$SessionConfig.Server = $Pools[$Config.Pool].Coins[$Config.Coin].Server
+		$SessionConfig.Port = $Pools[$Config.Pool].Coins[$Config.Coin].Port
 	}
 	else
 	{
@@ -1064,7 +1140,7 @@ function Get-GpuCount ()
 {
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'summary' $false
 
@@ -1254,7 +1330,7 @@ function Initialize-MinerArgs ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"ccminer-polytimos" { $Args = "--algo=polytimos --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
@@ -1277,35 +1353,35 @@ function Initialize-MinerArgs ()
 }
 
 # MPH API: https://github.com/miningpoolhub/php-mpos/wiki/API-Reference
-function Get-HashRate-Mph ()
-{
-	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getuserworkers&api_key=" + $Config.ApiKey
+# function Get-HashRate-Mph ()
+# {
+# 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getuserworkers&api_key=" + $Config.ApiKey
 
-	try
-	{
-		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorAction SilentlyContinue | ConvertFrom-Json
-		$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
-		# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
-		$HashRate = $PoolWorker.hashrate * 1000
-	}
-	catch
-	{
-		$HashRate = 0
-		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
+# 	try
+# 	{
+# 		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorAction SilentlyContinue | ConvertFrom-Json
+# 		$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
+# 		# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
+# 		$HashRate = $PoolWorker.hashrate * 1000
+# 	}
+# 	catch
+# 	{
+# 		$HashRate = 0
+# 		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
 
-		if ($Config.Debug)
-		{
-			Write-Pretty-Debug $_.Exception
-		}
-	}
+# 		if ($Config.Debug)
+# 		{
+# 			Write-Pretty-Debug $_.Exception
+# 		}
+# 	}
 
-	if (-Not ($HashRate))
-	{
-		$HashRate = 0
-	}
+# 	if (-Not ($HashRate))
+# 	{
+# 		$HashRate = 0
+# 	}
 
-	$RigStats.HashRate = ([math]::Round($HashRate, 0))
-}
+# 	$RigStats.HashRate = ([math]::Round($HashRate, 0))
+# }
 
 function Get-HashRate-Miner ()
 {
@@ -1313,7 +1389,7 @@ function Get-HashRate-Miner ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1463,30 +1539,30 @@ function Get-HashRate-Pretty ($HashRate)
 	}
 }
 
-function Get-Difficulty-Mph ()
-{
-	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
+# function Get-Difficulty-Mph ()
+# {
+# 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
 
-	try
-	{
-		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing | ConvertFrom-Json
-		$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
-		#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
-		#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
-	}
-	catch
-	{
-		$Difficulty = 0
-		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
+# 	try
+# 	{
+# 		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing | ConvertFrom-Json
+# 		$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
+# 		#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
+# 		#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
+# 	}
+# 	catch
+# 	{
+# 		$Difficulty = 0
+# 		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
 
-		if ($Config.Debug)
-		{
-			Write-Pretty-Debug $_.Exception
-		}
-	}
+# 		if ($Config.Debug)
+# 		{
+# 			Write-Pretty-Debug $_.Exception
+# 		}
+# 	}
 
-	return $Difficulty
-}
+# 	return $Difficulty
+# }
 
 function Get-PowerUsage ()
 {
@@ -1494,7 +1570,7 @@ function Get-PowerUsage ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1514,9 +1590,9 @@ function Get-PowerUsage ()
 					$GpuStats.Clear()
 				}
 
-				# these two return mW instead of W, because reasons
+				# these return mW instead of W, because reasons
 				# in fact, ccminer-phi might also return mW, but I really don't know coz it always returns 0 lol
-				if ($Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-tpruvot")
+				if ($Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-rvn" -Or $Config.Miner -eq "ccminer-tpruvot")
 				{
 					$PowerUsage /= 1000
 				}
@@ -1852,7 +1928,7 @@ function Get-MinerVersion ($Exe)
 			# klaust messes up stdio, can't determine version reliably
 			#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
 			"ccminer-phi" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split("-")[1] }
-			"ccminer-tpruvot" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
+			{$_ -in "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2] }
 			"dstm" { $VersionStr = (Get-MinerOutput $Exe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
 			"ethminer" { $VersionStr = (Get-MinerOutput $Exe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
 			"excavator" { $VersionStr = (Get-MinerOutput $Exe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
@@ -2038,7 +2114,7 @@ function Write-Stats ()
 			Write-Pretty-Info ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
-			if ($SessionConfig.CoinMode -Or $NiceHashAlgos.ContainsKey($Config.Algo))
+			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $NiceHashAlgos.ContainsKey($Config.Algo)))
 			{
 				Measure-Earnings
 
