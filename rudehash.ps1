@@ -11,6 +11,7 @@ $RegionChange = $false
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
+$MphStatsUrl = "https://miningpoolhubstats.com/api/worker/"
 $MinerApiErrorStr = "Malformed miner API response."
 
 Clear-Host
@@ -441,6 +442,26 @@ function Test-MonitoringKeyProperty ()
 		if (-Not $Res)
 		{
 			Write-Pretty-Error ("Monitoring key is in incorrect format, get a new one here: https://multipoolminer.io/monitor/")
+			return $false
+		}
+		else
+		{
+			return $true
+		}
+	}
+	else
+	{
+		return $true
+	}
+}
+
+function Test-MphApiKeyProperty ()
+{
+	if ($Config.MphApiKey)
+	{
+		if ($Config.MphApiKey.length -ne 64)
+		{
+			Write-Pretty-Error ("MPH API key is in incorrect format, check it here: https://miningpoolhub.com/?page=account&action=edit")
 			return $false
 		}
 		else
@@ -1043,6 +1064,7 @@ function Initialize-Properties ()
 	Initialize-Property "Debug" $true $FirstRun
 	Initialize-Property "Watchdog" $true $FirstRun
 	Initialize-Property "MonitoringKey" $false $FirstRun
+	Initialize-Property "MphApiKey" $false $FirstRun
 	Initialize-Property "Pool" $true $FirstRun
 	Initialize-Property "Worker" $true $FirstRun
 	Initialize-Property "Wallet" $false $FirstRun
@@ -2318,7 +2340,7 @@ function Ping-Miner ($Proc)
 
 function Ping-Monitoring ()
 {
-	if ($Config.MonitoringKey)
+	if ($Config.MonitoringKey -Or $Config.MphApiKey)
 	{
 		if ($SessionConfig.DevMining)
 		{
@@ -2331,35 +2353,69 @@ function Ping-Monitoring ()
 			$Active = Get-PrettyUptime
 		}
 
-		$MinerJson = ConvertTo-Json @( @{
+		$MinerStats= @{
 			Name = $Name
 			Path = $Miners[$Config.Miner].ExeFile
+			Type = @()
 			PID = $RigStats.Pid
 			Active = $Active
-			Algorithm = $AlgoNames[$Config.Algo]
-			Pool = $PoolNames[$Config.Pool]
-			CurrentSpeed = Get-HashRate-Pretty $RigStats.HashRate
-			EstimatedSpeed = Get-HashRate-Pretty $RigStats.HashRate
+			Algorithm = @($AlgoNames[$Config.Algo])
+			Pool = @($PoolNames[$Config.Pool])
 			'BTC/day' = $RigStats.EarningsBtc
-		} )
+		}
 
-		try
+		# if sent as array, MPM Monitoring displays it as H/s regardless of suffix
+		# if not sent as array, MPH Stats errors out completely
+		# because reasons.
+		$HashRate = Get-HashRate-Pretty $RigStats.HashRate
+
+		if ($Config.MonitoringKey)
 		{
-			$Response = Invoke-RestMethod -Uri $MonitoringUrl -Method Post -Body @{ address = $Config.MonitoringKey; workername = $Config.Worker; miners = $MinerJson; profit = $RigStats.EarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
-
-			if ($Config.Debug)
+			try
 			{
-				#Write-Pretty-Debug $MinerJson
-				Write-Pretty-Debug ("Monitoring server response: $Response")
+				$MinerStats.Add("CurrentSpeed", $HashRate)
+				$MinerStats.Add("EstimatedSpeed", $HashRate)
+				$MinerJson = ConvertTo-Json @($MinerStats)
+				$MinerStats.Remove("CurrentSpeed")
+				$MinerStats.Remove("EstimatedSpeed")
+
+				$Response = Invoke-RestMethod -Uri $MonitoringUrl -Method Post -Body @{ address = $Config.MonitoringKey; workername = $Config.Worker; miners = $MinerJson; profit = $RigStats.EarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+
+				if ($Config.Debug)
+				{
+					#Write-Pretty-Debug $MinerJson
+					Write-Pretty-Debug ("Monitoring server response: $Response")
+				}
+			}
+			catch
+			{
+				Write-Pretty-Error "Error while pinging the monitoring server!"
+
+				if ($Config.Debug)
+				{
+					Write-Pretty-Debug $_.Exception
+				}
 			}
 		}
-		catch
-		{
-			Write-Pretty-Error "Error while pinging the monitoring server!"
 
-			if ($Config.Debug)
+		if ($Config.MphApiKey)
+		{
+			try
 			{
-				Write-Pretty-Debug $_.Exception
+				$MinerStats.Add("CurrentSpeed", @($HashRate))
+				$MinerStats.Add("EstimatedSpeed", @($HashRate))
+				$MinerJson = ConvertTo-Json @($MinerStats)
+
+				$Response = Invoke-RestMethod -Uri ($MphStatsUrl + $Config.MphApiKey) -Method Post -Body @{ workername = $Config.Worker; miners = $MinerJson; profit = $RigStats.EarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+			}
+			catch
+			{
+				Write-Pretty-Error "Error while pinging the MiningPoolHubStats server!"
+
+				if ($Config.Debug)
+				{
+					Write-Pretty-Debug $_.Exception
+				}
 			}
 		}
 	}
