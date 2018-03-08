@@ -71,12 +71,12 @@ Pools:
 
 For health checks, you should most definitely check out MultiPoolMiner monitoring. [Obtain](https://multipoolminer.io/monitor/) your key, then set this same key in RudeHash, and you're ready to go.
 
-![MPM](https://i.imgur.com/i8NtDH6.png "MPHStats")
+![MPM](https://i.imgur.com/i8NtDH6.png "MPM")
 
 For performance reports I recommend the incredibly awesome [MiningPoolHubStats](https://miningpoolhubstats.com/user).
 RudeHash adjusts the miner arguments so that you can easily identify your individual rigs, and it works well even if you mix pools.
 
-![MPHStats](https://i.imgur.com/NpcUbUd.png "MPHStats")
+![MPHStats](https://i.imgur.com/HT3lwHj.png "MPHStats")
 
 Finally, you can check the pool's corresponding status page:
 
