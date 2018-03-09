@@ -28,7 +28,7 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 
 ## Support
 
-Algos:
+### Algos
 
 | Algo | Miner |
 |---|---|
@@ -42,7 +42,7 @@ Algos:
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | X16R | ccminer-rvn |
 
-Coins:
+### Coins
 
 | Coin | Algo |
 |---|---|
@@ -58,7 +58,7 @@ Coins:
 | ZEC | EquiHash |
 | ZEN | EquiHash |
 
-Pools:
+### Pools
 
 | Pool | Mining modes |
 |---|---|
