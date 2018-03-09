@@ -441,7 +441,11 @@ function Test-MonitoringKeyProperty ()
 
 		if (-Not $Res)
 		{
-			Write-Pretty-Error ("Monitoring key is in incorrect format, get a new one here: https://rudehash.org/monitor/")
+			$Uuid = New-Guid
+
+			Write-Pretty-Error ("Monitoring key is in incorrect format! New random key for you:")
+			Write-Pretty-Info ($Uuid.Guid)
+
 			return $false
 		}
 		else
