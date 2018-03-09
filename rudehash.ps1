@@ -10,7 +10,7 @@ $FirstLoop = $true
 $RegionChange = $false
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
-$MonitoringUrl = "https://multipoolminer.io/monitor/miner.php"
+$MonitoringUrl = "https://rudehash.org/monitor/miner.php"
 $MphStatsUrl = "https://miningpoolhubstats.com/api/worker/"
 $MinerApiErrorStr = "Malformed miner API response."
 
