@@ -2,7 +2,7 @@
 
 ## RudeHash 5.0 (TBD)
 
-* Add own monitoring site
+* Add own site with monitoring
 * Add 10 minutes dev fee after every 24 hours of continuous mining
 * Add Suprnova support
 * Add Keccak-C, X16R support
