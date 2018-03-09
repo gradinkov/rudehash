@@ -1,6 +1,6 @@
 # RudeHash Changelog
 
-## RudeHash 5.0 (TBD)
+## RudeHash 5.0 (2018-03-09)
 
 * Add own site with monitoring
 * Add 10 minutes dev fee after every 24 hours of continuous mining
