@@ -441,7 +441,7 @@ function Test-MonitoringKeyProperty ()
 
 		if (-Not $Res)
 		{
-			Write-Pretty-Error ("Monitoring key is in incorrect format, get a new one here: https://multipoolminer.io/monitor/")
+			Write-Pretty-Error ("Monitoring key is in incorrect format, get a new one here: https://rudehash.org/monitor/")
 			return $false
 		}
 		else
