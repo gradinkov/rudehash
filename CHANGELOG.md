@@ -1,11 +1,14 @@
 # RudeHash Changelog
 
-## RudeHash 4.1 (TB)
+## RudeHash 5.0 (TBD)
 
+* Add own monitoring site
+* Add 10 minutes dev fee after every 24 hours of continuous mining
 * Add Suprnova support
 * Add Keccak-C, X16R support
 * Add Bitcoin Private, Ravencoin, Kreds support
 * Add miner's uptime to statistics
+* Add support for MPHStats monitoring
 * Use IP address to connect to pool and update upon miner crash
 * Fix erroneous stat requests during miner crashes
 * Fix potential miner version check errors

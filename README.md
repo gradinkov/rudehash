@@ -69,21 +69,35 @@ Pools:
 
 ## Monitoring
 
-For health checks, you should most definitely check out MultiPoolMiner monitoring. [Obtain](https://multipoolminer.io/monitor/) your key, then set this same key in RudeHash, and you're ready to go.
+### MPM Monitoring
 
-![MPM](https://i.imgur.com/i8NtDH6.png "MPHStats")
+One option you have is MPM Monitoring. [Obtain](https://multipoolminer.io/monitor/) your key, then set this same key in RudeHash, and you're ready to go.
 
-For performance reports I recommend the incredibly awesome [MiningPoolHubStats](https://miningpoolhubstats.com/user).
-RudeHash adjusts the miner arguments so that you can easily identify your individual rigs, and it works well even if you mix pools.
+![MPMPic](https://i.imgur.com/i8NtDH6.png "MPMPic")
 
-![MPHStats](https://i.imgur.com/NpcUbUd.png "MPHStats")
+### MPHStats
 
-Finally, you can check the pool's corresponding status page:
+RudeHash also supports [MPHStats](https://miningpoolhubstats.com/user). You can easily identify your individual rigs and their stats, and it works well even if you mix pools.
+
+![MPHStatsPic](https://i.imgur.com/HT3lwHj.png "MPHStatsPic")
+
+### Pool pages
+
+You can also check the pools' corresponding status pages:
 
 * NiceHash: `https://www.nicehash.com/miner/<wallet>`
+* Suprnova: `https://<coin>.suprnova.cc/index.php?page=anondashboard&user=<wallet>`
 * zpool: `https://zpool.ca/?address=<wallet>`
 
 ## FAQ
+
+* Dev fee?
+
+It's 10 minutes **after** every 24 **straight** hours of your mining time (about 0.7% at the very most).
+Most software makes sure the dev fees are secured first, and only **then** starts mining for the user. RudeHash takes the opposite approach.
+Upon start, I get no dev fee, only after the first 24 hours. If you restart RudeHash before any 24 hour run, I get no dev fee.
+If the miner crashes before any 24 hour run, I get no dev fee. I only get dev fee once the currently running miner's uptime reaches 24 hours.
+I want full transparency on this, thus during dev mining, the progress is shown in the stats, and it's also indicated clearly on all supported monitoring sites.
 
 * What's the point of this tool? I could mine with just a one line batch file!
 
