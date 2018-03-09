@@ -94,7 +94,7 @@ You can also check the pools' corresponding status pages:
 * Dev fee?
 
 It's 10 minutes **after** every 24 **straight** hours of your mining time (about 0.7% at the very most).
-Most software makes sure the dev fees are secured first, and only **then** starts mining for the user. RudeHash takes the opposite approach.
+While most other miners makes sure the dev fees are secured first, and only **then** starts mining for the user, RudeHash takes the opposite approach.
 Upon start, I get no dev fee, only after the first 24 hours. If you restart RudeHash before any 24 hour run, I get no dev fee.
 If the miner crashes before any 24 hour run, I get no dev fee. I only get dev fee once the currently running miner's uptime reaches 24 hours.
 I want full transparency on this, thus during dev mining, the progress is shown in the stats, and it's also indicated clearly on all supported monitoring sites.
