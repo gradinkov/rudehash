@@ -12,9 +12,15 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 * Earnings and profit estimation, using WhatToMine for coins and NiceHash for algos
 * Watchdog to restart mining automatically if hash rate is repeatedly zero
 * Interactive first run wizard
-* Miner status reporting to MultiPoolMiner's monitoring service
+* Miner status reporting to RudeHash Monitoring and MPHStats
 
 ## Installation
+
+* First you need to modify PowerShell's execution policy, because by default it requires code to be digitally signed. Such a certificate costs about $220 per year, which is currently out of the scope of this project. So find your PowerShell shortcut in the Start Menu, right click on it, then _Run as Administrator_. Issue the following command:
+
+~~~~
+Set-ExecutionPolicy Unrestricted
+~~~~
 
 * Download and install the latest release of:
   * [NVIDIA Driver](https://www.geforce.com/drivers)
