@@ -1379,15 +1379,25 @@ function Initialize-Excavator ($User, $Pass)
 
 function Initialize-MinerArgs ()
 {
-	if ($Pools[$Config.Pool].Authless)
+	switch ($Config.Pool)
 	{
-		$PoolUser = $Config.Wallet + "." + $Config.Worker
-		$PoolPass = "c=BTC,ID=" + $Config.Worker
-	}
-	else
-	{
-		$PoolUser = $Config.User + "." + $Config.Worker
-		$PoolPass = "x"
+		{$_ -in "miningpoolhub", "suprnova" }
+		{
+			$PoolUser = $Config.User + "." + $Config.Worker
+			$PoolPass = "x"
+		}
+		"nicehash"
+		{
+			# https://www.nicehash.com/help/how-to-create-a-worker
+			$PoolUser = $Config.Wallet + "." + $Config.Worker
+			$PoolPass = "x"
+		}
+		"zpool"
+		{
+			$PoolUser = $Config.Wallet
+			# zpool only guarantees BTC payouts, so we enforce it, potentially suboptimal coin is better than completely lost mining
+			$PoolPass = "c=BTC,ID=" + $Config.Worker
+		}
 	}
 
 	# always update the IP, the miner could've crashed because of an IP change to begin with
