@@ -48,6 +48,7 @@ Set-ExecutionPolicy Unrestricted
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |
 | X16R | ccminer-rvn |
+| Xevan | ccminer-xevan |
 
 ### Coins
 
@@ -55,6 +56,7 @@ Set-ExecutionPolicy Unrestricted
 |---|---|
 | BTCP | EquiHash |
 | BTG | EquiHash |
+| BSD | Xevan |
 | BTX | TimeTravel10 |
 | ETH | Ethash |
 | FTC | NeoScrypt |

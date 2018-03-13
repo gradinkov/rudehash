@@ -2,7 +2,9 @@
 
 ## RudeHash 5.1 (TBD)
 
-* Add support for Bitcore
+* Add support for Bitcore, BitSend
+* Add support for TimeTravel10, Xevan
+* Add support for ccminer-xevan
 
 ## RudeHash 5.0 (2018-03-09)
 

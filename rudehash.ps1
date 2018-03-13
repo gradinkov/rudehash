@@ -155,6 +155,7 @@ $Pools =
 		StratumProto = 2
 		Coins =
 		@{
+			"bsd" = @{ Server = "bsd.suprnova.cc"; Port = 8686 }
 			"btcp" = @{ Server = "btcp.suprnova.cc"; Port = 6822 }
 			"btg" = @{ Server = "btg.suprnova.cc"; Port = 8816 }
 			"btx" = @{ Server = "btx.suprnova.cc"; Port = 3629 }
@@ -185,12 +186,14 @@ $Pools =
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333 }
 			"polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463 }
+			"xevan" = @{ Server = "xevan.mine.zpool.ca"; Port = 3739 }
 		}
 	}
 }
 
 $Coins =
 @{
+	"bsd" = @{ WtmPage = "201-bsd-xevan"; Algo = "xevan" }
 	"btcp" = @{ Algo = "equihash" }
 	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
 	"btx" = @{ WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
@@ -212,6 +215,7 @@ $Miners =
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
+	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev3" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
@@ -247,6 +251,7 @@ $WtmModifiers =
 	"equihash" = 1
 	"lyra2v2" = 1000
 	"neoscrypt" = 1000
+	"xevan" = 1000000
 }
 
 $AlgoNames =
@@ -261,6 +266,7 @@ $AlgoNames =
 	"phi" = "PHI1612"
 	"polytimos" = "Polytimos"
 	"x16r" = "X16R"
+	"xevan" = "Xevan"
 }
 
 $PoolNames =
@@ -1199,7 +1205,7 @@ function Get-GpuCount ()
 {
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'summary' $false
 
@@ -1389,7 +1395,7 @@ function Initialize-MinerArgs ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot"} { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"ccminer-polytimos" { $Args = "--algo=poly --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
@@ -1448,7 +1454,7 @@ function Get-HashRate-Miner ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1629,7 +1635,7 @@ function Get-PowerUsage ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "vertminer"}
+		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1651,7 +1657,7 @@ function Get-PowerUsage ()
 
 				# these return mW instead of W, because reasons
 				# in fact, ccminer-phi might also return mW, but I really don't know coz it always returns 0 lol
-				if ($Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-rvn" -Or $Config.Miner -eq "ccminer-tpruvot")
+				if ($Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-rvn" -Or $Config.Miner -eq "ccminer-tpruvot" -Or $Config.Miner -eq "ccminer-xevan")
 				{
 					$PowerUsage /= 1000
 				}
@@ -1896,6 +1902,11 @@ function Expand-Stuff ($File, $DestDir)
 	if ($File.EndsWith(".7z"))
 	{
 		Start-Process -FilePath ([io.path]::combine($ToolsDir, "7zip", $Tools["7zip"].ExeFile)) -ArgumentList ("x -o$DestDir $File") -NoNewWindow -Wait
+	}
+	elseif ($File.EndsWith(".exe"))
+	{
+		New-Item -ItemType Directory -Path $DestDir | Out-Null
+		Move-Item -Path $File -Destination $DestDir
 	}
 	else
 	{
