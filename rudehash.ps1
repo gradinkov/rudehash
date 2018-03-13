@@ -7,7 +7,7 @@ $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 [System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
-$RegionChange = $false
+# $RegionChange = $false
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://rudehash.org/monitor/miner.php"
@@ -114,21 +114,21 @@ $Pools =
 		StratumProto = 0
 		Algos =
 		@{
-			"ethash" = @{ Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 17020 }
-			"equihash" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 17023 }
+			"ethash" = @{ Server = "%REGION%ethash-hub.miningpoolhub.com"; Port = 17020 }
+			"equihash" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 17023 }
 			"lyra2v2" = @{ Server = "hub.miningpoolhub.com"; Port = 17018 }
 			"neoscrypt" = @{ Server = "hub.miningpoolhub.com"; Port = 17012 }
 		}
 		Coins =
 		@{
-			"btg" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20595 }
-			"eth" = @{ Server = $Config.Region + ".ethash-hub.miningpoolhub.com"; Port = 20535 }
+			"btg" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20595 }
+			"eth" = @{ Server = "%REGION%ethash-hub.miningpoolhub.com"; Port = 20535 }
 			"ftc" = @{ Server = "hub.miningpoolhub.com"; Port = 20510 }
 			"mona" = @{ Server = "hub.miningpoolhub.com"; Port = 20593 }
 			"vtc" = @{ Server = "hub.miningpoolhub.com"; Port = 20507 }
-			"zcl" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20575 }
-			"zec" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20570 }
-			"zen" = @{ Server = $Config.Region + ".equihash-hub.miningpoolhub.com"; Port = 20594 }
+			"zcl" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20575 }
+			"zec" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20570 }
+			"zen" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20594 }
 		}
 	}
 
@@ -140,10 +140,10 @@ $Pools =
 		StratumProto = 2
 		Algos =
 		@{
-			"ethash" = @{ Server = "daggerhashimoto." + $Config.Region + ".nicehash.com"; Port = 3353 }
-			"equihash" = @{ Server = "equihash." + $Config.Region + ".nicehash.com"; Port = 3357 }
-			"lyra2v2" = @{ Server = "lyra2rev2." + $Config.Region + ".nicehash.com"; Port = 3347 }
-			"neoscrypt" = @{ Server = "neoscrypt." + $Config.Region + ".nicehash.com"; Port = 3341 }
+			"ethash" = @{ Server = "daggerhashimoto.%REGION%nicehash.com"; Port = 3353 }
+			"equihash" = @{ Server = "equihash.%REGION%nicehash.com"; Port = 3357 }
+			"lyra2v2" = @{ Server = "lyra2rev2.%REGION%nicehash.com"; Port = 3347 }
+			"neoscrypt" = @{ Server = "neoscrypt.%REGION%nicehash.com"; Port = 3341 }
 		}
 	}
 
@@ -167,6 +167,34 @@ $Pools =
 			"zcl" = @{ Server = "zcl.suprnova.cc"; Port = 4042 }
 			"zec" = @{ Server = "zec.suprnova.cc"; Port = 2142 }
 			"zen" = @{ Server = "zen.suprnova.cc"; Port = 3618 }
+		}
+	}
+
+	"zergpool" =
+	@{
+		PoolFee = 0
+		Authless = $true
+		Regions = $true
+		StratumProto = 0
+		Algos =
+		@{
+			"bitcore" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556 }
+			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433 }
+			"keccakc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134 }
+			"lyra2v2" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
+			"neoscrypt" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
+			"phi" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
+			"x16r" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
+			"xevan" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
+		}
+		Coins =
+		@{
+			"bsd" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
+			"btx" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556 }
+			"ftc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
+			"mona" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
+			"rvn" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
+			"vtc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
 		}
 	}
 
@@ -241,6 +269,8 @@ $Regions =
 @{
 	"miningpoolhub" = @("asia", "europe", "us-east")
 	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
+	# zergpool uses "" for usa, we gotta fix this later
+	"zergpool" = @("usa", "europe")
 }
 
 # MPH returns all hashrates in kH/s but WTM uses different magnitudes for different algos
@@ -274,6 +304,7 @@ $PoolNames =
 	"miningpoolhub" = "Mining Pool Hub"
 	"nicehash" = "NiceHash"
 	"suprnova" = "Suprnova"
+	"zergpool" = "Zergpool"
 	"zpool" = "zpool"
 }
 
@@ -836,10 +867,10 @@ function Test-Compatibility ()
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
 
-			if ($Choice.ToLower() -eq "region")
-			{
-				$RegionChange = $true
-			}
+			# if ($Choice.ToLower() -eq "region")
+			# {
+			# 	$RegionChange = $true
+			# }
 
 			Initialize-Property $Choice $true $true
 			Test-Compatibility
@@ -850,10 +881,10 @@ function Test-Compatibility ()
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
 
-			if ($Choice.ToLower() -eq "region")
-			{
-				$RegionChange = $true
-			}
+			# if ($Choice.ToLower() -eq "region")
+			# {
+			# 	$RegionChange = $true
+			# }
 
 			Initialize-Property $Choice $true $true
 			Test-Compatibility
@@ -956,15 +987,24 @@ function Test-Compatibility ()
 		$SessionConfig.Port = $Pools[$Config.Pool].Algos[$Config.Algo].Port
 	}
 
+	if ($Pools[$Config.Pool].Regions)
+	{
+		# zergpool uses no prefix for usa region, wonderful
+		if (($Config.Pool -eq "zergpool") -And ($Config.Region -eq "usa"))
+		{
+			$RegionStr = ""
+		}
+		else
+		{
+			$RegionStr = $Config.Region + "."
+		}
+
+		$SessionConfig.Server = $SessionConfig.Server -Replace "%REGION%",$RegionStr
+	}
+
 	if ($Miners[$Config.Miner].Api)
 	{
 		$SessionConfig.Api = $true
-	}
-
-	if ($RegionChange)
-	{
-		Write-Pretty-Info ("Region has changed, please restart RudeHash for the changes to take effect!")
-		Exit-RudeHash
 	}
 }
 
@@ -1391,6 +1431,20 @@ function Initialize-MinerArgs ()
 			# https://www.nicehash.com/help/how-to-create-a-worker
 			$PoolUser = $Config.Wallet + "." + $Config.Worker
 			$PoolPass = "x"
+		}
+		"zergpool"
+		{
+			$PoolUser = $Config.Wallet
+
+			if ($SessionConfig.CoinMode)
+			{
+				# zergpool only accepts the coin in uppercase
+				$PoolPass = "c=BTC,mc="+ $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+			}
+			else
+			{
+				$PoolPass = "c=BTC,ID=" + $Config.Worker
+			}
 		}
 		"zpool"
 		{

@@ -75,6 +75,7 @@ Set-ExecutionPolicy Unrestricted
 | Mining Pool Hub | algo, coin | Site balance |
 | NiceHash | algo | BTC wallet |
 | Suprnova | coin | Site balance |
+| Zergpool | algo, coin | BTC wallet |
 | zpool | algo | BTC wallet |
 
 * _BTC wallet_ means you mine directly to your BTC wallet. In this case, you can specify a username during the First Run Wizard, but it'll be ignored on this specific pool.
