@@ -157,6 +157,7 @@ $Pools =
 		@{
 			"btcp" = @{ Server = "btcp.suprnova.cc"; Port = 6822 }
 			"btg" = @{ Server = "btg.suprnova.cc"; Port = 8816 }
+			"btx" = @{ Server = "btx.suprnova.cc"; Port = 3629 }
 			"eth" = @{ Server = "eth.suprnova.cc"; Port = 5000 }
 			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
 			"kreds" = @{ Server = "kreds.suprnova.cc"; Port = 7196 }
@@ -176,6 +177,7 @@ $Pools =
 		StratumProto = 0
 		Algos =
 		@{
+			"bitcore" = @{ Server = "bitcore.mine.zpool.ca"; Port = 3556 }
 			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142 }
 			"hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433 }
 			"keccakc" = @{ Server = "keccakc.mine.zpool.ca"; Port = 5134 }
@@ -191,6 +193,7 @@ $Coins =
 @{
 	"btcp" = @{ Algo = "equihash" }
 	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
+	"btx" = @{ WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
 	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
@@ -208,7 +211,7 @@ $Miners =
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
-	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev3/ethminer-0.14.0.dev3-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev3" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
@@ -239,6 +242,7 @@ $Regions =
 # MPH returns all hashrates in kH/s but WTM uses different magnitudes for different algos
 $WtmModifiers =
 @{
+	"bitcore" = 1000000
 	"ethash" = 1000000
 	"equihash" = 1
 	"lyra2v2" = 1000
@@ -247,6 +251,7 @@ $WtmModifiers =
 
 $AlgoNames =
 @{
+	"bitcore" = "TimeTravel10"
 	"ethash" = "Ethash"
 	"equihash" = "Equihash"
 	"hsr" = "HSR"

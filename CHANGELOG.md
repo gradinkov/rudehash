@@ -1,5 +1,9 @@
 # RudeHash Changelog
 
+## RudeHash 5.1 (TBD)
+
+* Add support for Bitcore
+
 ## RudeHash 5.0 (2018-03-09)
 
 * Add own site with monitoring

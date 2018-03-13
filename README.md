@@ -46,6 +46,7 @@ Set-ExecutionPolicy Unrestricted
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
+| TimeTravel10 | ccminer-tpruvot |
 | X16R | ccminer-rvn |
 
 ### Coins
@@ -54,6 +55,7 @@ Set-ExecutionPolicy Unrestricted
 |---|---|
 | BTCP | EquiHash |
 | BTG | EquiHash |
+| BTX | TimeTravel10 |
 | ETH | Ethash |
 | FTC | NeoScrypt |
 | MONA | Lyra2REv2 |
