@@ -7,6 +7,7 @@
 * Add support for TimeTravel10, Xevan
 * Add support for ccminer-xevan
 * Don't require a restart when changing the region
+* Update ethminer to v0.14.0.dev4
 
 ## RudeHash 5.0 (2018-03-09)
 
