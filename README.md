@@ -64,6 +64,7 @@ Set-ExecutionPolicy Unrestricted
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |
+| HSR | Hshare | HSR |
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
 | KREDS | Kreds | Lyra2REv2 |

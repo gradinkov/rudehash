@@ -195,6 +195,7 @@ $Pools =
 			"crea" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134 }
 			"flm" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
+			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433 }
 			"lux" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"mona" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
 			"rvn" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
@@ -233,6 +234,7 @@ $Coins =
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"flm" = @{ Algo = "phi" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
+	"hsr" = @{ Algo = "hsr" }
 	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
 	"kreds" = @{ Algo = "lyra2v2" }
 	"lux" = @{ WtmPage = "212-lux-phi1612"; Algo = "phi" }
