@@ -6,6 +6,7 @@
 * Add support for Bitcore, BitSend, Creativecoin, Folm Coin, Hshare, LUXCoin, Solaris, Trezarcoin
 * Add support for TimeTravel10, Xevan
 * Add support for ccminer-xevan, hsrminer-neoscrypt
+* Clear DNS cache upon miner crash and use Quad9 DNS for resolution
 * Don't require a restart when changing the region
 * Re-download miner if deleted during mining
 * Improve First Run Wizard

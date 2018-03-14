@@ -1343,7 +1343,18 @@ function Resolve-PoolIp ()
 {
 	try
 	{
-		$Ip = ([System.Net.DNS]::GetHostEntry($SessionConfig.Server).AddressList[0].IPAddressToString)
+		# make sure to flush the DNS cache first
+		Start-Process "ipconfig" -ArgumentList "/flushdns" -Wait -NoNewWindow -RedirectStandardOutput nul -ErrorAction SilentlyContinue
+
+		# wonderful workaround for PowerShell *and* .Net both lacking proper built-in DNS resolution
+		#$Ip = ([System.Net.DNS]::GetHostEntry($SessionConfig.Server).AddressList[0].IPAddressToString)
+		$Res = (Get-ProcessOutput "nslookup" "-type=A $($SessionConfig.Server) 9.9.9.9").Split("`r`n")
+		$Ip = ($Res.Split("`r`n") | Select-String -Pattern "^Address")[1].ToString().Split(":")[1].Trim()
+
+		if ($Config.Debug)
+		{
+			Write-Pretty-Debug ("Stratum server $($SessionConfig.Server) resolves to: $($Ip)")
+		}
 	}
 	catch
 	{
@@ -2154,14 +2165,15 @@ function Test-Tools ()
 	}
 }
 
-function Get-MinerOutput ($Exe, $Argus)
+function Get-ProcessOutput ($Exe, $Argus)
 {
 	$ProcInfo = New-Object System.Diagnostics.ProcessStartInfo
 	$ProcInfo.FileName = $Exe
 	# stupid PowerShell, $Args is a reserved word
 	$ProcInfo.Arguments = $Argus
 	$ProcInfo.RedirectStandardOutput = $true
-	#$ProcInfo.RedirectStandardError = $true
+	# nslookup prints "non-authoritative answer" line to stderr because reasons
+	$ProcInfo.RedirectStandardError = $true
 	$ProcInfo.UseShellExecute = $false
 
 	$Proc = New-Object System.Diagnostics.Process
@@ -2183,15 +2195,15 @@ function Get-MinerVersion ($Name)
 		switch ($Name)
 		{
 			# klaust messes up stdio, can't determine version reliably
-			#"ccminer-klaust" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
-			"ccminer-phi" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split("-")[1] }
-			{$_ -in "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
-			"dstm" { $VersionStr = (Get-MinerOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
-			"ethminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
-			"excavator" { $VersionStr = (Get-MinerOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
-			{$_ -in "hsrminer-hsr", "hsrminer-neoscrypt" } { $VersionStr = (Get-MinerOutput $MinerExe "-v").Split("`r`n")[17].Trim().Split(" ")[3] }
-			"vertminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
-			"zecminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
+			#"ccminer-klaust" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
+			"ccminer-phi" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split("-")[1] }
+			{$_ -in "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			"dstm" { $VersionStr = (Get-ProcessOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
+			"ethminer" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
+			"excavator" { $VersionStr = (Get-ProcessOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
+			{$_ -in "hsrminer-hsr", "hsrminer-neoscrypt" } { $VersionStr = (Get-ProcessOutput $MinerExe "-v").Split("`r`n")[17].Trim().Split(" ")[3] }
+			"vertminer" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			"zecminer" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
 		}
 	}
 	catch
