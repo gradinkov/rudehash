@@ -32,6 +32,8 @@ Set-ExecutionPolicy Unrestricted
 
 **Important:** on Suprnova you need to manually create your workers on the pool website beforehand. Make sure to always set the password to **x**, otherwise authentication will fail!
 
+**Important:** certain antivirus software may randomly delete your miner executables. For this reason, it is recommended to add the main `rudehash` folder to your AV's exclusions.
+
 ## Support
 
 ### Algos

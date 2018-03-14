@@ -2354,6 +2354,10 @@ function Write-Stats ()
 
 function Start-Miner ()
 {
+	# in the extremely rare case of AV deleting the miner, or even 7-Zip, try to re-download
+	Test-Tools
+	Test-Miner $Config.Miner
+
 	$Exe = [io.path]::combine($MinersDir, $Config.Miner, $Miners[$Config.Miner].ExeFile)
 	$Args = Initialize-MinerArgs
 
@@ -2597,7 +2601,5 @@ Write-Pretty-Header
 Initialize-Temp
 Initialize-Properties
 Set-WindowTitle
-Test-Tools
 Test-Miner "dstm"
-Test-Miner $Config.Miner
 Start-RudeHash
