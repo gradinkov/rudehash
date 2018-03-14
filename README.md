@@ -70,6 +70,7 @@ Set-ExecutionPolicy Unrestricted
 | KREDS | Kreds | Lyra2REv2 |
 | RVN | Ravencoin | X16R |
 | VTC | Vertcoin | Lyra2REv2 |
+| XLR | Solaris | Xevan |
 | ZCL | ZClassic | EquiHash |
 | ZEC | Zcash | EquiHash |
 | ZEN | ZenCash | EquiHash |
