@@ -1196,7 +1196,11 @@ function Initialize-Properties ()
 {
 	if ($FirstRun)
 	{
-		Write-Pretty-Info "Welcome to RudeHash! Let's set up your configuration."
+		Write-Pretty-Info ("Welcome to RudeHash! Let's set up your configuration.")
+		Write-Pretty-Info ("We'll ask your input for all config options. Some are optional, you can skip")
+		Write-Pretty-Info ("those by pressing 'Enter'. Don't worry, if you try to specify an incompatible")
+		Write-Pretty-Info ("setup, we will tell you and ask you to modify it. Not all options are used in")
+		Write-Pretty-Info ("all scenarios, e.g. wallet address is unused on pools with their own balances.")
 	}
 
 	Initialize-Property "Debug" $true $FirstRun
