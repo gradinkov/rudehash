@@ -54,23 +54,23 @@ Set-ExecutionPolicy Unrestricted
 
 ### Coins
 
-| Coin | Algo |
-|---|---|
-| BTCP | EquiHash |
-| BTG | EquiHash |
-| BSD | Xevan |
-| BTX | TimeTravel10 |
-| ETH | Ethash |
-| FLM | PHI1612 |
-| FTC | NeoScrypt |
-| LUX | PHI1612 |
-| MONA | Lyra2REv2 |
-| KREDS | Lyra2REv2 |
-| RVN | X16R |
-| VTC | Lyra2REv2 |
-| ZCL | EquiHash |
-| ZEC | EquiHash |
-| ZEN | EquiHash |
+| Symbol | Name | Algo |
+|---|---|---|
+| BTCP | Bitcoin Private | EquiHash |
+| BTG | Bitcoin Gold | EquiHash |
+| BSD | BitSend | Xevan |
+| BTX | Bitcore | TimeTravel10 |
+| ETH | Ethereum | Ethash |
+| FLM | Folm Coin | PHI1612 |
+| FTC | Feathercoin | NeoScrypt |
+| LUX | LUXCoin | PHI1612 |
+| MONA | Monacoin | Lyra2REv2 |
+| KREDS | Kreds | Lyra2REv2 |
+| RVN | Ravencoin | X16R |
+| VTC | Vertcoin | Lyra2REv2 |
+| ZCL | ZClassic | EquiHash |
+| ZEC | Zcash | EquiHash |
+| ZEN | ZenCash | EquiHash |
 
 ### Pools
 
