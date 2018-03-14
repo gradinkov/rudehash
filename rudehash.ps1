@@ -12,6 +12,7 @@ $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://rudehash.org/monitor/miner.php"
 $MphStatsUrl = "https://miningpoolhubstats.com/api/worker/"
+$ZergpoolCoinsUrl = "http://api.zergpool.com:8080/api/currencies"
 $MinerApiErrorStr = "Malformed miner API response."
 
 Clear-Host
@@ -782,6 +783,46 @@ function Test-AlgoProperty ()
 	}
 }
 
+function Test-CoinExchangeSupport ()
+{
+	if ($Config.Pool -eq "zergpool")
+	{
+		if ($Config.Debug)
+		{
+			Write-Pretty-Debug "Checking coin's exchange support..."
+		}
+
+		try
+		{
+			$Response = Invoke-RestMethod -Uri $ZergpoolCoinsUrl -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+
+			if ($Response.($Config.Coin).noautotrade -eq 0)
+			{
+				return $true
+			}
+			else
+			{
+				return $false
+			}
+		}
+		catch
+		{
+			Write-Pretty-Error "Error determining if the selected coin can be exchanged! RudeHash cannot continue."
+
+			if ($Config.Debug)
+			{
+				Write-Pretty-Debug $_.Exception
+			}
+
+			Exit-RudeHash
+		}
+	}
+	else
+	{
+		return $true
+	}
+}
+
 function Receive-Choice ($A, $B)
 {
 	$Name = ""
@@ -910,6 +951,14 @@ function Test-Compatibility ()
 			Write-Pretty-Error ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
 			Write-Pretty-Info (Get-Coin-Support)
 			Write-Pretty-Info (Get-Pool-Support)
+			$Choice = Receive-Choice "Coin" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+		elseif (-Not (Test-CoinExchangeSupport))
+		{
+			Write-Pretty-Error ("The """ + $Config.Coin + """ coin cannot be exchanged on """ + $Config.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
