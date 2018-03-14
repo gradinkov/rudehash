@@ -260,7 +260,8 @@ $Miners =
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev4/ethminer-0.14.0.dev4-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev4" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
-	"hsrminer" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $false; Version = "1.0" }
+	"hsrminer-hsr" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer_hsr.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $false; Version = "1.0" }
+	"hsrminer-neoscrypt" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/Neoscrypt%20algo/Windows/hsrminer_neoscrypt.zip"; ArchiveFile = "hsrminer_neoscrypt.zip"; ExeFile = "hsrminer_neoscrypt.exe"; FilesInRoot = $true; Algos = @("neoscrypt"); Api = $false; Version = "1.0.1" }
 	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true; Version = "1.0.1" }
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true; Version = "0.3.4b" }
 }
@@ -1587,7 +1588,7 @@ function Initialize-MinerArgs ()
 			Initialize-Excavator $PoolUser $PoolPass
 			$Args = "-c " + [io.path]::combine($TempDir, "excavator.json") + " -p " + $MinerPort
 		}
-		"hsrminer" { $Args = "--url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --userpass=" + $PoolUser + ":" + $PoolPass }
+		{$_ -in "hsrminer-hsr", "hsrminer-neoscrypt" } { $Args = "--url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --userpass=" + $PoolUser + ":" + $PoolPass }
 		"vertminer" { $Args = "-o stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " -u " + $PoolUser + " -p " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"zecminer" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
@@ -2188,7 +2189,7 @@ function Get-MinerVersion ($Name)
 			"dstm" { $VersionStr = (Get-MinerOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
 			"ethminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
 			"excavator" { $VersionStr = (Get-MinerOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
-			"hsrminer" { $VersionStr = (Get-MinerOutput $MinerExe "-h").Split("`r`n")[17].Trim().Split(" ")[3] }
+			{$_ -in "hsrminer-hsr", "hsrminer-neoscrypt" } { $VersionStr = (Get-MinerOutput $MinerExe "-v").Split("`r`n")[17].Trim().Split(" ")[3] }
 			"vertminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
 			"zecminer" { $VersionStr = (Get-MinerOutput $MinerExe "-V").Split("`r`n")[1].Split("|")[1].Trim().Split(" ")[4] }
 		}

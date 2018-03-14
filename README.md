@@ -42,10 +42,10 @@ Set-ExecutionPolicy Unrestricted
 |---|---|
 | Ethash | ethminer, Excavator |
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
-| HSR | ccminer-tpruvot, hsrminer |
+| HSR | ccminer-tpruvot, hsrminer-hsr |
 | Keccak-C | ccminer-tpruvot |
 | Lyra2REv2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
-| NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator |
+| NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |
