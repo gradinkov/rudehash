@@ -69,6 +69,7 @@ Set-ExecutionPolicy Unrestricted
 | MONA | Monacoin | Lyra2REv2 |
 | KREDS | Kreds | Lyra2REv2 |
 | RVN | Ravencoin | X16R |
+| TZC | Trezarcoin | NeoScrypt |
 | VTC | Vertcoin | Lyra2REv2 |
 | XLR | Solaris | Xevan |
 | ZCL | ZClassic | EquiHash |

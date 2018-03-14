@@ -199,6 +199,7 @@ $Pools =
 			"lux" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"mona" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
 			"rvn" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
+			"tzc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
 			"vtc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
 			"xlr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
 		}
@@ -240,6 +241,7 @@ $Coins =
 	"kreds" = @{ Algo = "lyra2v2" }
 	"lux" = @{ WtmPage = "212-lux-phi1612"; Algo = "phi" }
 	"rvn" = @{ Algo = "x16r" }
+	"tzc" = @{ WtmPage = "215-tzc-neoscrypt"; Algo = "neoscrypt" }
 	"vtc" = @{ WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
 	"xlr" = @{ WtmPage = "179-xlr-xevan"; Algo = "xevan" }
 	"zcl" = @{ WtmPage = "167-zcl-equihash"; Algo = "equihash" }
