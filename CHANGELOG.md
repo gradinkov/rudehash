@@ -1,6 +1,6 @@
 # RudeHash Changelog
 
-## RudeHash 5.1 (TBD)
+## RudeHash 6.0 (2018-03-14)
 
 * Add support for Zergpool
 * Add support for Bitcore, BitSend, Creativecoin, Folm Coin, Hshare, LUXCoin, Solaris, Trezarcoin
