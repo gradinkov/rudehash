@@ -399,9 +399,49 @@ function Get-Pool-Support ()
 {
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Pool", "string") | Out-Null
+	$Table.Columns.Add("Modes", "string") | Out-Null
+	$Table.Columns.Add("Payout", "string") | Out-Null
+
+	$Support += "Supported pools, mining modes and payout methods:"
+	foreach ($Key in $Pools.Keys)
+	{
+		$Row = $Table.NewRow()
+		$Row.Pool = $Key
+		$ModeStr = ""
+
+		if ($Pools[$Key].Algos)
+		{
+			$ModeStr += "algo "
+		}
+
+		if ($Pools[$Key].Coins)
+		{
+			$ModeStr += "coin "
+		}
+
+		$Row.Modes = $ModeStr
+
+		if ($Pools[$Key].Authless)
+		{
+			$Row.Payout = "BTC wallet"
+		}
+		else
+		{
+			$Row.Payout = "Site balance"
+		}
+
+		$Table.Rows.Add($Row)
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Algo", "string") | Out-Null
 
-	$Support += "Supported pools and algos:"
+	$Support += "Supported algos:"
 	foreach ($Key in $Pools.Keys)
 	{
 		if ($Pools[$Key].Algos)
@@ -423,7 +463,7 @@ function Get-Pool-Support ()
 	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Coin", "string") | Out-Null
 
-	$Support += "Supported pools and coins:"
+	$Support += "Supported coins:"
 	foreach ($Key in $Pools.Keys)
 	{
 		if ($Pools[$Key].Coins)
