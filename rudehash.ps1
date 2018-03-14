@@ -347,7 +347,7 @@ function Set-Property ($Name, $Value, $Permanent)
 	}
 }
 
-function Get-Coin-Support ()
+function Get-CoinSupport ()
 {
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Coin", "string") | Out-Null
@@ -371,7 +371,7 @@ function Get-Coin-Support ()
 	return $Support
 }
 
-function Get-Miner-Support ()
+function Get-MinerSupport ()
 {
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Miner", "string") | Out-Null
@@ -395,7 +395,12 @@ function Get-Miner-Support ()
 	return $Support
 }
 
-function Get-Pool-Support ()
+function Get-AlgoSupport ()
+{
+	return Get-MinerSupport
+}
+
+function Get-PoolSupport ()
 {
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Pool", "string") | Out-Null
@@ -475,6 +480,30 @@ function Get-Pool-Support ()
 			$Row.Coin = $Coins
 			$Table.Rows.Add($Row)
 		}
+	}
+
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	return $Support
+}
+
+function Get-RegionSupport ()
+{
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Pool", "string") | Out-Null
+	$Table.Columns.Add("Regions", "string") | Out-Null
+
+	$Support += "Pools with regions:"
+	foreach ($Key in $Regions.Keys)
+	{
+		$Row = $Table.NewRow()
+		$Row.Pool = $Key
+		$Regs = ""
+		$Regs += foreach ($Region in $Regions[$Key]) { $Region }
+		$Row.Regions = $Regs
+		$Table.Rows.Add($Row)
 	}
 
 	# use Format-Table to force flushing to screen immediately
@@ -577,13 +606,7 @@ function Test-PoolProperty ()
 	elseif (-Not ($Pools.ContainsKey($Config.Pool)))
 	{
 		Write-Pretty-Error ("The """ + $Config.Pool + """ pool is not supported!")
-		$Sep = "`u{00b7} "
-
-		Write-Pretty-Info "Supported pools:"
-		foreach ($Pool in $Pools.Keys)
-		{
-			Write-Pretty-Info ($Sep + $Pool)
-		}
+		Write-Pretty-Info (Get-PoolSupport)
 
 		return $false
 	}
@@ -701,21 +724,7 @@ function Test-RegionProperty ()
 		else
 		{
 			Write-Pretty-Error ("The """ + $Config.Region + """ region does not exist!")
-			$Sep = "`u{00b7} "
-
-			Write-Pretty-Info "Supported regions:"
-			foreach ($Pool in $Pools.Keys)
-			{
-				if ($Pools[$Pool].Regions)
-				{
-					Write-Pretty-Info ($Pool + ":")
-
-					foreach ($Region in $Regions[$Pool])
-					{
-						Write-Pretty-Info ($Sep + $Region)
-					}
-				}
-			}
+			Write-Pretty-Info (Get-RegionSupport)
 
 			return $false
 		}
@@ -735,14 +744,7 @@ function Test-CoinProperty ()
 		if (-Not ($Coins.ContainsKey($Config.Coin)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
-			$Sep = "`u{00b7} "
-
-			Write-Pretty-Info "Supported coins:"
-
-			foreach ($Coin in $Coins.Keys)
-			{
-				Write-Pretty-Info ($Sep + $Coin.ToUpper())
-			}
+			Write-Pretty-Info (Get-CoinSupport)
 
 			return $false
 		}
@@ -767,14 +769,7 @@ function Test-MinerProperty ()
 	elseif (-Not ($Miners.ContainsKey($Config.Miner)))
 	{
 		Write-Pretty-Error ("The """ + $Config.Miner + """ miner is not supported!")
-		$Sep = "`u{00b7} "
-
-		Write-Pretty-Info "Supported miners:"
-
-		foreach ($Miner in $Miners.Keys)
-		{
-			Write-Pretty-Info ($Sep + $Miner)
-		}
+		Write-Pretty-Info (Get-MinerSupport)
 
 		return $false
 	}
@@ -807,13 +802,7 @@ function Test-AlgoProperty ()
 		if (-Not ($Algos.Contains($Config.Algo)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Algo + """ algo is not supported!")
-			$Sep = "`u{00b7} "
-
-			Write-Pretty-Info "Supported algos:"
-			foreach ($Algo in $Algos)
-			{
-				Write-Pretty-Info ($Sep + $Algo)
-			}
+			Write-Pretty-Info(Get-AlgoSupport)
 
 			return $false
 		}
@@ -984,8 +973,8 @@ function Test-Compatibility ()
 		if (-Not ($Pools[$Config.Pool].Coins))
 		{
 			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """!")
-			Write-Pretty-Info (Get-Coin-Support)
-			Write-Pretty-Info (Get-Pool-Support)
+			Write-Pretty-Info (Get-CoinSupport)
+			Write-Pretty-Info (Get-PoolSupport)
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -994,8 +983,8 @@ function Test-Compatibility ()
 		elseif (-Not ($Pools[$Config.Pool].Coins.ContainsKey($Config.Coin)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
-			Write-Pretty-Info (Get-Coin-Support)
-			Write-Pretty-Info (Get-Pool-Support)
+			Write-Pretty-Info (Get-CoinSupport)
+			Write-Pretty-Info (Get-PoolSupport)
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1019,8 +1008,8 @@ function Test-Compatibility ()
 	elseif (-Not $Config.Algo)
 	{
 		Write-Pretty-Error ("You specified neither a coin nor an algo!")
-		Write-Pretty-Info (Get-Coin-Support)
-		Write-Pretty-Info (Get-Miner-Support)
+		Write-Pretty-Info (Get-CoinSupport)
+		Write-Pretty-Info (Get-MinerSupport)
 		$Choice = Receive-Choice "Coin" "Algo"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1029,7 +1018,7 @@ function Test-Compatibility ()
 	elseif (-Not ($Pools[$Config.Pool].Algos))
 	{
 		Write-Pretty-Error ("Algo mining is not supported on """ + $Config.Pool + """!")
-		Write-Pretty-Info (Get-Pool-Support)
+		Write-Pretty-Info (Get-PoolSupport)
 		$Choice = Receive-Choice "Coin" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1039,7 +1028,7 @@ function Test-Compatibility ()
 	elseif (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
 	{
 		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
-		Write-Pretty-Info (Get-Pool-Support)
+		Write-Pretty-Info (Get-PoolSupport)
 		$Choice = Receive-Choice "Algo" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1051,8 +1040,8 @@ function Test-Compatibility ()
 		if ($Config.Coin)
 		{
 			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Coin.ToUpper() + """ coin cannot be mined with """ + $Config.Miner + """.")
-			Write-Pretty-Info (Get-Coin-Support)
-			Write-Pretty-Info (Get-Miner-Support)
+			Write-Pretty-Info (Get-CoinSupport)
+			Write-Pretty-Info (Get-MinerSupport)
 			$Choice = Receive-Choice "Coin" "Miner"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1061,7 +1050,7 @@ function Test-Compatibility ()
 		else
 		{
 			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Algo + """ algo cannot be mined with """ + $Config.Miner + """.")
-			Write-Pretty-Info (Get-Miner-Support)
+			Write-Pretty-Info (Get-MinerSupport)
 			$Choice = Receive-Choice "Algo" "Miner"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1214,13 +1203,36 @@ function Initialize-Properties ()
 	Initialize-Property "Watchdog" $true $FirstRun
 	Initialize-Property "MonitoringKey" $false $FirstRun
 	Initialize-Property "MphApiKey" $false $FirstRun
+
+	if ($FirstRun)
+	{
+		Write-Pretty-Info (Get-PoolSupport)
+	}
 	Initialize-Property "Pool" $true $FirstRun
+
 	Initialize-Property "Worker" $true $FirstRun
 	Initialize-Property "Wallet" $false $FirstRun
 	Initialize-Property "User" $false $FirstRun
+
+	if ($FirstRun)
+	{
+		Write-Pretty-Info (Get-RegionSupport)
+	}
 	Initialize-Property "Region" $false $FirstRun
+
+	if ($FirstRun)
+	{
+		Write-Pretty-Info (Get-CoinSupport)
+	}
 	Initialize-Property "Coin" $false $FirstRun
+
+	if ($FirstRun)
+	{
+		Write-Pretty-Info (Get-MinerSupport)
+	}
 	Initialize-Property "Miner" $true $FirstRun
+
+	# don't print the same info again, algos depend on miners
 	Initialize-Property "Algo" $false $FirstRun
 
 	Test-Compatibility
