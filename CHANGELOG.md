@@ -3,7 +3,7 @@
 ## RudeHash 5.1 (TBD)
 
 * Add support for Zergpool
-* Add support for Bitcore, BitSend, Folm Coin, LUXCoin
+* Add support for Bitcore, BitSend, Creativecoin, Folm Coin, LUXCoin
 * Add support for TimeTravel10, Xevan
 * Add support for ccminer-xevan
 * Don't require a restart when changing the region

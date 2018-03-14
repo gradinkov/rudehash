@@ -60,6 +60,7 @@ Set-ExecutionPolicy Unrestricted
 | BTG | Bitcoin Gold | EquiHash |
 | BSD | BitSend | Xevan |
 | BTX | Bitcore | TimeTravel10 |
+| CREA | Creativecoin | Keccak-C |
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |

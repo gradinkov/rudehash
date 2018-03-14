@@ -192,6 +192,7 @@ $Pools =
 		@{
 			"bsd" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
 			"btx" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556 }
+			"crea" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134 }
 			"flm" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
 			"lux" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
@@ -228,6 +229,7 @@ $Coins =
 	"btcp" = @{ Algo = "equihash" }
 	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
 	"btx" = @{ WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
+	"crea" = @{ WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"flm" = @{ Algo = "phi" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
@@ -284,6 +286,7 @@ $WtmModifiers =
 	"bitcore" = 1000000
 	"ethash" = 1000000
 	"equihash" = 1
+	"keccakc" = 1000000
 	"lyra2v2" = 1000
 	"neoscrypt" = 1000
 	"phi" = 1000000
