@@ -61,7 +61,9 @@ Set-ExecutionPolicy Unrestricted
 | BSD | Xevan |
 | BTX | TimeTravel10 |
 | ETH | Ethash |
+| FLM | PHI1612 |
 | FTC | NeoScrypt |
+| LUX | PHI1612 |
 | MONA | Lyra2REv2 |
 | KREDS | Lyra2REv2 |
 | RVN | X16R |

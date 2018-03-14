@@ -192,7 +192,9 @@ $Pools =
 		@{
 			"bsd" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
 			"btx" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556 }
+			"flm" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
+			"lux" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"mona" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
 			"rvn" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
 			"vtc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
@@ -227,9 +229,11 @@ $Coins =
 	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
 	"btx" = @{ WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
+	"flm" = @{ Algo = "phi" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
 	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
 	"kreds" = @{ Algo = "lyra2v2" }
+	"lux" = @{ WtmPage = "212-lux-phi1612"; Algo = "phi" }
 	"rvn" = @{ Algo = "x16r" }
 	"vtc" = @{ WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
 	"zcl" = @{ WtmPage = "167-zcl-equihash"; Algo = "equihash" }
@@ -282,6 +286,7 @@ $WtmModifiers =
 	"equihash" = 1
 	"lyra2v2" = 1000
 	"neoscrypt" = 1000
+	"phi" = 1000000
 	"xevan" = 1000000
 }
 
