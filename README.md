@@ -46,6 +46,7 @@ Set-ExecutionPolicy Unrestricted
 | HSR | ccminer-tpruvot, hsrminer-hsr |
 | Keccak-C | ccminer-tpruvot |
 | Lyra2REv2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
+| Lyra2Z | ccminer-tpruvot |
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
@@ -62,11 +63,13 @@ Set-ExecutionPolicy Unrestricted
 | BSD | BitSend | Xevan |
 | BTX | Bitcore | TimeTravel10 |
 | CREA | Creativecoin | Keccak-C |
+| CRS | Cryptoreal | Lyra2Z |
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |
 | GRLC | Garlicoin | Allium |
 | HSR | Hshare | HSR |
+| IFX | Infinex | Lyra2Z |
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
 | KREDS | Kreds | Lyra2REv2 |
@@ -74,6 +77,7 @@ Set-ExecutionPolicy Unrestricted
 | TZC | Trezarcoin | NeoScrypt |
 | VTC | Vertcoin | Lyra2REv2 |
 | XLR | Solaris | Xevan |
+| XZC | Zcoin | Lyra2Z |
 | ZCL | ZClassic | EquiHash |
 | ZEC | Zcash | EquiHash |
 | ZEN | ZenCash | EquiHash |

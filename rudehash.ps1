@@ -118,6 +118,7 @@ $Pools =
 			"ethash" = @{ Server = "%REGION%ethash-hub.miningpoolhub.com"; Port = 17020 }
 			"equihash" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 17023 }
 			"lyra2v2" = @{ Server = "hub.miningpoolhub.com"; Port = 17018 }
+			"lyra2z" = @{ Server = "%REGION%lyra2z-hub.miningpoolhub.com"; Port = 17025 }
 			"neoscrypt" = @{ Server = "hub.miningpoolhub.com"; Port = 17012 }
 		}
 		Coins =
@@ -127,6 +128,7 @@ $Pools =
 			"ftc" = @{ Server = "hub.miningpoolhub.com"; Port = 20510 }
 			"mona" = @{ Server = "hub.miningpoolhub.com"; Port = 20593 }
 			"vtc" = @{ Server = "hub.miningpoolhub.com"; Port = 20507 }
+			"xzc" = @{ Server = "%REGION%lyra2z-hub.miningpoolhub.com"; Port = 20581 }
 			"zcl" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20575 }
 			"zec" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20570 }
 			"zen" = @{ Server = "%REGION%equihash-hub.miningpoolhub.com"; Port = 20594 }
@@ -160,12 +162,14 @@ $Pools =
 			"btcp" = @{ Server = "btcp.suprnova.cc"; Port = 6822 }
 			"btg" = @{ Server = "btg.suprnova.cc"; Port = 8816 }
 			"btx" = @{ Server = "btx.suprnova.cc"; Port = 3629 }
+			"crs" = @{ Server = "crs.suprnova.cc"; Port = 4155 }
 			"eth" = @{ Server = "eth.suprnova.cc"; Port = 5000 }
 			"grlc" = @{ Server = "grlc.suprnova.cc"; Port = 8600 }
 			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
 			"kreds" = @{ Server = "kreds.suprnova.cc"; Port = 7196 }
 			"rvn" = @{ Server = "rvn.suprnova.cc"; Port = 6667 }
 			"vtc" = @{ Server = "vtc.suprnova.cc"; Port = 5678 }
+			"xzc" = @{ Server = "xzc.suprnova.cc"; Port = 1596 }
 			"zcl" = @{ Server = "zcl.suprnova.cc"; Port = 4042 }
 			"zec" = @{ Server = "zec.suprnova.cc"; Port = 2142 }
 			"zen" = @{ Server = "zen.suprnova.cc"; Port = 3618 }
@@ -184,6 +188,7 @@ $Pools =
 			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433 }
 			"keccakc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134 }
 			"lyra2v2" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
+			"lyra2z" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4553 }
 			"neoscrypt" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
 			"phi" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"x16r" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
@@ -197,6 +202,7 @@ $Pools =
 			"flm" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
 			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433 }
+			"ifx" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4553 }
 			"lux" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
 			"mona" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
 			"rvn" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
@@ -219,6 +225,7 @@ $Pools =
 			"hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433 }
 			"keccakc" = @{ Server = "keccakc.mine.zpool.ca"; Port = 5134 }
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533 }
+			"lyra2z" = @{ Server = "lyra2z.mine.zpool.ca"; Port = 4553 }
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333 }
 			"polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463 }
@@ -234,11 +241,13 @@ $Coins =
 	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
 	"btx" = @{ WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
 	"crea" = @{ WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
+	"crs" = @{ Algo = "lyra2z" }
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"flm" = @{ Algo = "phi" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
 	"grlc" = @{ Algo = "allium" }
 	"hsr" = @{ Algo = "hsr" }
+	"ifx" = @{ Algo = "lyra2z" }
 	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
 	"kreds" = @{ Algo = "lyra2v2" }
 	"lux" = @{ WtmPage = "212-lux-phi1612"; Algo = "phi" }
@@ -246,6 +255,7 @@ $Coins =
 	"tzc" = @{ WtmPage = "215-tzc-neoscrypt"; Algo = "neoscrypt" }
 	"vtc" = @{ WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
 	"xlr" = @{ WtmPage = "179-xlr-xevan"; Algo = "xevan" }
+	"xzc" = @{ WtmPage = "175-xzc-lyra2z"; Algo = "lyra2z" }
 	"zcl" = @{ WtmPage = "167-zcl-equihash"; Algo = "equihash" }
 	"zec" = @{ WtmPage = "166-zec-equihash"; Algo = "equihash" }
 	"zen" = @{ WtmPage = "185-zen-equihash"; Algo = "equihash" }
@@ -258,7 +268,7 @@ $Miners =
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
-	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
 	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev4/ethminer-0.14.0.dev4-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev4" }
@@ -279,7 +289,7 @@ $ExcavatorAlgos =
 
 $Tools =
 @{
-	"7zip" = [pscustomobject]@{ Url = "http://7-zip.org/a/7za920.zip"; ArchiveFile = "7zip.zip"; ExeFile = "7za.exe"; FilesInRoot = $true }
+	"7zip" = @{ Url = "http://7-zip.org/a/7za920.zip"; ArchiveFile = "7zip.zip"; ExeFile = "7za.exe"; FilesInRoot = $true }
 }
 
 $Regions =
@@ -298,6 +308,7 @@ $WtmModifiers =
 	"equihash" = 1
 	"keccakc" = 1000000
 	"lyra2v2" = 1000
+	"lyra2z" = 1000
 	"neoscrypt" = 1000
 	"phi" = 1000000
 	"xevan" = 1000000
@@ -312,6 +323,7 @@ $AlgoNames =
 	"hsr" = "HSR"
 	"keccakc" = "Keccak-C"
 	"lyra2v2" = "Lyra2REv2"
+	"lyra2z" = "Lyra2Z"
 	"neoscrypt" = "NeoScrypt"
 	"phi" = "PHI1612"
 	"polytimos" = "Polytimos"
@@ -1273,7 +1285,7 @@ function Initialize-Properties ()
 }
 
 $RigStats =
-[pscustomobject]@{
+@{
 	GpuCount = 0;
 	HashRate = 0;
 	Difficulty = 0;
