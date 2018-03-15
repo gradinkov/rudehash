@@ -287,7 +287,7 @@ $Regions =
 	"miningpoolhub" = @("asia", "europe", "us-east")
 	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
 	# zergpool uses "" for usa, we gotta fix this later
-	"zergpool" = @("usa", "europe")
+	"zergpool" = @("europe", "usa")
 }
 
 # MPH returns all hashrates in kH/s but WTM uses different magnitudes for different algos
@@ -366,6 +366,7 @@ function Get-CoinSupport ()
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Coin", "string") | Out-Null
 	$Table.Columns.Add("Algo", "string") | Out-Null
+	$Table.DefaultView.Sort = "Coin ASC"
 
 	$Support = "Supported coins and their algos:"
 	foreach ($Key in $Coins.Keys)
@@ -378,6 +379,7 @@ function Get-CoinSupport ()
 		$Table.Rows.Add($Row)
 	}
 
+	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
@@ -390,6 +392,7 @@ function Get-MinerSupport ()
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Miner", "string") | Out-Null
 	$Table.Columns.Add("Algo", "string") | Out-Null
+	$Table.DefaultView.Sort = "Miner ASC"
 
 	$Support += "Supported miners and algos:"
 	foreach ($Key in $Miners.Keys)
@@ -402,6 +405,7 @@ function Get-MinerSupport ()
 		$Table.Rows.Add($Row)
 	}
 
+	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
@@ -420,6 +424,7 @@ function Get-PoolSupport ()
 	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Modes", "string") | Out-Null
 	$Table.Columns.Add("Payout", "string") | Out-Null
+	$Table.DefaultView.Sort = "Pool ASC"
 
 	$Support += "Supported pools, mining modes and payout methods:"
 	foreach ($Key in $Pools.Keys)
@@ -452,6 +457,7 @@ function Get-PoolSupport ()
 		$Table.Rows.Add($Row)
 	}
 
+	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
@@ -459,6 +465,7 @@ function Get-PoolSupport ()
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Algo", "string") | Out-Null
+	$Table.DefaultView.Sort = "Pool ASC"
 
 	$Support += "Supported algos:"
 	foreach ($Key in $Pools.Keys)
@@ -468,12 +475,13 @@ function Get-PoolSupport ()
 			$Row = $Table.NewRow()
 			$Row.Pool = $Key
 			$Algos = ""
-			$Algos += foreach ($Algo in $Pools[$Key].Algos.Keys) { $Algo }
+			$Algos += foreach ($Algo in $Pools[$Key].Algos.GetEnumerator() | Sort-Object -Property Name) { $Algo.Name }
 			$Row.Algo = $Algos
 			$Table.Rows.Add($Row)
 		}
 	}
 
+	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
@@ -481,6 +489,7 @@ function Get-PoolSupport ()
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Coin", "string") | Out-Null
+	$Table.DefaultView.Sort = "Pool ASC"
 
 	$Support += "Supported coins:"
 	foreach ($Key in $Pools.Keys)
@@ -490,12 +499,13 @@ function Get-PoolSupport ()
 			$Row = $Table.NewRow()
 			$Row.Pool = $Key
 			$Coins = ""
-			$Coins += foreach ($Coin in $Pools[$Key].Coins.Keys) { $Coin }
+			$Coins += foreach ($Coin in $Pools[$Key].Coins.GetEnumerator() | Sort-Object -Property Name) { $Coin.Name }
 			$Row.Coin = $Coins
 			$Table.Rows.Add($Row)
 		}
 	}
 
+	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()
@@ -508,6 +518,7 @@ function Get-RegionSupport ()
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Regions", "string") | Out-Null
+	$Table.DefaultView.Sort = "Pool ASC"
 
 	$Support += "Pools with regions:"
 	foreach ($Key in $Regions.Keys)
@@ -515,11 +526,12 @@ function Get-RegionSupport ()
 		$Row = $Table.NewRow()
 		$Row.Pool = $Key
 		$Regs = ""
-		$Regs += foreach ($Region in $Regions[$Key]) { $Region }
+		$Regs += foreach ($Region in $Regions[$Key] | Sort-Object) { $Region }
 		$Row.Regions = $Regs
 		$Table.Rows.Add($Row)
 	}
 
+	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
 	$Table.Dispose()

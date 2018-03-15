@@ -4,6 +4,7 @@
 
 * Add support for Garlicoin
 * Add support for ccminer-allium
+* Sort possible values in First Run Wizard
 * Validate pool's IP address before using it
 
 ## RudeHash 6.0 (2018-03-14)
