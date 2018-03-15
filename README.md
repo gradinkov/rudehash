@@ -40,6 +40,7 @@ Set-ExecutionPolicy Unrestricted
 
 | Algo | Miner |
 |---|---|
+| Allium | ccminer-allium |
 | Ethash | ethminer, Excavator |
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
 | HSR | ccminer-tpruvot, hsrminer-hsr |
@@ -64,6 +65,7 @@ Set-ExecutionPolicy Unrestricted
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |
+| GRLC | Garlicoin | Allium |
 | HSR | Hshare | HSR |
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |

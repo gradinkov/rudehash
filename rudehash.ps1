@@ -161,6 +161,7 @@ $Pools =
 			"btg" = @{ Server = "btg.suprnova.cc"; Port = 8816 }
 			"btx" = @{ Server = "btx.suprnova.cc"; Port = 3629 }
 			"eth" = @{ Server = "eth.suprnova.cc"; Port = 5000 }
+			"grlc" = @{ Server = "grlc.suprnova.cc"; Port = 8600 }
 			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
 			"kreds" = @{ Server = "kreds.suprnova.cc"; Port = 7196 }
 			"rvn" = @{ Server = "rvn.suprnova.cc"; Port = 6667 }
@@ -236,6 +237,7 @@ $Coins =
 	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"flm" = @{ Algo = "phi" }
 	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
+	"grlc" = @{ Algo = "allium" }
 	"hsr" = @{ Algo = "hsr" }
 	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
 	"kreds" = @{ Algo = "lyra2v2" }
@@ -251,6 +253,7 @@ $Coins =
 
 $Miners =
 @{
+	"ccminer-allium" = @{ Url = "https://github.com/lenis0012/ccminer/releases/download/2.3.0-allium/ccminer-x64.exe"; ArchiveFile = "ccminer-allium.exe"; ExeFile = "ccminer-allium.exe"; FilesInRoot = $true; Algos = @("allium"); Api = $true; Version = "2.2.4" }
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt"); Api = $true }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
@@ -302,6 +305,7 @@ $WtmModifiers =
 
 $AlgoNames =
 @{
+	"allium" = "Allium"
 	"bitcore" = "TimeTravel10"
 	"ethash" = "Ethash"
 	"equihash" = "Equihash"
@@ -1379,7 +1383,7 @@ function Get-GpuCount ()
 {
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'summary' $false
 
@@ -1593,7 +1597,7 @@ function Initialize-MinerArgs ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"ccminer-polytimos" { $Args = "--algo=poly --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
@@ -1652,7 +1656,7 @@ function Get-HashRate-Miner ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1833,7 +1837,7 @@ function Get-PowerUsage ()
 
 	switch ($Config.Miner)
 	{
-		{$_ -in "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-Miner-Api 'threads' $false
 
@@ -1855,7 +1859,7 @@ function Get-PowerUsage ()
 
 				# these return mW instead of W, because reasons
 				# in fact, ccminer-phi might also return mW, but I really don't know coz it always returns 0 lol
-				if ($Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-rvn" -Or $Config.Miner -eq "ccminer-tpruvot" -Or $Config.Miner -eq "ccminer-xevan")
+				if ($Config.Miner -eq "ccminer-allium" -Or $Config.Miner -eq "ccminer-klaust" -Or $Config.Miner -eq "ccminer-rvn" -Or $Config.Miner -eq "ccminer-tpruvot" -Or $Config.Miner -eq "ccminer-xevan")
 				{
 					$PowerUsage /= 1000
 				}
@@ -2200,7 +2204,7 @@ function Get-MinerVersion ($Name)
 			# klaust messes up stdio, can't determine version reliably
 			#"ccminer-klaust" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
 			"ccminer-phi" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split("-")[1] }
-			{$_ -in "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			{$_ -in "ccminer-allium", "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
 			"dstm" { $VersionStr = (Get-ProcessOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
 			"ethminer" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
 			"excavator" { $VersionStr = (Get-ProcessOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
