@@ -1351,6 +1351,9 @@ function Resolve-PoolIp ()
 		$Res = (Get-ProcessOutput "nslookup" "-type=A $($SessionConfig.Server) 9.9.9.9").Split("`r`n")
 		$Ip = ($Res.Split("`r`n") | Select-String -Pattern "^Address")[1].ToString().Split(":")[1].Trim()
 
+		# validate the IP address by casting it to IPAddress
+		$Ip -match [ipaddress]$Ip | Out-Null
+
 		if ($Config.Debug)
 		{
 			Write-Pretty-Debug ("Stratum server $($SessionConfig.Server) resolves to: $($Ip)")
@@ -1358,7 +1361,7 @@ function Resolve-PoolIp ()
 	}
 	catch
 	{
-		Write-Pretty-Error "Error resolving pool IP addess! Is your network connection working?"
+		Write-Pretty-Error "Error resolving pool IP addess, falling back to URL! Is your network connection working?"
 
 		if ($Config.Debug)
 		{
