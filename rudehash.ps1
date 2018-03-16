@@ -348,8 +348,9 @@ $NiceHashAlgos =
 	"neoscrypt" = @{ Id = 8; Modifier = 1000000000 }
 }
 
-# we build this dynamically
+# we build these dynamically
 [System.Collections.Hashtable]$BtcRates = @{}
+[System.Collections.Hashtable]$ZergpoolCoins = @{}
 
 function Set-Property ($Name, $Value, $Permanent)
 {
@@ -876,39 +877,47 @@ function Test-CoinExchangeSupport ()
 {
 	if ($Config.Pool -eq "zergpool")
 	{
-		if ($Config.Debug)
+		if ($ZergpoolCoins.Count -eq 0)
 		{
-			Write-Pretty-Debug "Checking coin's exchange support..."
-		}
-
-		try
-		{
-			$Response = Invoke-RestMethod -Uri $ZergpoolCoinsUrl -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
-
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug ("Server response: $($Response.($Config.Coin))")
+				Write-Pretty-Debug "Checking coin's exchange support..."
 			}
 
-			if ($Response.($Config.Coin).noautotrade -eq 0)
+			try
 			{
-				return $true
+				$Response = Invoke-RestMethod -Uri $ZergpoolCoinsUrl -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+
+				if ($Config.Debug)
+				{
+					Write-Pretty-Debug ("Server response: $($Response.($Config.Coin))")
+				}
+
+				foreach ($Coin in $Pools["zergpool"].Coins.Keys)
+				{
+					$ZergpoolCoins.Add($Coin, $Response.$Coin.noautotrade)
+				}
 			}
-			else
+			catch
 			{
-				return $false
+				Write-Pretty-Error "Error determining if the selected coin can be exchanged! RudeHash cannot continue."
+
+				if ($Config.Debug)
+				{
+					Write-Pretty-Debug $_.Exception
+				}
+
+				Exit-RudeHash
 			}
 		}
-		catch
+
+		if ($ZergpoolCoins.($Config.Coin) -eq 0)
 		{
-			Write-Pretty-Error "Error determining if the selected coin can be exchanged! RudeHash cannot continue."
-
-			if ($Config.Debug)
-			{
-				Write-Pretty-Debug $_.Exception
-			}
-
-			Exit-RudeHash
+			return $true
+		}
+		else
+		{
+			return $false
 		}
 	}
 	else
@@ -1169,13 +1178,7 @@ function Test-Compatibility ()
 
 function Get-CurrencySupport ()
 {
-	if ($SessionConfig.Rates)
-	{
-		$CurrencyStr = "Supported currencies:`r`n"
-		$CurrencyStr += foreach ($Currency in $BtcRates.GetEnumerator() | Sort-Object -Property Name) { $Currency.Name }
-		return $CurrencyStr
-	}
-	else
+	if (-Not ($SessionConfig.Rates))
 	{
 		try
 		{
@@ -1201,13 +1204,22 @@ function Get-CurrencySupport ()
 			$SessionConfig.Rates = $false
 		}
 	}
+
+	if ($SessionConfig.Rates)
+	{
+		$CurrencyStr = "Supported currencies:`r`n"
+		$CurrencyStr += foreach ($Currency in $BtcRates.GetEnumerator() | Sort-Object -Property Name) { $Currency.Name }
+		return $CurrencyStr
+	}
 }
 
 function Test-CurrencyProperty ()
 {
 	if (-Not $SessionConfig.Rates)
 	{
-		Get-CurrencySupport
+		# Out-Null this, coz it's printed by Receive-Property
+		# also, if this would return, the currency wouldn't be asked for
+		Get-CurrencySupport | Out-Null
 	}
 
 	if ($SessionConfig.Api -And $SessionConfig.Rates)
@@ -1223,13 +1235,7 @@ function Test-CurrencyProperty ()
 		if (-Not ($BtcRates.Contains($Config.Currency)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Currency + """ currency is not supported!")
-			$Sep = "`u{00b7} "
-
-			Write-Pretty-Info "Supported currencies:"
-			foreach ($Currency in $BtcRates.Keys)
-			{
-				Write-Pretty-Info ($Sep + $Currency)
-			}
+			# Write-Pretty-Info(Get-CurrencySupport)
 
 			return $false
 		}
