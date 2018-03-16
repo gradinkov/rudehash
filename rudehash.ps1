@@ -178,7 +178,7 @@ $Pools =
 
 	"zergpool" =
 	@{
-		PoolFee = 0
+		PoolFee = 0.5
 		Authless = $true
 		Regions = $true
 		StratumProto = 0
