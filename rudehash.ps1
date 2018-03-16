@@ -435,7 +435,8 @@ function Get-PoolSupport ()
 	$Table = New-Object System.Data.DataTable
 	$Table.Columns.Add("Pool", "string") | Out-Null
 	$Table.Columns.Add("Modes", "string") | Out-Null
-	$Table.Columns.Add("Payout", "string") | Out-Null
+	$Table.Columns.Add("Payout to", "string") | Out-Null
+	$Table.Columns.Add("Wallet currencies", "string") | Out-Null
 	$Table.DefaultView.Sort = "Pool ASC"
 
 	$Support += "Supported pools, mining modes and payout methods:"
@@ -452,19 +453,33 @@ function Get-PoolSupport ()
 
 		if ($Pools[$Key].Coins)
 		{
-			$ModeStr += "coin "
+			$ModeStr += "coin"
 		}
 
 		$Row.Modes = $ModeStr
+		$WallettCurrStr = ""
 
 		if ($Pools[$Key].Authless)
 		{
-			$Row.Payout = "BTC wallet"
+			$Row."Payout to" = "Own wallet"
+
+			if ($Pools[$Key].Algos)
+			{
+				$WallettCurrStr += "Bitcoin "
+			}
+
+			if ($Pools[$Key].Coins)
+			{
+				$WallettCurrStr += "Altcoin"
+			}
 		}
 		else
 		{
-			$Row.Payout = "Site balance"
+			$Row."Payout to" = "Site balance"
+			$WallettCurrStr += "N/A"
 		}
+
+		$Row."Wallet currencies" = $WallettCurrStr
 
 		$Table.Rows.Add($Row)
 	}
@@ -472,6 +487,8 @@ function Get-PoolSupport ()
 	$Table = $Table.DefaultView.ToTable()
 	# use Format-Table to force flushing to screen immediately
 	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Support += "Bitcoin wallet: you use BTC wallet, the pool auto-exchanges the mined coins to BTC.`r`n"
+	$Support += "Altcoin wallet: your wallet's currency is the same as the coin you're mining.`r`n`r`n"
 	$Table.Dispose()
 
 	$Table = New-Object System.Data.DataTable
@@ -644,7 +661,7 @@ function Test-PoolProperty ()
 	elseif (-Not ($Pools.ContainsKey($Config.Pool)))
 	{
 		Write-Pretty-Error ("The """ + $Config.Pool + """ pool is not supported!")
-		Write-Pretty-Info (Get-PoolSupport)
+		# Write-Pretty-Info (Get-PoolSupport)
 
 		return $false
 	}
@@ -762,7 +779,7 @@ function Test-RegionProperty ()
 		else
 		{
 			Write-Pretty-Error ("The """ + $Config.Region + """ region does not exist!")
-			Write-Pretty-Info (Get-RegionSupport)
+			# Write-Pretty-Info (Get-RegionSupport)
 
 			return $false
 		}
@@ -782,7 +799,7 @@ function Test-CoinProperty ()
 		if (-Not ($Coins.ContainsKey($Config.Coin)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
-			Write-Pretty-Info (Get-CoinSupport)
+			# Write-Pretty-Info (Get-CoinSupport)
 
 			return $false
 		}
@@ -807,7 +824,7 @@ function Test-MinerProperty ()
 	elseif (-Not ($Miners.ContainsKey($Config.Miner)))
 	{
 		Write-Pretty-Error ("The """ + $Config.Miner + """ miner is not supported!")
-		Write-Pretty-Info (Get-MinerSupport)
+		# Write-Pretty-Info (Get-MinerSupport)
 
 		return $false
 	}
@@ -840,7 +857,7 @@ function Test-AlgoProperty ()
 		if (-Not ($Algos.Contains($Config.Algo)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Algo + """ algo is not supported!")
-			Write-Pretty-Info(Get-AlgoSupport)
+			# Write-Pretty-Info(Get-AlgoSupport)
 
 			return $false
 		}
@@ -867,6 +884,11 @@ function Test-CoinExchangeSupport ()
 		try
 		{
 			$Response = Invoke-RestMethod -Uri $ZergpoolCoinsUrl -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+
+			if ($Config.Debug)
+			{
+				Write-Pretty-Debug ("Server response: $($Response.($Config.Coin))")
+			}
 
 			if ($Response.($Config.Coin).noautotrade -eq 0)
 			{
@@ -929,11 +951,26 @@ function Receive-Property ($Name, $Mandatory)
 	}
 }
 
+function Write-Help ($Property)
+{
+	# print help text, if any
+	try
+	{
+		Write-Pretty-Info( & (Get-ChildItem "Function:Get-$($Property)Support" -ErrorAction Ignore))
+	}
+	catch {	}
+}
+
 function Initialize-Property ($Name, $Mandatory, $Force)
 {
 	if ($Config.Debug)
 	{
 		Write-Pretty-Debug "Evaluating $Name property..."
+	}
+
+	if ($FirstRun)
+	{
+		Write-Help $Name
 	}
 
 	if ($Force)
@@ -945,6 +982,7 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
 	while (-Not (& (Get-ChildItem "Function:Test-$($Name)Property")))
 	{
+		Write-Help $Name
 		$Ret = Receive-Property $Name $Mandatory
 		Set-Property $Name $Ret $true
 	}
@@ -1011,8 +1049,8 @@ function Test-Compatibility ()
 		if (-Not ($Pools[$Config.Pool].Coins))
 		{
 			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """!")
-			Write-Pretty-Info (Get-CoinSupport)
-			Write-Pretty-Info (Get-PoolSupport)
+			# Write-Pretty-Info (Get-CoinSupport)
+			# Write-Pretty-Info (Get-PoolSupport)
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1021,8 +1059,8 @@ function Test-Compatibility ()
 		elseif (-Not ($Pools[$Config.Pool].Coins.ContainsKey($Config.Coin)))
 		{
 			Write-Pretty-Error ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
-			Write-Pretty-Info (Get-CoinSupport)
-			Write-Pretty-Info (Get-PoolSupport)
+			# Write-Pretty-Info (Get-CoinSupport)
+			# Write-Pretty-Info (Get-PoolSupport)
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1046,8 +1084,8 @@ function Test-Compatibility ()
 	elseif (-Not $Config.Algo)
 	{
 		Write-Pretty-Error ("You specified neither a coin nor an algo!")
-		Write-Pretty-Info (Get-CoinSupport)
-		Write-Pretty-Info (Get-MinerSupport)
+		# Write-Pretty-Info (Get-CoinSupport)
+		# Write-Pretty-Info (Get-MinerSupport)
 		$Choice = Receive-Choice "Coin" "Algo"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1056,7 +1094,7 @@ function Test-Compatibility ()
 	elseif (-Not ($Pools[$Config.Pool].Algos))
 	{
 		Write-Pretty-Error ("Algo mining is not supported on """ + $Config.Pool + """!")
-		Write-Pretty-Info (Get-PoolSupport)
+		# Write-Pretty-Info (Get-PoolSupport)
 		$Choice = Receive-Choice "Coin" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1066,7 +1104,7 @@ function Test-Compatibility ()
 	elseif (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
 	{
 		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
-		Write-Pretty-Info (Get-PoolSupport)
+		# Write-Pretty-Info (Get-PoolSupport)
 		$Choice = Receive-Choice "Algo" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1078,8 +1116,8 @@ function Test-Compatibility ()
 		if ($Config.Coin)
 		{
 			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Coin.ToUpper() + """ coin cannot be mined with """ + $Config.Miner + """.")
-			Write-Pretty-Info (Get-CoinSupport)
-			Write-Pretty-Info (Get-MinerSupport)
+			# Write-Pretty-Info (Get-CoinSupport)
+			# Write-Pretty-Info (Get-MinerSupport)
 			$Choice = Receive-Choice "Coin" "Miner"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1088,7 +1126,7 @@ function Test-Compatibility ()
 		else
 		{
 			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Algo + """ algo cannot be mined with """ + $Config.Miner + """.")
-			Write-Pretty-Info (Get-MinerSupport)
+			# Write-Pretty-Info (Get-MinerSupport)
 			$Choice = Receive-Choice "Algo" "Miner"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1129,29 +1167,38 @@ function Test-Compatibility ()
 	}
 }
 
-function Get-Currency-Support ()
+function Get-CurrencySupport ()
 {
-	$SessionConfig.Rates = $false
-
-	try
+	if ($SessionConfig.Rates)
 	{
-		$ResponseRaw = Invoke-WebRequest -Uri $BlockchainUrl -UseBasicParsing
-		$Response = $ResponseRaw | ConvertFrom-Json -AsHashtable
-
-		foreach ($Currency in $Response.Keys)
-		{
-			$BtcRates.Add($Currency, $Response[$Currency].buy)
-		}
-
-		$SessionConfig.Rates = $true
+		$CurrencyStr = "Supported currencies:`r`n"
+		$CurrencyStr += foreach ($Currency in $BtcRates.GetEnumerator() | Sort-Object -Property Name) { $Currency.Name }
+		return $CurrencyStr
 	}
-	catch
+	else
 	{
-		Write-Pretty-Error "Error obtaining BTC exchange rates! BTC to Fiat conversion is disabled."
-
-		if ($Config.Debug)
+		try
 		{
-			Write-Pretty-Debug $_.Exception
+			$ResponseRaw = Invoke-WebRequest -Uri $BlockchainUrl -UseBasicParsing
+			$Response = $ResponseRaw | ConvertFrom-Json -AsHashtable
+
+			foreach ($Currency in $Response.Keys)
+			{
+				$BtcRates.Add($Currency, $Response[$Currency].buy)
+			}
+
+			$SessionConfig.Rates = $true
+		}
+		catch
+		{
+			Write-Pretty-Error "Error obtaining BTC exchange rates! BTC to Fiat conversion is disabled."
+
+			if ($Config.Debug)
+			{
+				Write-Pretty-Debug $_.Exception
+			}
+
+			$SessionConfig.Rates = $false
 		}
 	}
 }
@@ -1160,7 +1207,7 @@ function Test-CurrencyProperty ()
 {
 	if (-Not $SessionConfig.Rates)
 	{
-		Get-Currency-Support
+		Get-CurrencySupport
 	}
 
 	if ($SessionConfig.Api -And $SessionConfig.Rates)
@@ -1248,7 +1295,7 @@ function Initialize-Properties ()
 
 	if ($FirstRun)
 	{
-		Write-Pretty-Info (Get-PoolSupport)
+		# Write-Pretty-Info (Get-PoolSupport)
 	}
 	Initialize-Property "Pool" $true $FirstRun
 
@@ -1258,19 +1305,19 @@ function Initialize-Properties ()
 
 	if ($FirstRun)
 	{
-		Write-Pretty-Info (Get-RegionSupport)
+		# Write-Pretty-Info (Get-RegionSupport)
 	}
 	Initialize-Property "Region" $false $FirstRun
 
 	if ($FirstRun)
 	{
-		Write-Pretty-Info (Get-CoinSupport)
+		# Write-Pretty-Info (Get-CoinSupport)
 	}
 	Initialize-Property "Coin" $false $FirstRun
 
 	if ($FirstRun)
 	{
-		Write-Pretty-Info (Get-MinerSupport)
+		# Write-Pretty-Info (Get-MinerSupport)
 	}
 	Initialize-Property "Miner" $true $FirstRun
 
