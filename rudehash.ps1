@@ -1429,7 +1429,7 @@ function Resolve-PoolIp ()
 
 		# wonderful workaround for PowerShell *and* .Net both lacking proper built-in DNS resolution
 		#$Ip = ([System.Net.DNS]::GetHostEntry($SessionConfig.Server).AddressList[0].IPAddressToString)
-		$Res = (Get-ProcessOutput "nslookup" "-type=A $($SessionConfig.Server) 9.9.9.9").Split("`r`n")
+		$Res = (Get-ProcessOutput "nslookup" "-type=A -retry=3 $($SessionConfig.Server) 9.9.9.9").Split("`r`n")
 		$Ip = ($Res.Split("`r`n") | Select-String -Pattern "^Address")[1].ToString().Split(":")[1].Trim()
 
 		# validate the IP address by casting it to IPAddress

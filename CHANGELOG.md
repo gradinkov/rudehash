@@ -8,6 +8,7 @@
 * Sort possible values in First Run Wizard
 * Validate pool's IP address before using it
 * Fix Zergpool auto-exchange checks
+* Retry pool IP lookup 3 times
 
 ## RudeHash 6.0 (2018-03-14)
 
