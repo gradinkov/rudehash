@@ -59,9 +59,9 @@ Set-ExecutionPolicy Unrestricted
 
 | Symbol | Name | Algo |
 |---|---|---|
+| BSD | BitSend | Xevan |
 | BTCP | Bitcoin Private | EquiHash |
 | BTG | Bitcoin Gold | EquiHash |
-| BSD | BitSend | Xevan |
 | BTX | Bitcore | TimeTravel10 |
 | CREA | Creativecoin | Keccak-C |
 | CRS | Cryptoreal | Lyra2Z |
@@ -71,9 +71,9 @@ Set-ExecutionPolicy Unrestricted
 | GRLC | Garlicoin | Allium |
 | HSR | Hshare | HSR |
 | IFX | Infinex | Lyra2Z |
+| KREDS | Kreds | Lyra2REv2 |
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
-| KREDS | Kreds | Lyra2REv2 |
 | RVN | Ravencoin | X16R |
 | TZC | Trezarcoin | NeoScrypt |
 | VTC | Vertcoin | Lyra2REv2 |

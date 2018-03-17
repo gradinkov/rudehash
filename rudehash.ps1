@@ -242,29 +242,29 @@ $Pools =
 
 $Coins =
 @{
-	"bsd" = @{ WtmPage = "201-bsd-xevan"; Algo = "xevan" }
-	"btcp" = @{ Algo = "equihash" }
-	"btg" = @{ WtmPage = "214-btg-equihash"; Algo = "equihash" }
-	"btx" = @{ WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
-	"crea" = @{ WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
-	"crs" = @{ Algo = "lyra2z" }
-	"eth" = @{ WtmPage = "151-eth-ethash"; Algo = "ethash" }
-	"flm" = @{ Algo = "phi" }
-	"ftc" = @{ WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
-	"grlc" = @{ Algo = "allium" }
-	"hsr" = @{ Algo = "hsr" }
-	"ifx" = @{ Algo = "lyra2z" }
-	"mona" = @{ WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
-	"kreds" = @{ Algo = "lyra2v2" }
-	"lux" = @{ WtmPage = "212-lux-phi1612"; Algo = "phi" }
-	"rvn" = @{ Algo = "x16r" }
-	"tzc" = @{ WtmPage = "215-tzc-neoscrypt"; Algo = "neoscrypt" }
-	"vtc" = @{ WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
-	"xlr" = @{ WtmPage = "179-xlr-xevan"; Algo = "xevan" }
-	"xzc" = @{ WtmPage = "175-xzc-lyra2z"; Algo = "lyra2z" }
-	"zcl" = @{ WtmPage = "167-zcl-equihash"; Algo = "equihash" }
-	"zec" = @{ WtmPage = "166-zec-equihash"; Algo = "equihash" }
-	"zen" = @{ WtmPage = "185-zen-equihash"; Algo = "equihash" }
+	"bsd" = @{ Name = "BitSend"; WtmPage = "201-bsd-xevan"; Algo = "xevan" }
+	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash" }
+	"btg" = @{ Name = "Bitcoin Gold"; WtmPage = "214-btg-equihash"; Algo = "equihash" }
+	"btx" = @{ Name = "Bitcore"; WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
+	"crea" = @{ Name = "Creativecoin"; WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
+	"crs" = @{ Name = "Cryptoreal"; Algo = "lyra2z" }
+	"eth" = @{ Name = "Ethereum"; WtmPage = "151-eth-ethash"; Algo = "ethash" }
+	"flm" = @{ Name = "Folm Coin"; Algo = "phi" }
+	"ftc" = @{ Name = "Feathercoin"; WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
+	"grlc" = @{ Name = "Garlicoin"; Algo = "allium" }
+	"hsr" = @{ Name = "Hshare"; Algo = "hsr" }
+	"ifx" = @{ Name = "Infinex"; Algo = "lyra2z" }
+	"kreds" = @{ Name = "Kreds"; Algo = "lyra2v2" }
+	"lux" = @{ Name = "LUXCoin"; WtmPage = "212-lux-phi1612"; Algo = "phi" }
+	"mona" = @{ Name = "Monacoin"; WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
+	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
+	"tzc" = @{ Name = "Trezarcoin"; WtmPage = "215-tzc-neoscrypt"; Algo = "neoscrypt" }
+	"vtc" = @{ Name = "Vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
+	"xlr" = @{ Name = "Solaris"; WtmPage = "179-xlr-xevan"; Algo = "xevan" }
+	"xzc" = @{ Name = "Zcoin"; WtmPage = "175-xzc-lyra2z"; Algo = "lyra2z" }
+	"zcl" = @{ Name = "ZClassic"; WtmPage = "167-zcl-equihash"; Algo = "equihash" }
+	"zec" = @{ Name = "Zcash"; WtmPage = "166-zec-equihash"; Algo = "equihash" }
+	"zen" = @{ Name = "ZenCash"; WtmPage = "185-zen-equihash"; Algo = "equihash" }
 }
 
 $Miners =
@@ -2404,7 +2404,7 @@ function Set-WindowTitle ()
 
 	if ($SessionConfig.CoinMode)
 	{
-		$CoinStr = ("Coin: " + $Config.Coin.ToUpper() + $Sep)
+		$CoinStr = ("Coin: " + $Coins[$Config.Coin].Name + $Sep)
 	}
 	else
 	{
