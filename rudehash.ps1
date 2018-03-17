@@ -109,6 +109,7 @@ $Pools =
 @{
 	"miningpoolhub" =
 	@{
+		Name = "Mining Pool Hub"
 		PoolFee = 1.1
 		Authless = $false
 		Regions = $true
@@ -137,6 +138,7 @@ $Pools =
 
 	"nicehash" =
 	@{
+		Name = "NiceHash"
 		PoolFee = 2
 		Authless = $true
 		Regions = $true
@@ -154,6 +156,7 @@ $Pools =
 
 	"suprnova" =
 	@{
+		Name = "Suprnova"
 		PoolFee = 1.0
 		Authless = $false
 		Regions = $false
@@ -181,6 +184,7 @@ $Pools =
 
 	"zergpool" =
 	@{
+		Name = "Zergpool"
 		PoolFee = 0.5
 		Authless = $true
 		Regions = $true
@@ -219,6 +223,7 @@ $Pools =
 
 	"zpool" =
 	@{
+		Name = "zpool"
 		PoolFee = 2
 		Authless = $true
 		Regions = $false
@@ -340,15 +345,6 @@ $AlgoNames =
 	"polytimos" = "Polytimos"
 	"x16r" = "X16R"
 	"xevan" = "Xevan"
-}
-
-$PoolNames =
-@{
-	"miningpoolhub" = "Mining Pool Hub"
-	"nicehash" = "NiceHash"
-	"suprnova" = "Suprnova"
-	"zergpool" = "Zergpool"
-	"zpool" = "zpool"
 }
 
 # we build these dynamically
@@ -2122,7 +2118,7 @@ function Measure-Earnings ()
 			}
 			catch
 			{
-				Write-Pretty-Error "$($PoolNames[$Config.Pool]) API request failed! Is your network connection working?"
+				Write-Pretty-Error "$($Pools[$Config.Pool].Name) API request failed! Earnings estimations will not work."
 
 				if ($Config.Debug)
 				{
@@ -2424,7 +2420,7 @@ function Set-WindowTitle ()
 		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
 	}
 
-	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $PoolNames[$Config.Pool] + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
+	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Pools[$Config.Pool].Name + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
 }
 
 function Update-MinerUptime ()
@@ -2674,7 +2670,7 @@ function Ping-Monitoring ()
 			PID = $RigStats.Pid
 			Active = $Active
 			Algorithm = @($AlgoNames[$Config.Algo])
-			Pool = @($PoolNames[$Config.Pool])
+			Pool = @($Pools[$Config.Pool].Name)
 			'BTC/day' = $RigStats.EarningsBtc
 		}
 
