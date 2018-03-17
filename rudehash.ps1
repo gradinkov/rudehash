@@ -141,13 +141,14 @@ $Pools =
 		Authless = $true
 		Regions = $true
 		StratumProto = 2
+		ApiUrl = "https://api.nicehash.com/api?method=stats.global.current"
 		Algos =
 		@{
-			"ethash" = @{ Server = "daggerhashimoto.%REGION%nicehash.com"; Port = 3353 }
-			"equihash" = @{ Server = "equihash.%REGION%nicehash.com"; Port = 3357 }
-			"lyra2v2" = @{ Server = "lyra2rev2.%REGION%nicehash.com"; Port = 3347 }
-			"neoscrypt" = @{ Server = "neoscrypt.%REGION%nicehash.com"; Port = 3341 }
-			"nist5" = @{ Server = "nist5.%REGION%nicehash.com"; Port = 3340 }
+			"equihash" = @{ Server = "equihash.%REGION%nicehash.com"; Port = 3357; Modifier = 1000000; Id = 24 }
+			"ethash" = @{ Server = "daggerhashimoto.%REGION%nicehash.com"; Port = 3353; Modifier = 1000000000; Id = 20 }
+			"lyra2v2" = @{ Server = "lyra2rev2.%REGION%nicehash.com"; Port = 3347; Modifier = 1000000000000; Id = 14 }
+			"neoscrypt" = @{ Server = "neoscrypt.%REGION%nicehash.com"; Port = 3341; Modifier = 1000000000; Id = 8 }
+			"nist5" = @{ Server = "nist5.%REGION%nicehash.com"; Port = 3340; Modifier = 1000000000; Id = 7 }
 		}
 	}
 
@@ -183,18 +184,19 @@ $Pools =
 		Authless = $true
 		Regions = $true
 		StratumProto = 0
+		ApiUrl = "http://api.zergpool.com:8080/api/status"
 		Algos =
 		@{
-			"bitcore" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556 }
-			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433 }
-			"keccakc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134 }
-			"lyra2v2" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
-			"lyra2z" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4553 }
-			"neoscrypt" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
-			"nist5" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3833 }
-			"phi" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
-			"x16r" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
-			"xevan" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
+			"bitcore" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556; Modifier = 1000000 }
+			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433; Modifier = 1000000 }
+			"keccakc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134; Modifier = 1000000000 }
+			"lyra2v2" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533; Modifier = 1000000 }
+			"lyra2z" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4553; Modifier = 1000000 }
+			"neoscrypt" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233; Modifier = 1000000 }
+			"nist5" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3833; Modifier = 1000000 }
+			"phi" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333; Modifier = 1000000 }
+			"x16r" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636; Modifier = 1000000 }
+			"xevan" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739; Modifier = 1000000 }
 		}
 		Coins =
 		@{
@@ -220,19 +222,20 @@ $Pools =
 		Authless = $true
 		Regions = $false
 		StratumProto = 0
+		ApiUrl = "https://www.zpool.ca/api/status"
 		Algos =
 		@{
-			"bitcore" = @{ Server = "bitcore.mine.zpool.ca"; Port = 3556 }
-			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142 }
-			"hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433 }
-			"keccakc" = @{ Server = "keccakc.mine.zpool.ca"; Port = 5134 }
-			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533 }
-			"lyra2z" = @{ Server = "lyra2z.mine.zpool.ca"; Port = 4553 }
-			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233 }
-			"nist5" = @{ Server = "nist5.mine.zpool.ca"; Port = 3833 }
-			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333 }
-			"polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463 }
-			"xevan" = @{ Server = "xevan.mine.zpool.ca"; Port = 3739 }
+			"bitcore" = @{ Server = "bitcore.mine.zpool.ca"; Port = 3556; Modifier = 1000000 }
+			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142; Modifier = 1000 }
+			"hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433; Modifier = 1000000 }
+			"keccakc" = @{ Server = "keccakc.mine.zpool.ca"; Port = 5134; Modifier = 1000000000 }
+			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533; Modifier = 1000000 }
+			"lyra2z" = @{ Server = "lyra2z.mine.zpool.ca"; Port = 4553; Modifier = 1000000 }
+			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233; Modifier = 1000000 }
+			"nist5" = @{ Server = "nist5.mine.zpool.ca"; Port = 3833; Modifier = 1000000 }
+			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333; Modifier = 1000000 }
+			"polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463; Modifier = 1000000 }
+			"xevan" = @{ Server = "xevan.mine.zpool.ca"; Port = 3739; Modifier = 1000000 }
 		}
 	}
 }
@@ -344,15 +347,6 @@ $PoolNames =
 	"suprnova" = "Suprnova"
 	"zergpool" = "Zergpool"
 	"zpool" = "zpool"
-}
-
-$NiceHashAlgos =
-@{
-	"equihash" = @{ Id = 24; Modifier = 1000000 }
-	"ethash" = @{ Id = 20; Modifier = 1000000000 }
-	"lyra2v2" = @{ Id = 14; Modifier = 1000000000000 }
-	"neoscrypt" = @{ Id = 8; Modifier = 1000000000 }
-	"nist5" = @{ Id = 7; Modifier = 1000000000 }
 }
 
 # we build these dynamically
@@ -2103,27 +2097,35 @@ function Measure-Earnings ()
 	}
 	else
 	{
-		$HashRate = $RigStats.HashRate / $NiceHashAlgos[$Config.Algo].Modifier
-
-		try
+		if ($Pools[$Config.Pool].ApiUrl)
 		{
-			$Response = Invoke-RestMethod -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
-			$Multiplier = 1 - ($Pools[$Config.Pool].PoolFee / 100)
-			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price * $Multiplier
-			$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price), 8)
-
-			if ($SessionConfig.Rates)
+			try
 			{
-				$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+				[double]$HashRate = $RigStats.HashRate / $Pools[$Config.Pool].Algos[$Config.Algo].Modifier
+				[double]$Multiplier = 1 - ($Pools[$Config.Pool].PoolFee / 100)
+				$Response = Invoke-RestMethod -Uri $Pools[$Config.Pool].ApiUrl -UseBasicParsing -ErrorAction SilentlyContinue
+
+				switch ($Config.Pool)
+				{
+					"nicehash" { [double]$Price = $Response.result.stats[$Pools[$Config.Pool].Algos[$Config.Algo].Id].price }
+					{$_ -in "zergpool", "zpool"} { [double]$Price = $Response.($Config.Algo).estimate_current }
+				}
+
+				$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price * $Multiplier), 8)
+
+				if ($SessionConfig.Rates)
+				{
+					$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+				}
 			}
-		}
-		catch
-		{
-			Write-Pretty-Error "NiceHash request failed! Is your network connection working?"
-
-			if ($Config.Debug)
+			catch
 			{
-				Write-Pretty-Debug $_.Exception
+				Write-Pretty-Error "$($PoolNames[$Config.Pool]) API request failed! Is your network connection working?"
+
+				if ($Config.Debug)
+				{
+					Write-Pretty-Debug $_.Exception
+				}
 			}
 		}
 	}
@@ -2467,7 +2469,7 @@ function Read-Stats ()
 			Get-HashRate
 			Get-PowerUsage
 
-			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $NiceHashAlgos.ContainsKey($Config.Algo)))
+			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
 			{
 				Measure-Earnings
 
@@ -2504,7 +2506,7 @@ function Write-Stats ()
 			Write-Pretty-Info ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
-			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $NiceHashAlgos.ContainsKey($Config.Algo)))
+			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
 			{
 				# we could keep trying to obtain exchange rates, but if it would eventually succeed and the
 				# list didn't contain the currency specified in the config, it'd result in indexing errors

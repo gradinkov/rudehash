@@ -5,6 +5,7 @@
 * Add support for Cryptoreal, Garlicoin, Infinex, Zcoin
 * Add support for Lyra2Z, Nist5
 * Add support for ccminer-allium
+* Use current pool's API for algo profit estimation
 * Sort possible values in First Run Wizard
 * Validate pool's IP address before using it
 * Fix Zergpool auto-exchange checks
