@@ -64,7 +64,7 @@ Set-ExecutionPolicy Unrestricted
 | BTG | Bitcoin Gold | EquiHash |
 | BTX | Bitcore | TimeTravel10 |
 | CREA | Creativecoin | Keccak-C |
-| CRS | Cryptoreal | Lyra2Z |
+| CRS | Criptoreal | Lyra2Z |
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |

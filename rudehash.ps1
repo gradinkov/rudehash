@@ -247,7 +247,7 @@ $Coins =
 	"btg" = @{ Name = "Bitcoin Gold"; WtmPage = "214-btg-equihash"; Algo = "equihash" }
 	"btx" = @{ Name = "Bitcore"; WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
 	"crea" = @{ Name = "Creativecoin"; WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
-	"crs" = @{ Name = "Cryptoreal"; Algo = "lyra2z" }
+	"crs" = @{ Name = "Criptoreal"; Algo = "lyra2z" }
 	"eth" = @{ Name = "Ethereum"; WtmPage = "151-eth-ethash"; Algo = "ethash" }
 	"flm" = @{ Name = "Folm Coin"; Algo = "phi" }
 	"ftc" = @{ Name = "Feathercoin"; WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
