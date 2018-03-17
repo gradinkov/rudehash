@@ -1609,7 +1609,12 @@ function Initialize-Excavator ($User, $Pass)
 	Get-GpuCount
 	Stop-Process $Proc
 
-	Write-Pretty-Info ($RigStats.GpuCount.ToString() + " GPUs detected.")
+	if ($RigStats.GpuCount -gt 1)
+	{
+		$Suffix = "s"
+	}
+
+	Write-Pretty-Info ($RigStats.GpuCount.ToString() + " GPU" + $Suffix + " detected.")
 
 	$Json = Initialize-Json $User $Pass
 	$JsonFile = [io.path]::combine($TempDir, "excavator.json")
