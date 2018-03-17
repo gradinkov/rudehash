@@ -48,6 +48,7 @@ Set-ExecutionPolicy Unrestricted
 | Lyra2REv2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
 | Lyra2Z | ccminer-tpruvot |
 | NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
+| Nist5 | ccminer-klaust, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |

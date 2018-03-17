@@ -3,7 +3,7 @@
 ## RudeHash 7.0 (TBD)
 
 * Add support for Cryptoreal, Garlicoin, Infinex, Zcoin
-* Add support for Lyra2Z
+* Add support for Lyra2Z, Nist5
 * Add support for ccminer-allium
 * Sort possible values in First Run Wizard
 * Validate pool's IP address before using it
