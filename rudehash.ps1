@@ -2416,7 +2416,7 @@ function Set-WindowTitle ()
 
 	if ($Pools[$Config.Pool].Authless)
 	{
-		$WalletStr = "Wallet: " + $Config.Wallet + $Sep
+		$WalletStr = $Sep + "Wallet: " + $Config.Wallet
 		$WorkerStr = "Worker: " + $Config.Worker + $Sep
 	}
 	else
@@ -2425,7 +2425,7 @@ function Set-WindowTitle ()
 		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
 	}
 
-	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Pools[$Config.Pool].Name + $Sep + $WalletStr + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner
+	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Pools[$Config.Pool].Name + $Sep + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner + $WalletStr
 }
 
 function Update-MinerUptime ()
