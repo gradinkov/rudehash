@@ -169,6 +169,7 @@ $Pools =
 			"grlc" = @{ Server = "grlc.suprnova.cc"; Port = 8600 }
 			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
 			"kreds" = @{ Server = "kreds.suprnova.cc"; Port = 7196 }
+			"poly" = @{ Server = "poly.suprnova.cc"; Port = 7935 }
 			"rvn" = @{ Server = "rvn.suprnova.cc"; Port = 6667 }
 			"vtc" = @{ Server = "vtc.suprnova.cc"; Port = 5678 }
 			"xzc" = @{ Server = "xzc.suprnova.cc"; Port = 1596 }
@@ -257,6 +258,7 @@ $Coins =
 	"kreds" = @{ Name = "Kreds"; Algo = "lyra2v2" }
 	"lux" = @{ Name = "LUXCoin"; WtmPage = "212-lux-phi1612"; Algo = "phi" }
 	"mona" = @{ Name = "Monacoin"; WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
+	"poly" = @{ Name = "Polytimos"; Algo = "polytimos" }
 	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
 	"tzc" = @{ Name = "Trezarcoin"; WtmPage = "215-tzc-neoscrypt"; Algo = "neoscrypt" }
 	"vtc" = @{ Name = "Vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }

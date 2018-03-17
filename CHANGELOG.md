@@ -2,8 +2,8 @@
 
 ## RudeHash 7.0 (TBD)
 
-* Add support for Criptoreal, Garlicoin, Infinex, Zcoin
-* Add support for Lyra2Z, Nist5
+* Add support for Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
+* Add support for Allium, Lyra2Z, Nist5
 * Add support for ccminer-allium
 * Use current pool's API for algo profit estimation
 * Sort possible values in First Run Wizard

@@ -74,6 +74,7 @@ Set-ExecutionPolicy Unrestricted
 | KREDS | Kreds | Lyra2REv2 |
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
+| POLY | Polytimos | Polytimos |
 | RVN | Ravencoin | X16R |
 | TZC | Trezarcoin | NeoScrypt |
 | VTC | Vertcoin | Lyra2REv2 |
