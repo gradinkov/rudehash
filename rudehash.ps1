@@ -2107,8 +2107,7 @@ function Measure-Earnings ()
 
 		try
 		{
-			$ResponseRaw = Invoke-WebRequest -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
-			$Response = $ResponseRaw | ConvertFrom-Json
+			$Response = Invoke-RestMethod -Uri "https://api.nicehash.com/api?method=stats.global.24h" -UseBasicParsing -ErrorAction SilentlyContinue
 			$Multiplier = 1 - ($Pools[$Config.Pool].PoolFee / 100)
 			$Price = $Response.result.stats[$NiceHashAlgos[$Config.Algo].Id].price * $Multiplier
 			$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price), 8)
