@@ -45,10 +45,10 @@ Set-ExecutionPolicy Unrestricted
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
 | HSR | ccminer-tpruvot, hsrminer-hsr |
 | Keccak-C | ccminer-tpruvot |
-| Lyra2REv2 | ccminer-klaust, ccminer-tpruvot, Excavator, vertminer |
-| Lyra2Z | ccminer-tpruvot |
-| NeoScrypt | ccminer-klaust, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
-| Nist5 | ccminer-klaust, ccminer-tpruvot, Excavator |
+| Lyra2REv2 | ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, vertminer |
+| Lyra2Z | ccminer-palginmod, ccminer-tpruvot |
+| NeoScrypt | ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
+| Nist5 | ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |
@@ -63,6 +63,7 @@ Set-ExecutionPolicy Unrestricted
 | BTCP | Bitcoin Private | EquiHash |
 | BTG | Bitcoin Gold | EquiHash |
 | BTX | Bitcore | TimeTravel10 |
+| BWK | Bulwark | Nist5 |
 | CREA | Creativecoin | Keccak-C |
 | CRS | Criptoreal | Lyra2Z |
 | ETH | Ethereum | Ethash |

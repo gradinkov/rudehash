@@ -2,10 +2,10 @@
 
 ## RudeHash 7.0 (TBD)
 
-* Add support for Bulwark, Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
-* Add support for Poolr
-* Add support for Allium, Lyra2Z, Nist5
-* Add support for ccminer-allium
+* New coins: Bulwark, Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
+* New pools: Poolr
+* New algos: Allium, Lyra2Z, Nist5
+* New miners: ccminer-allium, ccminer-palginmod
 * Add support for altcoin wallet payouts
 * Add remarks for config options during First Run Wizard
 * Sort possible values in First Run Wizard
