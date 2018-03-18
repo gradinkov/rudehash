@@ -21,8 +21,6 @@ $MphStatsUrl = "https://miningpoolhubstats.com/api/worker/"
 $ZergpoolCoinsUrl = "http://api.zergpool.com:8080/api/currencies"
 $MinerApiErrorStr = "Malformed miner API response."
 
-Clear-Host
-
 function Exit-RudeHash ()
 {
 	Read-Host -Prompt "Press Enter to exit..."
@@ -2790,6 +2788,7 @@ function Start-RudeHash ()
 	}
 }
 
+Clear-Host
 Write-PrettyHeader
 Initialize-Temp
 Initialize-Properties
