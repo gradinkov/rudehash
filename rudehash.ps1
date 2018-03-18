@@ -14,7 +14,6 @@ $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 [System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
-# $RegionChange = $false
 $MinerPort = 28178
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://rudehash.org/monitor/miner.php"
@@ -1084,12 +1083,6 @@ function Test-Compatibility ()
 			Write-PrettyError ("Region must be set for the """ + $Config.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
-
-			# if ($Choice.ToLower() -eq "region")
-			# {
-			# 	$RegionChange = $true
-			# }
-
 			Initialize-Property $Choice $true $true
 			Test-Compatibility
 		}
@@ -1098,12 +1091,6 @@ function Test-Compatibility ()
 			Write-PrettyError ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
-
-			# if ($Choice.ToLower() -eq "region")
-			# {
-			# 	$RegionChange = $true
-			# }
-
 			Initialize-Property $Choice $true $true
 			Test-Compatibility
 		}
