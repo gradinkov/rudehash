@@ -2,7 +2,8 @@
 
 ## RudeHash 7.0 (TBD)
 
-* Add support for Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
+* Add support for Bulwark, Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
+* Add support for Poolr
 * Add support for Allium, Lyra2Z, Nist5
 * Add support for ccminer-allium
 * Add support for altcoin wallet payouts

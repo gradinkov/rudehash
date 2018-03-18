@@ -90,6 +90,7 @@ Set-ExecutionPolicy Unrestricted
 |---|---|---|---|
 | Mining Pool Hub | algo, coin | Site balance | N/A |
 | NiceHash | algo | Own wallet | Bitcoin |
+| Poolr | coin | Own wallet | Altcoin |
 | Suprnova | coin | Site balance | N/A |
 | Zergpool | algo, coin | Own wallet | Bitcoin, Altcoin |
 | zpool | algo | Own wallet | Bitcoin |

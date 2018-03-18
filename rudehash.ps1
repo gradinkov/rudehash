@@ -160,6 +160,20 @@ $Pools =
 		}
 	}
 
+	"poolr" =
+	@{
+		Name = "Poolr"
+		PoolFee = 0.4
+		Authless = $true
+		Regions = $false
+		StratumProto = 0
+		Coins =
+		@{
+			"bwk" = @{ Server = "poolr.io"; Port = 3833 }
+			"flm" = @{ Server = "poolr.io"; Port = 8333 }
+		}
+	}
+
 	"suprnova" =
 	@{
 		Name = "Suprnova"
@@ -258,6 +272,7 @@ $Coins =
 	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash" }
 	"btg" = @{ Name = "Bitcoin Gold"; WtmPage = "214-btg-equihash"; Algo = "equihash" }
 	"btx" = @{ Name = "Bitcore"; WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
+	"bwk" = @{ Name = "Bulwark"; WtmPage = "224-bwk-nist5"; Algo = "nist5" }
 	"crea" = @{ Name = "Creativecoin"; WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
 	"crs" = @{ Name = "Criptoreal"; Algo = "lyra2z" }
 	"eth" = @{ Name = "Ethereum"; WtmPage = "151-eth-ethash"; Algo = "ethash" }
@@ -1698,6 +1713,11 @@ function Initialize-MinerArgs ()
 			# https://www.nicehash.com/help/how-to-create-a-worker
 			$PoolUser = $Config.Wallet + "." + $Config.Worker
 			$PoolPass = "x"
+		}
+		"poolr"
+		{
+			$PoolUser = $Config.Wallet
+			$PoolPass = "c=" + $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
 		}
 		"zergpool"
 		{
