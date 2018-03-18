@@ -6,6 +6,7 @@
 * New pools: Poolr
 * New algos: Allium, Lyra2Z, Nist5
 * New miners: ccminer-allium, ccminer-palginmod
+* Updates: ccminer-klaust 8.21
 * Add support for altcoin wallet payouts
 * Add remarks for config options during First Run Wizard
 * Sort possible values in First Run Wizard

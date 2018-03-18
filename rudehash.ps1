@@ -301,7 +301,7 @@ $Coins =
 $Miners =
 @{
 	"ccminer-allium" = @{ Url = "https://github.com/lenis0012/ccminer/releases/download/2.3.0-allium/ccminer-x64.exe"; ArchiveFile = "ccminer-allium.exe"; ExeFile = "ccminer-allium.exe"; FilesInRoot = $true; Algos = @("allium"); Api = $true; Version = "2.2.4" }
-	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.20/ccminer-820-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5"); Api = $true }
+	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5"); Api = $true }
 	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "nist5"); Api = $true; Version = "2.0" }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
