@@ -1336,7 +1336,7 @@ function Test-ElectricityCostProperty ()
 		}
 
 		# make sure we don't miscalculate profits, e.g. don't convert 0,18 to 18
-		if ($Config.ElectricityCost.Contains(","))
+		if ($Config.ElectricityCost.ToString().Contains(","))
 		{
 			Write-PrettyError ("Invalid electricity cost, make sure to use '.' as decimal separator!")
 			return $false
