@@ -9,7 +9,7 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 * Easy switching between supported pools, coins, algos and miners
 * Automatic download of miners
 * Auto-restart upon miner crash
-* Earnings and profit estimation, using WhatToMine for coins and NiceHash for algos
+* Earnings and profit estimation, using WhatToMine for coins and pool APIs for algos
 * Watchdog to restart mining automatically if hash rate is repeatedly zero
 * Interactive first run wizard
 * Miner status reporting to RudeHash Monitoring and MPHStats
