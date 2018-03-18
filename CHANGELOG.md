@@ -1,5 +1,9 @@
 # RudeHash Changelog
 
+## RudeHash 7.1 (TBD)
+
+* Fix validating electricity cost
+
 ## RudeHash 7.0 (2018-03-18)
 
 * New coins: Bulwark, Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
