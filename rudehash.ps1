@@ -44,29 +44,29 @@ function Write-PrettyDots ()
 	Write-Pretty DarkCyan $String
 }
 
-function Write-Pretty-Header ()
+function Write-PrettyHeader ()
 {
 	Write-PrettyDots
 	Write-Pretty DarkCyan "RudeHash NVIDIA Miner `u{00a9} gradinkov"
 	Write-PrettyDots
 }
 
-function Write-Pretty-Error ($String)
+function Write-PrettyError ($String)
 {
 	Write-Pretty Red $String
 }
 
-function Write-Pretty-Debug ($String)
+function Write-PrettyDebug ($String)
 {
 	Write-Pretty Magenta $String
 }
 
-function Write-Pretty-Info ($String)
+function Write-PrettyInfo ($String)
 {
 	Write-Pretty DarkBlue $String
 }
 
-function Write-Pretty-Earnings ($String)
+function Write-PrettyEarnings ($String)
 {
 	Write-Pretty DarkGreen $String
 }
@@ -86,12 +86,12 @@ if (Test-Path $ConfigFile)
 	}
 	catch [System.Management.Automation.PSInvalidOperationException]
 	{
-		Write-Pretty-Error "Error parsing '$ConfigFile'! Do you have an option set multiple times?"
+		Write-PrettyError "Error parsing '$ConfigFile'! Do you have an option set multiple times?"
 		Exit-RudeHash
 	}
 	catch
 	{
-		Write-Pretty-Error "Error accessing '$ConfigFile'!"
+		Write-PrettyError "Error accessing '$ConfigFile'!"
 		Exit-RudeHash
 	}
 }
@@ -105,7 +105,7 @@ else
 	}
 	catch
 	{
-		Write-Pretty-Error "Error creating '$ConfigFile'!"
+		Write-PrettyError "Error creating '$ConfigFile'!"
 		Exit-RudeHash
 	}
 }
@@ -387,11 +387,11 @@ function Set-Property ($Name, $Value, $Permanent)
 		}
 		catch
 		{
-			Write-Pretty-Error "Error writing '$ConfigFile'!"
+			Write-PrettyError "Error writing '$ConfigFile'!"
 
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug $_.Exception
+				Write-PrettyDebug $_.Exception
 			}
 		}
 	}
@@ -601,7 +601,7 @@ function Test-DebugProperty ()
 	}
 	catch
 	{
-		Write-Pretty-Error ("'Debug' property is in incorrect format, it must be 'true' or 'false'!")
+		Write-PrettyError ("'Debug' property is in incorrect format, it must be 'true' or 'false'!")
 		return $false
 	}
 }
@@ -615,11 +615,11 @@ function Test-WatchdogProperty ()
 	}
 	catch
 	{
-		Write-Pretty-Error ("'Watchdog' property is in incorrect format, it must be 'true' or 'false'!")
+		Write-PrettyError ("'Watchdog' property is in incorrect format, it must be 'true' or 'false'!")
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 
 		return $false
@@ -637,7 +637,7 @@ function Test-MonitoringKeyProperty ()
 
 		if (-Not $Res)
 		{
-			Write-Pretty-Error ("Monitoring key is in incorrect format!")
+			Write-PrettyError ("Monitoring key is in incorrect format!")
 
 			return $false
 		}
@@ -658,7 +658,7 @@ function Test-MphApiKeyProperty ()
 	{
 		if ($Config.MphApiKey.length -ne 64)
 		{
-			Write-Pretty-Error ("MPH API key is in incorrect format, check it here: https://miningpoolhub.com/?page=account&action=edit")
+			Write-PrettyError ("MPH API key is in incorrect format, check it here: https://miningpoolhub.com/?page=account&action=edit")
 			return $false
 		}
 		else
@@ -676,13 +676,12 @@ function Test-PoolProperty ()
 {
 	if (-Not ($Config.Pool))
 	{
-		Write-Pretty-Error ("Pool must be set!")
+		Write-PrettyError ("Pool must be set!")
 		return $false
 	}
 	elseif (-Not ($Pools.ContainsKey($Config.Pool)))
 	{
-		Write-Pretty-Error ("The """ + $Config.Pool + """ pool is not supported!")
-		# Write-Pretty-Info (Get-PoolSupport)
+		Write-PrettyError ("The """ + $Config.Pool + """ pool is not supported!")
 
 		return $false
 	}
@@ -698,12 +697,12 @@ function Test-WorkerProperty ()
 
 	if (-Not ($Config.Worker))
 	{
-		Write-Pretty-Error ("Worker must be set!")
+		Write-PrettyError ("Worker must be set!")
 		return $false
 	}
 	elseif (-Not ($Config.Worker -match $Pattern))
 	{
-			Write-Pretty-Error ("Worker name is in invalid format! Use a maximum of 15 letters and numbers!")
+			Write-PrettyError ("Worker name is in invalid format! Use a maximum of 15 letters and numbers!")
 			return $false
 	}
 	else
@@ -742,7 +741,7 @@ function Test-WalletProperty ()
 		}
 		else
 		{
-			Write-Pretty-Error ("Bitcoin wallet address is in incorrect format, please check it!")
+			Write-PrettyError ("Bitcoin wallet address is in incorrect format, please check it!")
 			return $false
 		}
 	}
@@ -764,7 +763,7 @@ function Test-UserProperty ()
 		}
 		else
 		{
-			Write-Pretty-Error ("User name is in invalid format! Use a maximum of 20 letters and numbers!")
+			Write-PrettyError ("User name is in invalid format! Use a maximum of 20 letters and numbers!")
 			return $false
 		}
 	}
@@ -799,8 +798,7 @@ function Test-RegionProperty ()
 		}
 		else
 		{
-			Write-Pretty-Error ("The """ + $Config.Region + """ region does not exist!")
-			# Write-Pretty-Info (Get-RegionSupport)
+			Write-PrettyError ("The """ + $Config.Region + """ region does not exist!")
 
 			return $false
 		}
@@ -819,8 +817,7 @@ function Test-CoinProperty ()
 
 		if (-Not ($Coins.ContainsKey($Config.Coin)))
 		{
-			Write-Pretty-Error ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
-			# Write-Pretty-Info (Get-CoinSupport)
+			Write-PrettyError ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
 
 			return $false
 		}
@@ -839,13 +836,12 @@ function Test-MinerProperty ()
 {
 	if (-Not ($Config.Miner))
 	{
-		Write-Pretty-Error ("Miner must be set!")
+		Write-PrettyError ("Miner must be set!")
 		return $false
 	}
 	elseif (-Not ($Miners.ContainsKey($Config.Miner)))
 	{
-		Write-Pretty-Error ("The """ + $Config.Miner + """ miner is not supported!")
-		# Write-Pretty-Info (Get-MinerSupport)
+		Write-PrettyError ("The """ + $Config.Miner + """ miner is not supported!")
 
 		return $false
 	}
@@ -877,8 +873,7 @@ function Test-AlgoProperty ()
 
 		if (-Not ($Algos.Contains($Config.Algo)))
 		{
-			Write-Pretty-Error ("The """ + $Config.Algo + """ algo is not supported!")
-			# Write-Pretty-Info(Get-AlgoSupport)
+			Write-PrettyError ("The """ + $Config.Algo + """ algo is not supported!")
 
 			return $false
 		}
@@ -901,7 +896,7 @@ function Test-CoinExchangeSupport ()
 		{
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug "Checking coin's exchange support..."
+				Write-PrettyDebug "Checking coin's exchange support..."
 			}
 
 			try
@@ -910,7 +905,7 @@ function Test-CoinExchangeSupport ()
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug ("Server response: $($Response.($Config.Coin))")
+					Write-PrettyDebug ("Server response: $($Response.($Config.Coin))")
 				}
 
 				foreach ($Coin in $Pools["zergpool"].Coins.Keys)
@@ -920,11 +915,11 @@ function Test-CoinExchangeSupport ()
 			}
 			catch
 			{
-				Write-Pretty-Error "Error determining if the selected coin can be exchanged! RudeHash cannot continue."
+				Write-PrettyError "Error determining if the selected coin can be exchanged! RudeHash cannot continue."
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 
 				Exit-RudeHash
@@ -985,13 +980,13 @@ function Write-Help ($Property)
 	# print help text, if any
 	try
 	{
-		Write-Pretty-Info( & (Get-ChildItem "Function:Get-$($Property)Support" -ErrorAction Ignore))
+		Write-PrettyInfo( & (Get-ChildItem "Function:Get-$($Property)Support" -ErrorAction Ignore))
 	}
 	catch
 	{
 		if ($Remarks.ContainsKey($Property))
 		{
-			Write-Pretty-Info($Property + ": " + $Remarks[$Property])
+			Write-PrettyInfo($Property + ": " + $Remarks[$Property])
 		}
 	}
 }
@@ -1000,7 +995,7 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 {
 	if ($Config.Debug)
 	{
-		Write-Pretty-Debug "Evaluating $Name property..."
+		Write-PrettyDebug "Evaluating $Name property..."
 	}
 
 	if ($FirstRun)
@@ -1029,7 +1024,7 @@ function Test-Compatibility ()
 	{
 		if (-Not ($Config.Wallet))
 		{
-			Write-Pretty-Error ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
+			Write-PrettyError ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
 			$Choice = Receive-Choice "Wallet" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1038,7 +1033,7 @@ function Test-Compatibility ()
 	}
 	elseif (-Not ($Config.User))
 	{
-		Write-Pretty-Error ("""" + $Config.Pool + """ implements authentication, user name must be set!")
+		Write-PrettyError ("""" + $Config.Pool + """ implements authentication, user name must be set!")
 		$Choice = Receive-Choice "User" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1049,7 +1044,7 @@ function Test-Compatibility ()
 	{
 		if (-Not ($Config.Region))
 		{
-			Write-Pretty-Error ("Region must be set for the """ + $Config.Pool + """ pool!")
+			Write-PrettyError ("Region must be set for the """ + $Config.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
 
@@ -1063,7 +1058,7 @@ function Test-Compatibility ()
 		}
 		if (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
 		{
-			Write-Pretty-Error ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
+			Write-PrettyError ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
 			$Config.$Choice = ""
 
@@ -1083,9 +1078,7 @@ function Test-Compatibility ()
 	{
 		if (-Not ($Pools[$Config.Pool].Coins))
 		{
-			Write-Pretty-Error ("Coin mining is not supported on """ + $Config.Pool + """!")
-			# Write-Pretty-Info (Get-CoinSupport)
-			# Write-Pretty-Info (Get-PoolSupport)
+			Write-PrettyError ("Coin mining is not supported on """ + $Config.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1093,9 +1086,7 @@ function Test-Compatibility ()
 		}
 		elseif (-Not ($Pools[$Config.Pool].Coins.ContainsKey($Config.Coin)))
 		{
-			Write-Pretty-Error ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
-			# Write-Pretty-Info (Get-CoinSupport)
-			# Write-Pretty-Info (Get-PoolSupport)
+			Write-PrettyError ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1103,7 +1094,7 @@ function Test-Compatibility ()
 		}
 		elseif (-Not (Test-CoinExchangeSupport))
 		{
-			Write-Pretty-Error ("The """ + $Config.Coin + """ coin cannot be exchanged on """ + $Config.Pool + """!")
+			Write-PrettyError ("The """ + $Config.Coin + """ coin cannot be exchanged on """ + $Config.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1118,9 +1109,7 @@ function Test-Compatibility ()
 	}
 	elseif (-Not $Config.Algo)
 	{
-		Write-Pretty-Error ("You specified neither a coin nor an algo!")
-		# Write-Pretty-Info (Get-CoinSupport)
-		# Write-Pretty-Info (Get-MinerSupport)
+		Write-PrettyError ("You specified neither a coin nor an algo!")
 		$Choice = Receive-Choice "Coin" "Algo"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1128,8 +1117,7 @@ function Test-Compatibility ()
 	}
 	elseif (-Not ($Pools[$Config.Pool].Algos))
 	{
-		Write-Pretty-Error ("Algo mining is not supported on """ + $Config.Pool + """!")
-		# Write-Pretty-Info (Get-PoolSupport)
+		Write-PrettyError ("Algo mining is not supported on """ + $Config.Pool + """!")
 		$Choice = Receive-Choice "Coin" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1138,8 +1126,7 @@ function Test-Compatibility ()
 	# reason for elseif: if the coin is supported on the pool, its algo doesn't need to be checked
 	elseif (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
 	{
-		Write-Pretty-Error ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
-		# Write-Pretty-Info (Get-PoolSupport)
+		Write-PrettyError ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
 		$Choice = Receive-Choice "Algo" "Pool"
 		$Config.$Choice = ""
 		Initialize-Property $Choice $true $true
@@ -1150,9 +1137,7 @@ function Test-Compatibility ()
 	{
 		if ($Config.Coin)
 		{
-			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Coin.ToUpper() + """ coin cannot be mined with """ + $Config.Miner + """.")
-			# Write-Pretty-Info (Get-CoinSupport)
-			# Write-Pretty-Info (Get-MinerSupport)
+			Write-PrettyError ("Incompatible configuration! The """ + $Config.Coin.ToUpper() + """ coin cannot be mined with """ + $Config.Miner + """.")
 			$Choice = Receive-Choice "Coin" "Miner"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1160,8 +1145,7 @@ function Test-Compatibility ()
 		}
 		else
 		{
-			Write-Pretty-Error ("Incompatible configuration! The """ + $Config.Algo + """ algo cannot be mined with """ + $Config.Miner + """.")
-			# Write-Pretty-Info (Get-MinerSupport)
+			Write-PrettyError ("Incompatible configuration! The """ + $Config.Algo + """ algo cannot be mined with """ + $Config.Miner + """.")
 			$Choice = Receive-Choice "Algo" "Miner"
 			$Config.$Choice = ""
 			Initialize-Property $Choice $true $true
@@ -1220,11 +1204,11 @@ function Get-CurrencySupport ()
 		}
 		catch
 		{
-			Write-Pretty-Error "Error obtaining BTC exchange rates! BTC to Fiat conversion is disabled."
+			Write-PrettyError "Error obtaining BTC exchange rates! BTC to Fiat conversion is disabled."
 
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug $_.Exception
+				Write-PrettyDebug $_.Exception
 			}
 
 			$SessionConfig.Rates = $false
@@ -1252,7 +1236,7 @@ function Test-CurrencyProperty ()
 	{
 		if (-Not ($Config.Currency))
 		{
-			Write-Pretty-Error ("Currency must be set!")
+			Write-PrettyError ("Currency must be set!")
 			return $false
 		}
 
@@ -1260,8 +1244,7 @@ function Test-CurrencyProperty ()
 
 		if (-Not ($BtcRates.Contains($Config.Currency)))
 		{
-			Write-Pretty-Error ("The """ + $Config.Currency + """ currency is not supported!")
-			# Write-Pretty-Info(Get-CurrencySupport)
+			Write-PrettyError ("The """ + $Config.Currency + """ currency is not supported!")
 
 			return $false
 		}
@@ -1282,7 +1265,7 @@ function Test-ElectricityCostProperty ()
 	{
 		if (-Not ($Config.ElectricityCost))
 		{
-			Write-Pretty-Error ("Electricity cost must be set!")
+			Write-PrettyError ("Electricity cost must be set!")
 			return $false
 		}
 
@@ -1293,7 +1276,7 @@ function Test-ElectricityCostProperty ()
 		}
 		catch
 		{
-			Write-Pretty-Error ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
+			Write-PrettyError ("Invalid electricity cost, """ + $Config.ElectricityCost + """ is not a number!")
 			return $false
 		}
 	}
@@ -1313,11 +1296,11 @@ function Initialize-Properties ()
 {
 	if ($FirstRun)
 	{
-		Write-Pretty-Info ("Welcome to RudeHash! Let's set up your configuration.")
-		Write-Pretty-Info ("We'll ask your input for all config options. Some are optional, you can skip")
-		Write-Pretty-Info ("those by pressing 'Enter'. Don't worry, if you try to specify an incompatible")
-		Write-Pretty-Info ("setup, we will tell you and ask you to modify it. Not all options are used in")
-		Write-Pretty-Info ("all scenarios, e.g. wallet address is unused on pools with their own balances.")
+		Write-PrettyInfo ("Welcome to RudeHash! Let's set up your configuration.")
+		Write-PrettyInfo ("We'll ask your input for all config options. Some are optional, you can skip")
+		Write-PrettyInfo ("those by pressing 'Enter'. Don't worry, if you try to specify an incompatible")
+		Write-PrettyInfo ("setup, we will tell you and ask you to modify it. Not all options are used in")
+		Write-PrettyInfo ("all scenarios, e.g. wallet address is unused on pools with their own balances.")
 		Write-PrettyDots
 	}
 
@@ -1370,18 +1353,18 @@ function Initialize-Temp ()
 	}
 	catch
 	{
-		Write-Pretty-Error "Error setting up temporary directory! Do we have write access?"
+		Write-PrettyError "Error setting up temporary directory! Do we have write access?"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 
 		Exit-RudeHash
 	}
 }
 
-function Read-Miner-Api ($Request, $Critical)
+function Read-MinerApi ($Request, $Critical)
 {
 	$Timeout = 10
 
@@ -1400,16 +1383,16 @@ function Read-Miner-Api ($Request, $Critical)
 	}
 	catch
 	{
-		Write-Pretty-Error "Error connecting to miner API!"
+		Write-PrettyError "Error connecting to miner API!"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 
 		if ($Critical -eq "true")
 		{
-			Write-Pretty-Error "Critical error, RudeHash cannot continue."
+			Write-PrettyError "Critical error, RudeHash cannot continue."
 			Exit-RudeHash
 		}
 	}
@@ -1441,16 +1424,16 @@ function Resolve-PoolIp ()
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug ("Stratum server $($SessionConfig.Server) resolves to: $($Ip)")
+			Write-PrettyDebug ("Stratum server $($SessionConfig.Server) resolves to: $($Ip)")
 		}
 	}
 	catch
 	{
-		Write-Pretty-Error "Error resolving pool IP addess, falling back to URL! Is your network connection working?"
+		Write-PrettyError "Error resolving pool IP addess, falling back to URL! Is your network connection working?"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 
 		# it's better than nothing, it might start working during stratum connection
@@ -1466,7 +1449,7 @@ function Get-GpuCount ()
 	{
 		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
-			$Response = Read-Miner-Api 'summary' $false
+			$Response = Read-MinerApi 'summary' $false
 
 			try
 			{
@@ -1474,11 +1457,11 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -1486,7 +1469,7 @@ function Get-GpuCount ()
 		"dstm"
 		{
 			# dstm accepts any string as request, let's use the same as ccminer
-			$ResponseRaw = Read-Miner-Api 'summary' $false
+			$ResponseRaw = Read-MinerApi 'summary' $false
 
 			try
 			{
@@ -1495,11 +1478,11 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -1507,7 +1490,7 @@ function Get-GpuCount ()
 		# api: https://github.com/ethereum-mining/ethminer/issues/295#issuecomment-353755310
 		"ethminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstat1"}' $false
+			$ResponseRaw = Read-MinerApi '{"id":0,"jsonrpc":"2.0","method":"miner_getstat1"}' $false
 
 			try
 			{
@@ -1516,25 +1499,25 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
 
 		"excavator"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":1,"method":"device.list","params":[]}' $true
+			$ResponseRaw = Read-MinerApi '{"id":1,"method":"device.list","params":[]}' $true
 			$Response = $ResponseRaw | ConvertFrom-Json -ErrorAction SilentlyContinue
 			$Count = $Response.devices.length
 		}
 
 		"zecminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":"0", "method":"getstat"}' $false
+			$ResponseRaw = Read-MinerApi '{"id":"0", "method":"getstat"}' $false
 
 			try
 			{
@@ -1543,11 +1526,11 @@ function Get-GpuCount ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -1563,11 +1546,11 @@ function Start-Excavator ()
 
 	if ($Config.Debug)
 	{
-		Write-Pretty-Debug ("$Excavator $Args")
+		Write-PrettyDebug ("$Excavator $Args")
 	}
 
 	$Proc = Start-Process -FilePath $Excavator -ArgumentList $Args -PassThru -NoNewWindow -RedirectStandardOutput nul
-	Write-Pretty-Info "Determining the number of GPUs..."
+	Write-PrettyInfo "Determining the number of GPUs..."
 	Start-Sleep -Seconds 5
 	return $Proc
 }
@@ -1619,7 +1602,7 @@ function Initialize-Excavator ($User, $Pass)
 		$Suffix = "s"
 	}
 
-	Write-Pretty-Info ($RigStats.GpuCount.ToString() + " GPU" + $Suffix + " detected.")
+	Write-PrettyInfo ($RigStats.GpuCount.ToString() + " GPU" + $Suffix + " detected.")
 
 	$Json = Initialize-Json $User $Pass
 	$JsonFile = [io.path]::combine($TempDir, "excavator.json")
@@ -1630,11 +1613,11 @@ function Initialize-Excavator ($User, $Pass)
 	}
 	catch
 	{
-		Write-Pretty-Error "Error writing Excavator JSON file! Make sure the file is not locked by another process!"
+		Write-PrettyError "Error writing Excavator JSON file! Make sure the file is not locked by another process!"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 
 		Exit-RudeHash
@@ -1705,38 +1688,7 @@ function Initialize-MinerArgs ()
 	return $Args
 }
 
-# MPH API: https://github.com/miningpoolhub/php-mpos/wiki/API-Reference
-# function Get-HashRate-Mph ()
-# {
-# 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getuserworkers&api_key=" + $Config.ApiKey
-
-# 	try
-# 	{
-# 		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing -ErrorAction SilentlyContinue | ConvertFrom-Json
-# 		$PoolWorker = $PoolJson.getuserworkers.data | Where-Object -Property "username" -EQ -Value ($Config.User + "." + $Config.Worker)
-# 		# getpoolstatus shows hashrate in H/s, getuserworkers uses kH/s, lovely!
-# 		$HashRate = $PoolWorker.hashrate * 1000
-# 	}
-# 	catch
-# 	{
-# 		$HashRate = 0
-# 		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
-
-# 		if ($Config.Debug)
-# 		{
-# 			Write-Pretty-Debug $_.Exception
-# 		}
-# 	}
-
-# 	if (-Not ($HashRate))
-# 	{
-# 		$HashRate = 0
-# 	}
-
-# 	$RigStats.HashRate = ([math]::Round($HashRate, 0))
-# }
-
-function Get-HashRate-Miner ()
+function Get-HashRate ()
 {
 	$HashRate = 0
 
@@ -1744,7 +1696,7 @@ function Get-HashRate-Miner ()
 	{
 		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
-			$Response = Read-Miner-Api 'threads' $false
+			$Response = Read-MinerApi 'threads' $false
 
 			try
 			{
@@ -1767,11 +1719,11 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -1779,7 +1731,7 @@ function Get-HashRate-Miner ()
 		"dstm"
 		{
 			# dstm accepts any string as request, let's use the same as ccminer
-			$ResponseRaw = Read-Miner-Api 'summary' $false
+			$ResponseRaw = Read-MinerApi 'summary' $false
 
 			try
 			{
@@ -1792,18 +1744,18 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
 
 		"ethminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstathr"}' $false
+			$ResponseRaw = Read-MinerApi '{"id":0,"jsonrpc":"2.0","method":"miner_getstathr"}' $false
 
 			try
 			{
@@ -1812,18 +1764,18 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
 
 		"excavator"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":1,"method":"algorithm.list","params":[]}' $false
+			$ResponseRaw = Read-MinerApi '{"id":1,"method":"algorithm.list","params":[]}' $false
 
 			try
 			{
@@ -1838,14 +1790,14 @@ function Get-HashRate-Miner ()
 			{
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
 
 		"zecminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":"0", "method":"getstat"}' $false
+			$ResponseRaw = Read-MinerApi '{"id":"0", "method":"getstat"}' $false
 
 			try
 			{
@@ -1858,11 +1810,11 @@ function Get-HashRate-Miner ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -1871,12 +1823,7 @@ function Get-HashRate-Miner ()
 	$RigStats.HashRate = ([math]::Round($HashRate, 0))
 }
 
-function Get-HashRate ()
-{
-	Get-HashRate-Miner
-}
-
-function Get-HashRate-Pretty ($HashRate)
+function Get-PrettyHashRate ($HashRate)
 {
 	if ($HashRate -ge 1000000)
 	{
@@ -1892,31 +1839,6 @@ function Get-HashRate-Pretty ($HashRate)
 	}
 }
 
-# function Get-Difficulty-Mph ()
-# {
-# 	$PoolUrl = "https://" + $Coins[$Config.Coin].PoolPage + ".miningpoolhub.com/index.php?page=api&action=getpoolstatus&api_key=" + $Config.ApiKey
-
-# 	try
-# 	{
-# 		$PoolJson = Invoke-WebRequest -Uri $PoolUrl -UseBasicParsing | ConvertFrom-Json
-# 		$Difficulty = $PoolJson.getpoolstatus.data.networkdiff
-# 		#$Difficulty = $PoolJson.getdashboarddata.data.network.difficulty
-# 		#$HashRate = $PoolJson.getdashboarddata.data.personal.hashrate
-# 	}
-# 	catch
-# 	{
-# 		$Difficulty = 0
-# 		Write-Pretty-Error "Pool API call failed! Have you set your API key correctly?"
-
-# 		if ($Config.Debug)
-# 		{
-# 			Write-Pretty-Debug $_.Exception
-# 		}
-# 	}
-
-# 	return $Difficulty
-# }
-
 function Get-PowerUsage ()
 {
 	$PowerUsage = 0
@@ -1925,7 +1847,7 @@ function Get-PowerUsage ()
 	{
 		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
-			$Response = Read-Miner-Api 'threads' $false
+			$Response = Read-MinerApi 'threads' $false
 
 			try
 			{
@@ -1952,11 +1874,11 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -1964,7 +1886,7 @@ function Get-PowerUsage ()
 		"dstm"
 		{
 			# dstm accepts any string as request, let's use the same as ccminer
-			$ResponseRaw = Read-Miner-Api 'summary' $false
+			$ResponseRaw = Read-MinerApi 'summary' $false
 
 			try
 			{
@@ -1977,18 +1899,18 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
 
 		"ethminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":0,"jsonrpc":"2.0","method":"miner_getstathr"}' $false
+			$ResponseRaw = Read-MinerApi '{"id":0,"jsonrpc":"2.0","method":"miner_getstathr"}' $false
 
 			try
 			{
@@ -2001,11 +1923,11 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -2014,7 +1936,7 @@ function Get-PowerUsage ()
 		{
 			for ($i = 0; $i -lt $RigStats.GpuCount; $i++)
 			{
-				$ResponseRaw = Read-Miner-Api '{"id":1,"method":"device.get","params":["0"]}' $false
+				$ResponseRaw = Read-MinerApi '{"id":1,"method":"device.get","params":["0"]}' $false
 
 				try
 				{
@@ -2025,7 +1947,7 @@ function Get-PowerUsage ()
 				{
 					if ($Config.Debug)
 					{
-						Write-Pretty-Debug $_.Exception
+						Write-PrettyDebug $_.Exception
 					}
 				}
 			}
@@ -2033,7 +1955,7 @@ function Get-PowerUsage ()
 
 		"zecminer"
 		{
-			$ResponseRaw = Read-Miner-Api '{"id":"0", "method":"getstat"}' $false
+			$ResponseRaw = Read-MinerApi '{"id":"0", "method":"getstat"}' $false
 
 			try
 			{
@@ -2046,11 +1968,11 @@ function Get-PowerUsage ()
 			}
 			catch
 			{
-				Write-Pretty-Error $MinerApiErrorStr
+				Write-PrettyError $MinerApiErrorStr
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -2072,11 +1994,11 @@ function Measure-Earnings ()
 		}
 		catch
 		{
-			Write-Pretty-Error "WhatToMine request failed! Is your network connection working?"
+			Write-PrettyError "WhatToMine request failed! Is your network connection working?"
 
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug $_.Exception
+				Write-PrettyDebug $_.Exception
 			}
 		}
 
@@ -2095,11 +2017,11 @@ function Measure-Earnings ()
 		}
 		catch
 		{
-			Write-Pretty-Error "Malformed WhatToMine response."
+			Write-PrettyError "Malformed WhatToMine response."
 
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug $_.Exception
+				Write-PrettyDebug $_.Exception
 			}
 		}
 	}
@@ -2128,11 +2050,11 @@ function Measure-Earnings ()
 			}
 			catch
 			{
-				Write-Pretty-Error "$($Pools[$Config.Pool].Name) API request failed! Earnings estimations will not work."
+				Write-PrettyError "$($Pools[$Config.Pool].Name) API request failed! Earnings estimations will not work."
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -2153,11 +2075,11 @@ function Update-ExchangeRates ()
 	}
 	catch
 	{
-		Write-Pretty-Error "Error updating BTC exchange rates! Is your network connection working?"
+		Write-PrettyError "Error updating BTC exchange rates! Is your network connection working?"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 	}
 }
@@ -2179,11 +2101,11 @@ function Get-Archive ($Url, $FileName)
 	}
 	catch
 	{
-		Write-Pretty-Error "Error downloading package! Is your network connection working?"
+		Write-PrettyError "Error downloading package! Is your network connection working?"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $_.Exception
+			Write-PrettyDebug $_.Exception
 		}
 
 		Exit-RudeHash
@@ -2226,7 +2148,7 @@ function Test-Tool ($Name)
 			Remove-Item -Recurse -Force -Path $ToolDir
 		}
 
-		Write-Pretty-Info ("Downloading " + $Name + "...")
+		Write-PrettyInfo ("Downloading " + $Name + "...")
 		$ArchiveDir = (Get-Archive ($Tools[$Name].Url) ($Tools[$Name].ArchiveFile))
 
 		if ($Tools[$Name].FilesInRoot)
@@ -2341,11 +2263,11 @@ function Test-Miner ($Name)
 			{
 				if ($CurrentVer -eq "UNKNOWN")
 				{
-					Write-Pretty-Info ("Unknown " + $Name + " version found, it will be replaced with v" + $LatestVer + ".")
+					Write-PrettyInfo ("Unknown " + $Name + " version found, it will be replaced with v" + $LatestVer + ".")
 				}
 				else
 				{
-					Write-Pretty-Info ($Name + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
+					Write-PrettyInfo ($Name + " v" + $CurrentVer + " found, it will be updated to v" + $LatestVer + ".")
 				}
 
 				try
@@ -2354,7 +2276,7 @@ function Test-Miner ($Name)
 				}
 				catch
 				{
-					Write-Pretty-Error ("Error removing " + $Name + " v" + $CurrentVer + "!")
+					Write-PrettyError ("Error removing " + $Name + " v" + $CurrentVer + "!")
 					Exit-RudeHash
 				}
 
@@ -2362,7 +2284,7 @@ function Test-Miner ($Name)
 			}
 			elseif ($Config.Debug)
 			{
-				Write-Pretty-Debug ($Name + " v" + $CurrentVer + " found, it is the latest version.")
+				Write-PrettyDebug ($Name + " v" + $CurrentVer + " found, it is the latest version.")
 			}
 		}
 	}
@@ -2374,7 +2296,7 @@ function Test-Miner ($Name)
 			Remove-Item -Recurse -Force -Path $MinerDir
 		}
 
-		Write-Pretty-Info ("Downloading " + $Name + $VersionStr + "...")
+		Write-PrettyInfo ("Downloading " + $Name + $VersionStr + "...")
 		$ArchiveDir = (Get-Archive ($Miners[$Name].Url) ($Miners[$Name].ArchiveFile))
 
 		if ($Miners[$Name].FilesInRoot)
@@ -2442,11 +2364,11 @@ function Update-MinerUptime ()
 	}
 	catch
 	{
-		Write-Pretty-Error "Error while checking the miner's uptime!"
+		Write-PrettyError "Error while checking the miner's uptime!"
 
 		if ($Config.Debug)
 		{
-			Write-Pretty-Debug $Err
+			Write-PrettyDebug $Err
 		}
 	}
 }
@@ -2497,7 +2419,7 @@ function Write-Stats ()
 {
 	if ($SessionConfig.DevMining)
 	{
-		Write-Pretty-Info ("Dev mining minutes " + $RigStats.DevMinutes  + "/10")
+		Write-PrettyInfo ("Dev mining minutes " + $RigStats.DevMinutes  + "/10")
 	}
 	elseif ($SessionConfig.Api)
 	{
@@ -2511,7 +2433,7 @@ function Write-Stats ()
 				$PowerUsageStr = $Sep + "Power Usage: " + $RigStats.PowerUsage + " W"
 			}
 
-			Write-Pretty-Info ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-HashRate-Pretty $RigStats.HashRate) + $PowerUsageStr)
+			Write-PrettyInfo ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-PrettyHashRate $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
 			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
@@ -2529,7 +2451,7 @@ function Write-Stats ()
 					}
 				}
 
-				Write-Pretty-Earnings ("Daily earnings: " + $RigStats.EarningsBtc + " BTC" + $FiatStr + $ProfitStr)
+				Write-PrettyEarnings ("Daily earnings: " + $RigStats.EarningsBtc + " BTC" + $FiatStr + $ProfitStr)
 			}
 		}
 	}
@@ -2546,8 +2468,8 @@ function Start-Miner ()
 
 	if ($Config.Debug)
 	{
-		Write-Pretty-Debug ("Stratum address: " + $SessionConfig.Server + ":" + $SessionConfig.Port)
-		Write-Pretty-Debug ("Miner command line: $Exe $Args")
+		Write-PrettyDebug ("Stratum address: " + $SessionConfig.Server + ":" + $SessionConfig.Port)
+		Write-PrettyDebug ("Miner command line: $Exe $Args")
 	}
 
 	$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
@@ -2603,7 +2525,7 @@ function Test-DevMining ($Proc)
 	# only start devfee processing if user's miner has been running for 24 hours straight
 	elseif ($RigStats.Uptime.Hours -ge 24)
 	{
-		Write-Pretty-Info ("Starting dev mining...")
+		Write-PrettyInfo ("Starting dev mining...")
 		Enable-DevMining
 		Stop-Process $Proc
 		Start-Sleep 5
@@ -2613,7 +2535,7 @@ function Test-DevMining ($Proc)
 
 	if ($RigStats.DevMinutes -ge 10)
 	{
-		Write-Pretty-Info ("Stopping dev mining...")
+		Write-PrettyInfo ("Stopping dev mining...")
 		Disable-DevMining
 		Stop-Process $Proc
 		Start-Sleep 5
@@ -2640,13 +2562,13 @@ function Ping-Miner ($Proc)
 
 			if ($Config.Debug)
 			{
-				Write-Pretty-Debug ("Watchdog detected zero hash rate " + $RigStats.FailedChecks + " time" + $Suffix + ".")
+				Write-PrettyDebug ("Watchdog detected zero hash rate " + $RigStats.FailedChecks + " time" + $Suffix + ".")
 			}
 		}
 
 		if ($RigStats.FailedChecks -ge 5)
 		{
-			Write-Pretty-Error "Watchdog detected zero hash rate, restarting miner..."
+			Write-PrettyError "Watchdog detected zero hash rate, restarting miner..."
 			Stop-Process $Proc
 			# let the dust settle
 			Start-Sleep 5
@@ -2687,7 +2609,7 @@ function Ping-Monitoring ()
 		# if sent as array, MPM Monitoring displays it as H/s regardless of suffix
 		# if not sent as array, MPH Stats errors out completely
 		# because reasons.
-		$HashRate = Get-HashRate-Pretty $RigStats.HashRate
+		$HashRate = Get-PrettyHashRate $RigStats.HashRate
 
 		if ($Config.MonitoringKey)
 		{
@@ -2703,17 +2625,17 @@ function Ping-Monitoring ()
 
 				if ($Config.Debug)
 				{
-					#Write-Pretty-Debug $MinerJson
-					Write-Pretty-Debug ("Monitoring server response: $Response")
+					#Write-PrettyDebug $MinerJson
+					Write-PrettyDebug ("Monitoring server response: $Response")
 				}
 			}
 			catch
 			{
-				Write-Pretty-Error "Error while pinging the monitoring server!"
+				Write-PrettyError "Error while pinging the monitoring server!"
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -2730,11 +2652,11 @@ function Ping-Monitoring ()
 			}
 			catch
 			{
-				Write-Pretty-Error "Error while pinging the MiningPoolHubStats server!"
+				Write-PrettyError "Error while pinging the MiningPoolHubStats server!"
 
 				if ($Config.Debug)
 				{
-					Write-Pretty-Debug $_.Exception
+					Write-PrettyDebug $_.Exception
 				}
 			}
 		}
@@ -2760,7 +2682,7 @@ function Start-RudeHash ()
 		{
 			if ($Proc.HasExited)
 			{
-				Write-Pretty-Error ("Miner has crashed, restarting...")
+				Write-PrettyError ("Miner has crashed, restarting...")
 			}
 
 			$Proc = Start-Miner
@@ -2780,7 +2702,7 @@ function Start-RudeHash ()
 	}
 }
 
-Write-Pretty-Header
+Write-PrettyHeader
 Initialize-Temp
 Initialize-Properties
 Set-WindowTitle
