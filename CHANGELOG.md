@@ -5,6 +5,7 @@
 * Add support for Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
 * Add support for Allium, Lyra2Z, Nist5
 * Add support for ccminer-allium
+* Add support for altcoin wallet payouts
 * Add remarks for config options during First Run Wizard
 * Sort possible values in First Run Wizard
 * Use current pool's API for algo profit estimation

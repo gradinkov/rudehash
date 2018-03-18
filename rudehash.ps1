@@ -4,6 +4,7 @@ $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 [System.Collections.Hashtable]$Config = @{}
 [System.Collections.Hashtable]$FileConfig = @{}
+# Api CoinMode DevMining Port Rates
 [System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
@@ -354,13 +355,14 @@ $AlgoNames =
 
 $Remarks =
 @{
-	"Debug" = "If enabled, RudeHash will print diagnostic information along with the rest. Useful for troubleshooting."
-	"Watchdog" = "If enabled, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes."
+	"Debug" = "If true, RudeHash will print diagnostic information along with the rest. Useful for troubleshooting."
+	"Watchdog" = "If true, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes."
 	"MonitoringKey" = "Allows for monitoring your rigs at rudehash.org/monitor. A newly generated random key for you:`r`n$(New-Guid)"
 	"MphApiKey" = "Allows for monitoring at miningpoolhubstats.com using your MPH API key."
 	# Pool
 	"Worker" = "Your rig's nickname."
 	"Wallet" = "Your Bitcoin or Altcoin wallet. Ignored on pools that use a site balance."
+	"WalletIsAltcoin" = "If true, your wallet's currency is the same as the coin you're mining, and you're paid directly to this wallet for mining a coin. If false, your wallet is Bitcoin, and the pool auto-exchanges the mined coins to BTC. Ignored on pools that use a site balance."
 	"User" = "Pool user name. Ignored on pools that use a wallet address."
 	# Region
 	# Coin
@@ -726,22 +728,37 @@ function Test-Wallet ($Address, $Symbol)
 				return $false
 			}
 		}
-		Default { return $false }
+		Default
+		{
+			return $true
+		}
 	}
-
 }
 
 function Test-WalletProperty ()
 {
-	if ($Config.Wallet)
+	# we don't care about wallet format here, later when we know it's BTC, we'll check it
+	return $true
+}
+
+function Test-WalletIsAltcoinProperty ()
+{
+	if ($Config.WalletIsAltcoin)
 	{
-		if (Test-Wallet $Config.Wallet "BTC")
+		try
 		{
+			$Config.WalletIsAltcoin = [System.Convert]::ToBoolean($Config.WalletIsAltcoin)
 			return $true
 		}
-		else
+		catch
 		{
-			Write-PrettyError ("Bitcoin wallet address is in incorrect format, please check it!")
+			Write-PrettyError ("'WalletIsAltcoin' property is in incorrect format, it must be 'true' or 'false'!")
+
+			if ($Config.Debug)
+			{
+				Write-PrettyDebug $_.Exception
+			}
+
 			return $false
 		}
 	}
@@ -943,24 +960,22 @@ function Test-CoinExchangeSupport ()
 
 function Receive-Choice ($A, $B)
 {
-	$Name = ""
+	$KeyPress = ""
+	Write-PrettyInfo "Press '1' to change '$($A)' or '2' to change '$($B)')"
 
-	while (-Not ($Name.Equals($A) -Or $Name.Equals($B)))
+	while (-Not (($KeyPress.Character -eq "1") -Or ($KeyPress.Character -eq "2")))
 	{
-		$Name = Read-Host "Please specify the property you want to modify ('$($A)' or '$($B)')"
-
-		# capitalization
-		if ($Name.Length -gt 1)
-		{
-			$Name = ($Name.Substring(0,1).ToUpper() + $Name.Substring(1).ToLower())
-		}
-		else
-		{
-			$Name = $Name.ToUpper()
-		}
+		$KeyPress = $host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 	}
 
-	return $Name
+	if ($KeyPress.Character -eq "1")
+	{
+		return $A
+	}
+	elseif ($KeyPress.Character -eq "2")
+	{
+		return $B
+	}
 }
 
 function Receive-Property ($Name, $Mandatory)
@@ -1153,6 +1168,50 @@ function Test-Compatibility ()
 		}
 	}
 
+	# wallet checks, only relevant on wallet pools
+	if ($Pools[$Config.Pool].Authless)
+	{
+		# altcoin payouts are only possible if the pool has coins
+		if ($Config.WalletIsAltcoin -And (-Not ($Pools[$Config.Pool].Coins)))
+		{
+			Write-PrettyError ("""" + $Config.Pool + """ doesn't support Altcoin payouts!")
+			$Choice = Receive-Choice "WalletIsAltcoin" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+
+		# bitcoin payouts are only possible if the pool has algos (at least ATM)
+		if ((-Not ($Config.WalletIsAltcoin)) -And (-Not ($Pools[$Config.Pool].Algos)))
+		{
+			Write-PrettyError ("""" + $Config.Pool + """ doesn't support Bitcoin payouts!")
+			$Choice = Receive-Choice "WalletIsAltcoin" "Pool"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+
+		# altcoin payouts are only possible if mining a coin
+		if ($Config.WalletIsAltcoin -And (-Not ($SessionConfig.CoinMode)))
+		{
+			Write-PrettyError ("Altcoin payouts are only possible if mining a coin!")
+			$Choice = Receive-Choice "WalletIsAltcoin" "Coin"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+
+		# if getting paid in BTC, check its format, let's accept altcoin wallets as-is
+		if ((-Not ($Config.WalletIsAltcoin)) -And (-Not (Test-Wallet $Config.Wallet "BTC")))
+		{
+			Write-PrettyError ("Wallet is not a valid BTC address!")
+			$Choice = Receive-Choice "WalletIsAltcoin" "Wallet"
+			$Config.$Choice = ""
+			Initialize-Property $Choice $true $true
+			Test-Compatibility
+		}
+	}
+
 	# configuration is good, let's set up globals
 	if ($SessionConfig.CoinMode)
 	{
@@ -1311,6 +1370,7 @@ function Initialize-Properties ()
 	Initialize-Property "Pool" $true $FirstRun
 	Initialize-Property "Worker" $true $FirstRun
 	Initialize-Property "Wallet" $false $FirstRun
+	Initialize-Property "WalletIsAltcoin" $false $FirstRun
 	Initialize-Property "User" $false $FirstRun
 	Initialize-Property "Region" $false $FirstRun
 	Initialize-Property "Coin" $false $FirstRun
@@ -1646,7 +1706,14 @@ function Initialize-MinerArgs ()
 			if ($SessionConfig.CoinMode)
 			{
 				# zergpool only accepts the coin in uppercase
-				$PoolPass = "c=BTC,mc="+ $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+				if ($Config.WalletIsAltcoin)
+				{
+					$PoolPass = "c=" + $Config.Coin.ToUpper() + ",mc="+ $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+				}
+				else
+				{
+					$PoolPass = "c=BTC,mc="+ $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+				}
 			}
 			else
 			{

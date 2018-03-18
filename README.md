@@ -86,16 +86,16 @@ Set-ExecutionPolicy Unrestricted
 
 ### Pools
 
-| Pool | Mining modes | Payouts |
-|---|---|---|
-| Mining Pool Hub | algo, coin | Site balance |
-| NiceHash | algo | BTC wallet |
-| Suprnova | coin | Site balance |
-| Zergpool | algo, coin | BTC wallet |
-| zpool | algo | BTC wallet |
+| Pool | Mining modes | Payout to | Wallet currencies |
+|---|---|---|---|
+| Mining Pool Hub | algo, coin | Site balance | N/A |
+| NiceHash | algo | Own wallet | Bitcoin |
+| Suprnova | coin | Site balance | N/A |
+| Zergpool | algo, coin | Own wallet | Bitcoin, Altcoin |
+| zpool | algo | Own wallet | Bitcoin |
 
-* _BTC wallet_ means you mine directly to your BTC wallet. In this case, you can specify a username during the First Run Wizard, but it'll be ignored on this specific pool.
-* _Site balance_ means you need to register on the pool's website beforehand. The payments will appear under your pool account, and you can specify the payout address on the site, not in RudeHash. In this case, you can specify a BTC wallet address during the First Run Wizard, but it'll be ignored on this specific pool.
+* _Own wallet_ means you mine directly to your wallet. In this case, you can specify a username during the First Run Wizard, but it'll be ignored on this specific pool.
+* _Site balance_ means you need to register on the pool's website beforehand. The payments will appear under your pool account, and you can specify the payout address on the site, not in RudeHash. In this case, you can specify a wallet address during the First Run Wizard, but it'll be ignored on this specific pool.
 
 The reason why RudeHash still asks for both information during the First Run Wizard is the fact that you may switch to a different pool later on, which does require the other info. It's just an option, and you can skip entering it by simply pressing `Enter` when RudeHash asks for it. Don't worry, if you skip an option that is mandatory for your setup, RudeHash will let you know and ask you to re-enter.
 
