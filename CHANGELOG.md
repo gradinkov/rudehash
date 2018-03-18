@@ -1,6 +1,6 @@
 # RudeHash Changelog
 
-## RudeHash 7.0 (TBD)
+## RudeHash 7.0 (2018-03-18)
 
 * New coins: Bulwark, Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
 * New pools: Poolr
