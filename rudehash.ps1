@@ -1,10 +1,16 @@
+# files, directories
 $ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.json")
 $MinersDir = [io.path]::combine($PSScriptRoot, "miners")
 $ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
 $TempDir = [io.path]::combine($PSScriptRoot, "temp")
+
+# make sure math functions work regardless of regional settings
+[cultureinfo]::CurrentCulture = [cultureinfo]::InvariantCulture
+
+# globals
 [System.Collections.Hashtable]$Config = @{}
 [System.Collections.Hashtable]$FileConfig = @{}
-# Api CoinMode DevMining Port Rates
+# current keys: Api CoinMode DevMining Port Rates
 [System.Collections.Hashtable]$SessionConfig = @{}
 $FirstRun = $false
 $FirstLoop = $true
@@ -385,7 +391,7 @@ $Remarks =
 	# Miner
 	# Algo
 	"Currency" = "Fiat currency used for calculating your earnings."
-	"ElectricityCost" = "The price you pay for electricity, <your currency>/kWh"
+	"ElectricityCost" = "The price you pay for electricity, <your currency>/kWh, decimal separator is '.'"
 	"ExtraArgs" = "Any additional command line arguments you want to pass to the miner."
 }
 
@@ -1341,6 +1347,13 @@ function Test-ElectricityCostProperty ()
 		if (-Not ($Config.ElectricityCost))
 		{
 			Write-PrettyError ("Electricity cost must be set!")
+			return $false
+		}
+
+		# make sure we don't miscalculate profits, e.g. don't convert 0,18 to 18
+		if ($Config.ElectricityCost.Contains(","))
+		{
+			Write-PrettyError ("Invalid electricity cost, make sure to use '.' as decimal separator!")
 			return $false
 		}
 

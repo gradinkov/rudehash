@@ -13,6 +13,7 @@
 * Validate pool's IP address before using it
 * Retry pool IP lookup 3 times
 * Fix Zergpool auto-exchange checks
+* Fix earnings estimates failing with certain regional settings
 
 ## RudeHash 6.0 (2018-03-14)
 
