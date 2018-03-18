@@ -5,11 +5,12 @@
 * Add support for Criptoreal, Garlicoin, Infinex, Polytimos, Zcoin
 * Add support for Allium, Lyra2Z, Nist5
 * Add support for ccminer-allium
-* Use current pool's API for algo profit estimation
+* Add remarks for config options during First Run Wizard
 * Sort possible values in First Run Wizard
+* Use current pool's API for algo profit estimation
 * Validate pool's IP address before using it
-* Fix Zergpool auto-exchange checks
 * Retry pool IP lookup 3 times
+* Fix Zergpool auto-exchange checks
 
 ## RudeHash 6.0 (2018-03-14)
 

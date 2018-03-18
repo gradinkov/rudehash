@@ -36,14 +36,19 @@ function Write-Pretty ($BgColor, $String)
 	}
 }
 
-function Write-Pretty-Header ()
+function Write-PrettyDots ()
 {
 	$WindowWidth = $Host.UI.RawUI.MaxWindowSize.Width - 1
 	$String += "`u{2219}" * $WindowWidth
 
 	Write-Pretty DarkCyan $String
+}
+
+function Write-Pretty-Header ()
+{
+	Write-PrettyDots
 	Write-Pretty DarkCyan "RudeHash NVIDIA Miner `u{00a9} gradinkov"
-	Write-Pretty DarkCyan $String
+	Write-PrettyDots
 }
 
 function Write-Pretty-Error ($String)
@@ -347,6 +352,25 @@ $AlgoNames =
 	"xevan" = "Xevan"
 }
 
+$Remarks =
+@{
+	"Debug" = "If enabled, RudeHash will print diagnostic information along with the rest. Useful for troubleshooting."
+	"Watchdog" = "If enabled, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes."
+	"MonitoringKey" = "Allows for monitoring your rigs at rudehash.org/monitor. A newly generated random key for you:`r`n$(New-Guid)"
+	"MphApiKey" = "Allows for monitoring at miningpoolhubstats.com using your MPH API key."
+	# Pool
+	"Worker" = "Your rig's nickname."
+	"Wallet" = "Your Bitcoin or Altcoin wallet. Ignored on pools that use a site balance."
+	"User" = "Pool user name. Ignored on pools that use a wallet address."
+	# Region
+	# Coin
+	# Miner
+	# Algo
+	"Currency" = "Fiat currency used for calculating your earnings."
+	"ElectricityCost" = "The price you pay for electricity, <your currency>/kWh"
+	"ExtraArgs" = "Any additional command line arguments you want to pass to the miner."
+}
+
 # we build these dynamically
 [System.Collections.Hashtable]$BtcRates = @{}
 [System.Collections.Hashtable]$ZergpoolCoins = @{}
@@ -613,10 +637,7 @@ function Test-MonitoringKeyProperty ()
 
 		if (-Not $Res)
 		{
-			$Uuid = New-Guid
-
-			Write-Pretty-Error ("Monitoring key is in incorrect format! New random key for you:")
-			Write-Pretty-Info ($Uuid.Guid)
+			Write-Pretty-Error ("Monitoring key is in incorrect format!")
 
 			return $false
 		}
@@ -966,7 +987,13 @@ function Write-Help ($Property)
 	{
 		Write-Pretty-Info( & (Get-ChildItem "Function:Get-$($Property)Support" -ErrorAction Ignore))
 	}
-	catch {	}
+	catch
+	{
+		if ($Remarks.ContainsKey($Property))
+		{
+			Write-Pretty-Info($Property + ": " + $Remarks[$Property])
+		}
+	}
 }
 
 function Initialize-Property ($Name, $Mandatory, $Force)
@@ -1291,42 +1318,20 @@ function Initialize-Properties ()
 		Write-Pretty-Info ("those by pressing 'Enter'. Don't worry, if you try to specify an incompatible")
 		Write-Pretty-Info ("setup, we will tell you and ask you to modify it. Not all options are used in")
 		Write-Pretty-Info ("all scenarios, e.g. wallet address is unused on pools with their own balances.")
+		Write-PrettyDots
 	}
 
 	Initialize-Property "Debug" $true $FirstRun
 	Initialize-Property "Watchdog" $true $FirstRun
 	Initialize-Property "MonitoringKey" $false $FirstRun
 	Initialize-Property "MphApiKey" $false $FirstRun
-
-	if ($FirstRun)
-	{
-		# Write-Pretty-Info (Get-PoolSupport)
-	}
 	Initialize-Property "Pool" $true $FirstRun
-
 	Initialize-Property "Worker" $true $FirstRun
 	Initialize-Property "Wallet" $false $FirstRun
 	Initialize-Property "User" $false $FirstRun
-
-	if ($FirstRun)
-	{
-		# Write-Pretty-Info (Get-RegionSupport)
-	}
 	Initialize-Property "Region" $false $FirstRun
-
-	if ($FirstRun)
-	{
-		# Write-Pretty-Info (Get-CoinSupport)
-	}
 	Initialize-Property "Coin" $false $FirstRun
-
-	if ($FirstRun)
-	{
-		# Write-Pretty-Info (Get-MinerSupport)
-	}
 	Initialize-Property "Miner" $true $FirstRun
-
-	# don't print the same info again, algos depend on miners
 	Initialize-Property "Algo" $false $FirstRun
 
 	Test-Compatibility
