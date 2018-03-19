@@ -1,5 +1,7 @@
 # RudeHash
 
+[![Github All Releases](https://img.shields.io/github/downloads/gradinkov/rudehash/total.svg)]() 
+
 ![RudeHash](https://i.imgur.com/kQO48jP.png "RudeHash")
 
 ## About
