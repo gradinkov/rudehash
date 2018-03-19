@@ -210,37 +210,37 @@ $Pools =
 		Name = "Zergpool"
 		PoolFee = 0.5
 		Authless = $true
-		Regions = $true
+		Regions = $false
 		StratumProto = 0
 		ApiUrl = "http://api.zergpool.com:8080/api/status"
 		Algos =
 		@{
-			"bitcore" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556; Modifier = 1000000 }
-			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433; Modifier = 1000000 }
-			"keccakc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134; Modifier = 1000000000 }
-			"lyra2v2" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533; Modifier = 1000000 }
-			"lyra2z" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4553; Modifier = 1000000 }
-			"neoscrypt" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233; Modifier = 1000000 }
-			"nist5" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3833; Modifier = 1000000 }
-			"phi" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333; Modifier = 1000000 }
-			"x16r" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636; Modifier = 1000000 }
-			"xevan" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739; Modifier = 1000000 }
+			"bitcore" = @{ Server = "bitcore.mine.zergpool.com"; Port = 3556; Modifier = 1000000 }
+			"hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433; Modifier = 1000000 }
+			"keccakc" = @{ Server = "keccakc.mine.zergpool.com"; Port = 5134; Modifier = 1000000000 }
+			"lyra2v2" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533; Modifier = 1000000 }
+			"lyra2z" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553; Modifier = 1000000 }
+			"neoscrypt" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233; Modifier = 1000000 }
+			"nist5" = @{ Server = "nist5.mine.zergpool.com"; Port = 3833; Modifier = 1000000 }
+			"phi" = @{ Server = "phi.mine.zergpool.com"; Port = 8333; Modifier = 1000000 }
+			"x16r" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636; Modifier = 1000000 }
+			"xevan" = @{ Server = "xevan.mine.zergpool.com"; Port = 3739; Modifier = 1000000 }
 		}
 		Coins =
 		@{
-			"bsd" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
-			"btx" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3556 }
-			"crea" = @{ Server = "%REGION%mine.zergpool.com"; Port = 5134 }
-			"flm" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
-			"ftc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
-			"hsr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 7433 }
-			"ifx" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4553 }
-			"lux" = @{ Server = "%REGION%mine.zergpool.com"; Port = 8333 }
-			"mona" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
-			"rvn" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3636 }
-			"tzc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4233 }
-			"vtc" = @{ Server = "%REGION%mine.zergpool.com"; Port = 4533 }
-			"xlr" = @{ Server = "%REGION%mine.zergpool.com"; Port = 3739 }
+			"bsd" = @{ Server = "xevan.mine.zergpool.com"; Port = 3739 }
+			"btx" = @{ Server = "bitcore.mine.zergpool.com"; Port = 3556 }
+			"crea" = @{ Server = "keccakc.mine.zergpool.com"; Port = 5134 }
+			"flm" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
+			"ftc" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
+			"hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433 }
+			"ifx" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553 }
+			"lux" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
+			"mona" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533 }
+			"rvn" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636 }
+			"tzc" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
+			"vtc" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533 }
+			"xlr" = @{ Server = "xevan.mine.zergpool.com"; Port = 3739 }
 		}
 	}
 
@@ -335,8 +335,6 @@ $Regions =
 @{
 	"miningpoolhub" = @("asia", "europe", "us-east")
 	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
-	# zergpool uses "" for usa, we gotta fix this later
-	"zergpool" = @("europe", "usa")
 }
 
 # MPH returns all hashrates in kH/s but WTM uses different magnitudes for different algos
@@ -962,6 +960,7 @@ function Test-CoinExchangeSupport ()
 			}
 		}
 
+		# noautotrade = 0
 		if ($ZergpoolCoins.($Config.Coin) -eq 0)
 		{
 			return $true
@@ -1233,16 +1232,7 @@ function Test-Compatibility ()
 
 	if ($Pools[$Config.Pool].Regions)
 	{
-		# zergpool uses no prefix for usa region, wonderful
-		if (($Config.Pool -eq "zergpool") -And ($Config.Region -eq "usa"))
-		{
-			$RegionStr = ""
-		}
-		else
-		{
-			$RegionStr = $Config.Region + "."
-		}
-
+		$RegionStr = $Config.Region + "."
 		$SessionConfig.Server = $SessionConfig.Server -Replace "%REGION%",$RegionStr
 	}
 

@@ -2,6 +2,7 @@
 
 ## RudeHash 7.1 (TBD)
 
+* Update Zergpool stratum addresses
 * Fix validating electricity cost
 
 ## RudeHash 7.0 (2018-03-18)
