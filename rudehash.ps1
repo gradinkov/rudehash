@@ -288,7 +288,7 @@ $Pools =
 $Coins =
 @{
 	"bsd" = @{ Name = "BitSend"; Algo = "xevan"; WtmId = "201" }
-	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash" }
+	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash"; WtmId = "230" }
 	"btg" = @{ Name = "Bitcoin Gold"; Algo = "equihash"; WtmId = "214" }
 	"btx" = @{ Name = "Bitcore"; Algo = "bitcore"; WtmId = "202" }
 	"bwk" = @{ Name = "Bulwark"; Algo = "nist5"; WtmId = "224" }
