@@ -89,6 +89,7 @@ Set-ExecutionPolicy Unrestricted
 
 | Pool | Mining modes | Payout to | Wallet currencies |
 |---|---|---|---|
+| MasterHash | coin | Own wallet | Altcoin |
 | Mining Pool Hub | algo, coin | Site balance | N/A |
 | NiceHash | algo | Own wallet | Bitcoin |
 | Poolr | coin | Own wallet | Altcoin |
