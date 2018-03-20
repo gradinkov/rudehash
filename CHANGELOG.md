@@ -1,6 +1,6 @@
 # RudeHash Changelog
 
-## RudeHash 7.1 (TBD)
+## RudeHash 7.1 (2018-03-20)
 
 * New pools: MasterHash
 * Update Zergpool stratum addresses
