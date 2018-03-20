@@ -4,6 +4,7 @@
 
 * New pools: MasterHash
 * Update Zergpool stratum addresses
+* Fix WhatToMine calculations failing due to added DDoS protection
 * Fix validating electricity cost
 
 ## RudeHash 7.0 (2018-03-18)

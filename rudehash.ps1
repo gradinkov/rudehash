@@ -287,31 +287,31 @@ $Pools =
 
 $Coins =
 @{
-	"bsd" = @{ Name = "BitSend"; WtmPage = "201-bsd-xevan"; Algo = "xevan" }
+	"bsd" = @{ Name = "BitSend"; Algo = "xevan"; WtmId = "201" }
 	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash" }
-	"btg" = @{ Name = "Bitcoin Gold"; WtmPage = "214-btg-equihash"; Algo = "equihash" }
-	"btx" = @{ Name = "Bitcore"; WtmPage = "202-btx-timetravel10"; Algo = "bitcore" }
-	"bwk" = @{ Name = "Bulwark"; WtmPage = "224-bwk-nist5"; Algo = "nist5" }
-	"crea" = @{ Name = "Creativecoin"; WtmPage = "199-crea-keccak-c"; Algo = "keccakc" }
+	"btg" = @{ Name = "Bitcoin Gold"; Algo = "equihash"; WtmId = "214" }
+	"btx" = @{ Name = "Bitcore"; Algo = "bitcore"; WtmId = "202" }
+	"bwk" = @{ Name = "Bulwark"; Algo = "nist5"; WtmId = "224" }
+	"crea" = @{ Name = "Creativecoin"; Algo = "keccakc"; WtmId = "199" }
 	"crs" = @{ Name = "Criptoreal"; Algo = "lyra2z" }
-	"eth" = @{ Name = "Ethereum"; WtmPage = "151-eth-ethash"; Algo = "ethash" }
+	"eth" = @{ Name = "Ethereum"; Algo = "ethash"; WtmId = "151" }
 	"flm" = @{ Name = "Folm Coin"; Algo = "phi" }
-	"ftc" = @{ Name = "Feathercoin"; WtmPage = "8-ftc-neoscrypt"; Algo = "neoscrypt" }
+	"ftc" = @{ Name = "Feathercoin"; Algo = "neoscrypt"; WtmId = "8" }
 	"grlc" = @{ Name = "Garlicoin"; Algo = "allium" }
 	"hsr" = @{ Name = "Hshare"; Algo = "hsr" }
 	"ifx" = @{ Name = "Infinex"; Algo = "lyra2z" }
 	"kreds" = @{ Name = "Kreds"; Algo = "lyra2v2" }
-	"lux" = @{ Name = "LUXCoin"; WtmPage = "212-lux-phi1612"; Algo = "phi" }
-	"mona" = @{ Name = "Monacoin"; WtmPage = "148-mona-lyra2rev2"; Algo = "lyra2v2" }
+	"lux" = @{ Name = "LUXCoin"; Algo = "phi"; WtmId = "212" }
+	"mona" = @{ Name = "Monacoin"; Algo = "lyra2v2"; WtmId = "148" }
 	"poly" = @{ Name = "Polytimos"; Algo = "polytimos" }
 	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
-	"tzc" = @{ Name = "Trezarcoin"; WtmPage = "215-tzc-neoscrypt"; Algo = "neoscrypt" }
-	"vtc" = @{ Name = "Vertcoin"; WtmPage = "5-vtc-lyra2rev2"; Algo = "lyra2v2" }
-	"xlr" = @{ Name = "Solaris"; WtmPage = "179-xlr-xevan"; Algo = "xevan" }
-	"xzc" = @{ Name = "Zcoin"; WtmPage = "175-xzc-lyra2z"; Algo = "lyra2z" }
-	"zcl" = @{ Name = "ZClassic"; WtmPage = "167-zcl-equihash"; Algo = "equihash" }
-	"zec" = @{ Name = "Zcash"; WtmPage = "166-zec-equihash"; Algo = "equihash" }
-	"zen" = @{ Name = "ZenCash"; WtmPage = "185-zen-equihash"; Algo = "equihash" }
+	"tzc" = @{ Name = "Trezarcoin"; Algo = "neoscrypt"; WtmId = "215" }
+	"vtc" = @{ Name = "Vertcoin"; Algo = "lyra2v2"; WtmId = "5" }
+	"xlr" = @{ Name = "Solaris"; Algo = "xevan"; WtmId = "179" }
+	"xzc" = @{ Name = "Zcoin"; Algo = "lyra2z"; WtmId = "175" }
+	"zcl" = @{ Name = "ZClassic"; Algo = "equihash"; WtmId = "167" }
+	"zec" = @{ Name = "Zcash"; Algo = "equihash"; WtmId = "166" }
+	"zen" = @{ Name = "ZenCash"; Algo = "equihash"; WtmId = "185" }
 }
 
 $Miners =
@@ -2082,43 +2082,29 @@ function Measure-Earnings ()
 {
 	if ($SessionConfig.CoinMode)
 	{
-		$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
-		$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmPage + "?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
-
-		try
+		if ($Coins[$Config.Coin].WtmId)
 		{
-			$WtmHtml = Invoke-WebRequest -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
-		}
-		catch
-		{
-			Write-PrettyError "WhatToMine request failed! Is your network connection working?"
-
-			if ($Config.Debug)
+			try
 			{
-				Write-PrettyDebug $_.Exception
+				[double]$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
+				$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmId + ".json?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
+				$Response = Invoke-RestMethod -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
+				[double]$Revenue = $Response.btc_revenue
+				$RigStats.EarningsBtc = [math]::Round($Revenue, 8)
+
+				if ($SessionConfig.Rates)
+				{
+					$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+				}
 			}
-		}
-
-		$WtmObj = $WtmHtml.Content -split "[`r`n]"
-		$LineNo = $WtmObj | Select-String -Pattern "Estimated Rewards" | Select-Object -ExpandProperty 'LineNumber'
-
-		try
-		{
-			$BtcEarnings = [System.Convert]::ToDouble(($WtmObj | Select-Object -Index ($LineNo + 46)).Trim())
-			$RigStats.EarningsBtc = [math]::Round($BtcEarnings, 8)
-
-			if ($SessionConfig.Rates)
+			catch
 			{
-				$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
-			}
-		}
-		catch
-		{
-			Write-PrettyError "Malformed WhatToMine response."
+				Write-PrettyError "WhatToMine API request failed! Earnings estimations will not work."
 
-			if ($Config.Debug)
-			{
-				Write-PrettyDebug $_.Exception
+				if ($Config.Debug)
+				{
+					Write-PrettyDebug $_.Exception
+				}
 			}
 		}
 	}
@@ -2496,7 +2482,7 @@ function Read-Stats ()
 			Get-HashRate
 			Get-PowerUsage
 
-			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
+			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmId) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
 			{
 				Measure-Earnings
 
@@ -2533,7 +2519,7 @@ function Write-Stats ()
 			Write-PrettyInfo ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-PrettyHashRate $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
-			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmPage) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
+			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmId) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
 			{
 				# we could keep trying to obtain exchange rates, but if it would eventually succeed and the
 				# list didn't contain the currency specified in the config, it'd result in indexing errors
