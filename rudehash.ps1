@@ -116,6 +116,22 @@ else
 
 $Pools =
 @{
+	"masterhash" =
+	@{
+		Name = "MasterHash"
+		PoolFee = 0.5
+		Authless = $true
+		Regions = $false
+		StratumProto = 0
+		Coins =
+		@{
+			"btx" = @{ Server = "pool.masterhash.us"; Port = 10001 }
+			"bwk" = @{ Server = "pool.masterhash.us"; Port = 10010 }
+			"flm" = @{ Server = "pool.masterhash.us"; Port = 10019 }
+			"rvn" = @{ Server = "pool.masterhash.us"; Port = 10023 }
+		}
+	}
+
 	"miningpoolhub" =
 	@{
 		Name = "Mining Pool Hub"
@@ -1692,6 +1708,11 @@ function Initialize-MinerArgs ()
 {
 	switch ($Config.Pool)
 	{
+		"masterhash"
+		{
+			$PoolUser = $Config.Wallet
+			$PoolPass = "c=" + $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+		}
 		{$_ -in "miningpoolhub", "suprnova" }
 		{
 			$PoolUser = $Config.User + "." + $Config.Worker

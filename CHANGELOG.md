@@ -2,6 +2,7 @@
 
 ## RudeHash 7.1 (TBD)
 
+* New pools: MasterHash
 * Update Zergpool stratum addresses
 * Fix validating electricity cost
 
