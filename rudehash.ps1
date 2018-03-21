@@ -116,6 +116,27 @@ else
 
 $Pools =
 @{
+	"bsod" =
+	@{
+		Name = "TheBSODPool"
+		PoolFee = 0.9
+		Authless = $true
+		Regions = $true
+		StratumProto = 0
+		Coins =
+		@{
+			"btx" = @{ Server = "%REGION%bsod.pw"; Port = 3556 }
+			"bwk" = @{ Server = "%REGION%bsod.pw"; Port = 3833 }
+			"crs" = @{ Server = "%REGION%bsod.pw"; Port = 2145 }
+			"flm" = @{ Server = "%REGION%bsod.pw"; Port = 2150 }
+			"ifx" = @{ Server = "%REGION%bsod.pw"; Port = 2142 }
+			"lux" = @{ Server = "%REGION%bsod.pw"; Port = 6667 }
+			"pyro" = @{ Server = "%REGION%bsod.pw"; Port = 2180 }
+			"rvn" = @{ Server = "%REGION%bsod.pw"; Port = 2176 }
+			"xlr" = @{ Server = "%REGION%bsod.pw"; Port = 3739 }
+		}
+	}
+
 	"masterhash" =
 	@{
 		Name = "MasterHash"
@@ -304,6 +325,7 @@ $Coins =
 	"lux" = @{ Name = "LUXCoin"; Algo = "phi"; WtmId = "212" }
 	"mona" = @{ Name = "Monacoin"; Algo = "lyra2v2"; WtmId = "148" }
 	"poly" = @{ Name = "Polytimos"; Algo = "polytimos" }
+	"pyro" = @{ Name = "Pyro"; Algo = "lyra2z" }
 	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
 	"tzc" = @{ Name = "Trezarcoin"; Algo = "neoscrypt"; WtmId = "215" }
 	"vtc" = @{ Name = "Vertcoin"; Algo = "lyra2v2"; WtmId = "5" }
@@ -349,6 +371,7 @@ $Tools =
 
 $Regions =
 @{
+	"bsod" = @("eu1", "eu2", "pool")
 	"miningpoolhub" = @("asia", "europe", "us-east")
 	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
 }
@@ -1708,6 +1731,11 @@ function Initialize-MinerArgs ()
 {
 	switch ($Config.Pool)
 	{
+		"bsod"
+		{
+			$PoolUser = $Config.Wallet
+			$PoolPass = "c=" + $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+		}
 		"masterhash"
 		{
 			$PoolUser = $Config.Wallet

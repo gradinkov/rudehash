@@ -1,5 +1,10 @@
 # RudeHash Changelog
 
+## RudeHash 8.0 (TBD)
+
+* New coins: Pyro
+* New pools: TheBSODPool
+
 ## RudeHash 7.1 (2018-03-20)
 
 * New pools: MasterHash
