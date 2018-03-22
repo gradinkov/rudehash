@@ -76,6 +76,7 @@ Set-ExecutionPolicy Unrestricted
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
 | POLY | Polytimos | Polytimos |
+| PYRO | Pyro | Lyra2Z |
 | RVN | Ravencoin | X16R |
 | TZC | Trezarcoin | NeoScrypt |
 | VTC | Vertcoin | Lyra2REv2 |
@@ -93,8 +94,8 @@ Set-ExecutionPolicy Unrestricted
 | Mining Pool Hub | algo, coin | Site balance | N/A |
 | NiceHash | algo | Own wallet | Bitcoin |
 | Poolr | coin | Own wallet | Altcoin |
-| Pyro | coin | Own wallet | Altcoin |
 | Suprnova | coin | Site balance | N/A |
+| TheBSODPool | coin | Own wallet | Altcoin |
 | Zergpool | algo, coin | Own wallet | Bitcoin, Altcoin |
 | zpool | algo | Own wallet | Bitcoin |
 
