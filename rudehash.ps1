@@ -1754,8 +1754,8 @@ function Initialize-MinerArgs ()
 		}
 		"poolr"
 		{
-			$PoolUser = $Config.Wallet
-			$PoolPass = "c=" + $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+			$PoolUser = $Config.Wallet + "." + $Config.Worker
+			$PoolPass = "c=" + $Config.Coin.ToUpper()
 		}
 		"zergpool"
 		{
