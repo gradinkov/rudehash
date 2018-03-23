@@ -17,11 +17,20 @@
         <div class='span6 col-md-5 columns five large-5'>
             <h2>Config file</h2>
             <p>
-                Paste these to your <code>rudehash.json</code> file.
-                <button class='btn btn-primary' id='setvalue'>Update Form</button>
+                Load existing <code>rudehash.json</code> file: <input type="file" class='btn' id="file-input" />
             </p>
-            <textarea id='output' style='width: 90%; height: 800px; font-family: monospace;' class='form-control'></textarea>
-
+            <!--p>
+                Paste the contents below to your <code>rudehash.json</code> file.
+            </p-->
+            <p>
+                <textarea id='output' style='width: 90%; height: 600px; font-family: monospace;' class='form-control'></textarea>
+            </p>
+            <!--p>
+                <button class='btn btn-primary' id='setvalue'>Update Form</button>
+            </p-->
+            <p>
+                <button class='btn btn-primary' id='save'>Save</button>
+            </p>
         </div>
     </div>
 </div>
@@ -237,7 +246,9 @@ var $rudeSchema =
 
 var $element = document.getElementById('editor');
 var $output = document.getElementById('output');
-var $set_value_button = document.getElementById('setvalue');
+//var $set_value_button = document.getElementById('setvalue');
+var $save_button = document.getElementById('save');
+var $file_input = document.getElementById('file-input')
 
 var $editor = new JSONEditor($element, {
   schema: $rudeSchema,
@@ -251,9 +262,55 @@ $editor.on('change',function() {
 });
 
 /* update config from JSON when button clicked */
-$set_value_button.addEventListener('click',function() {
-  $editor.setValue(JSON.parse($output.value));
-});
+//$set_value_button.addEventListener('click',function() {
+//  $editor.setValue(JSON.parse($output.value));
+//});
+
+/* option to load existing JSON file */
+function readSingleFile($e) {
+  var $file = $e.target.files[0];
+
+  if (!$file) {
+    return;
+  }
+
+  var $reader = new FileReader();
+
+  $reader.onload = function($e) {
+    $output.value = $e.target.result;
+    $editor.setValue(JSON.parse($e.target.result));
+  };
+
+  $reader.readAsText($file);
+}
+
+$file_input.addEventListener('change', readSingleFile, false);
+
+/* file download */
+function downloadJson ($e) {
+  /* application/octet-stream: filename is broken
+   * application/json: opens in browser
+   */
+  //uriContent = "data:application/json," + encodeURIComponent(JSON.stringify($editor.getValue(),null,2));
+  //newWindow = window.open(uriContent, 'rudehash');
+
+  var $jsonText = JSON.stringify($editor.getValue(),null,2)
+  var $pom = document.createElement('a');
+  $pom.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent($jsonText));
+  $pom.setAttribute('download', 'rudehash.json');
+
+  if (document.createEvent) {
+    var event = document.createEvent('MouseEvents');
+    event.initEvent('click', true, true);
+    $pom.dispatchEvent(event);
+  }
+  else {
+    $pom.click();
+  }
+}
+
+$save_button.addEventListener('click', downloadJson);
+
 </script>
 
 </body>
