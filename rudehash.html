@@ -23,7 +23,7 @@
                 Paste the contents below to your <code>rudehash.json</code> file.
             </p-->
             <p>
-                <textarea id='output' style='width: 90%; height: 600px; font-family: monospace;' class='form-control'></textarea>
+                <textarea id='output' style='width: 100%; height: 600px; font-family: monospace;' class='form-control'></textarea>
             </p>
             <!--p>
                 <button class='btn btn-primary' id='setvalue'>Update Form</button>
@@ -31,6 +31,10 @@
             <p>
                 <button class='btn btn-primary' id='save'>Save</button>
             </p>
+
+            <h2>Validation</h2>
+            <p>Whenever you change the configuration, validation errors will be shown here, if any.</p>
+            <textarea id='validate' style='width: 100%; height: 100px; font-family: monospace;' readonly disabled class='form-control'></textarea>
         </div>
     </div>
 </div>
@@ -249,6 +253,7 @@ var $output = document.getElementById('output');
 //var $set_value_button = document.getElementById('setvalue');
 var $save_button = document.getElementById('save');
 var $file_input = document.getElementById('file-input')
+var $validate = document.getElementById('validate');
 
 var $editor = new JSONEditor($element, {
   schema: $rudeSchema,
@@ -256,12 +261,23 @@ var $editor = new JSONEditor($element, {
   iconlib: 'foundation3',
   disable_edit_json: true,
   disable_properties: true,
-  disable_collapse: true
+  disable_collapse: true,
+  no_additional_properties: true
 });
 
 /* update JSON when config changes */
 $editor.on('change',function() {
   $output.value = JSON.stringify($editor.getValue(),null,2);
+
+  var $validation_errors = $editor.validate();
+
+  /* Show validation errors if there are any */
+  if($validation_errors.length) {
+      $validate.value = JSON.stringify($validation_errors,null,2);
+  }
+  else {
+      $validate.value = 'valid';
+  }
 });
 
 /* update config from JSON when button clicked */
