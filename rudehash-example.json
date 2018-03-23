@@ -1,6 +1,7 @@
 {
   "Pool": "zpool",
   "Algo": "equihash",
+  "Coin": "",
   "Miner": "dstm",
   "Worker": "rudehash",
   "Currency": "USD",
@@ -9,10 +10,9 @@
   "Debug": false,
   "MonitoringKey": "",
   "MphApiKey": "",
-  "ExtraArgs": "",
   "Wallet": "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk",
   "WalletIsAltcoin": false,
   "User": "",
   "Region": "",
-  "Coin": ""
+  "ExtraArgs": ""
 }
