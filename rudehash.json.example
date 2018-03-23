@@ -1,16 +1,18 @@
 {
-  "Pool": "nicehash",
+  "Pool": "zpool",
   "Algo": "equihash",
-  "Miner": "excavator",
+  "Miner": "dstm",
   "Worker": "rudehash",
   "Currency": "USD",
   "ElectricityCost": 0.1,
   "Watchdog": true,
   "Debug": false,
   "MonitoringKey": "",
+  "MphApiKey": "",
   "ExtraArgs": "",
-  "Wallet": "3Gfmm5iAYvu8wf2pLyUjKBcGWsXZ8EEubi",
+  "Wallet": "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk",
+  "WalletIsAltcoin": false,
   "User": "",
-  "Region": "usa",
+  "Region": "",
   "Coin": ""
 }
