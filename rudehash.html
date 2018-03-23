@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>RudeHash Config Editor</title>
+    <link rel='stylesheet' href='https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css'>
+    <script src='dist/jsoneditor.min.js'></script>
+</head>
+<body>
+
+<div class='container'>
+    <div class='row'>
+        <div class='span7 col-md-7 columns seven large-7'>
+            <div id='editor'></div>
+        </div>
+        <div class='span6 col-md-5 columns five large-5'>
+            <h2>Config file</h2>
+            <p>
+                Paste these to your <code>rudehash.json</code> file.
+                <button class='btn btn-primary' id='setvalue'>Update Form</button>
+            </p>
+            <textarea id='output' style='width: 90%; height: 800px; font-family: monospace;' class='form-control'></textarea>
+
+        </div>
+    </div>
+</div>
+
+<script>
+var $rudeSchema =
+{
+  "title": "Config",
+  "type": "object",
+  "properties": {
+    "Worker": {
+      "type": "string",
+      "description": "Your rig's nickname.",
+      "minLength": 1,
+      "default": "rudehash",
+      "required": true
+    },
+    "Currency": {
+      "type": "string",
+      "description": "Your currency's symbol.",
+      "minLength": 1,
+      "default": "USD",
+      "required": true
+    },
+    "ElectricityCost": {
+      "type": "number",
+      "description": "The price you pay for electricity, <your currency>/kWh, decimal separator is '.'",
+      "minLength": 1,
+      "default": "0.1",
+      "required": true
+    },
+    "MonitoringKey": {
+      "type": "string",
+      "description": "Allows for monitoring your rigs at rudehash.org/monitor.",
+      "minLength": 0,
+      "maxLength": 36,
+      "default": "",
+      "required": false
+    },
+    "MphApiKey": {
+      "type": "string",
+      "description": "Allows for monitoring at miningpoolhubstats.com using your MPH API key.",
+      "minLength": 0,
+      "maxLength": 64,
+      "default": "",
+      "required": false
+    },
+    "ActiveProfile": {
+      "type": "integer",
+      "description": "RudeHash profile currently in use.",
+      "minLength": 1,
+      "default": 1,
+      "required": true
+    },
+    "Profiles": {
+      "type": "array",
+      "format": "tabs",
+      "title": "Profiles",
+      "uniqueItems": true,
+      "required": true,
+      "items": {
+        "type": "object",
+        "title": "Profile",
+        "properties": {
+          "Pool": {
+            "type": "string",
+            "description": "The pool you want to mine on.",
+            "enum": [
+              "bsod",
+              "masterhash",
+              "miningpoolhub",
+              "nicehash",
+              "poolr",
+              "suprnova",
+              "zergpool",
+              "zpool"
+            ],
+            "required": true
+          },
+          "Algo": {
+            "type": "string",
+            "description": "The algo you want to mine in. Ignored if coin is set.",
+            "enum": [
+              "allium",
+              "bitcore",
+              "ethash",
+              "equihash",
+              "hsr",
+              "keccakc",
+              "lyra2v2",
+              "lyra2z",
+              "neoscrypt",
+              "nist5",
+              "phi",
+              "polytimos",
+              "x16r",
+              "xevan"
+            ],
+            "required": false
+          },
+          "Coin": {
+            "type": "string",
+            "description": "The coin you want to mine. If unset, you must select an algo instead.",
+            "enum": [
+              "bsd",
+              "btcp",
+              "btg",
+              "btx",
+              "bwk",
+              "crea",
+              "crs",
+              "eth",
+              "flm",
+              "ftc",
+              "grlc",
+              "hsr",
+              "ifx",
+              "kreds",
+              "lux",
+              "mona",
+              "poly",
+              "pyro",
+              "rvn",
+              "tzc",
+              "vtc",
+              "xlr",
+              "xzc",
+              "zcl",
+              "zec",
+              "zen"
+            ],
+            "required": false
+          },
+          "Miner": {
+            "type": "string",
+            "description": "The miner you want to use.",
+            "enum": [
+              "ccminer-allium",
+              "ccminer-klaust",
+              "ccminer-palginmod",
+              "ccminer-phi",
+              "ccminer-rvn",
+              "ccminer-polytimos",
+              "ccminer-tpruvot",
+              "ccminer-xevan",
+              "dstm",
+              "ethminer",
+              "excavator",
+              "hsrminer-hsr",
+              "hsrminer-neoscrypt",
+              "vertminer",
+              "zecminer"
+            ],
+            "required": true
+          },
+          "Watchdog": {
+            "type": "boolean",
+            "description": "If true, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes.",
+            "required": true,
+            "default": true
+          },
+          "Debug": {
+            "type": "boolean",
+            "description": "If true, RudeHash will print diagnostic information along with the rest. Useful for troubleshooting.",
+            "required": true,
+            "default": false
+          },
+          "Wallet": {
+            "type": "string",
+            "description": "Your Bitcoin or Altcoin wallet. Ignored on pools that use a site balance.",
+            "required": false,
+            "default": ""
+          },
+          "WalletIsAltcoin": {
+            "type": "boolean",
+            "description": "If true, your wallet's currency is the same as the coin you're mining, and you're paid directly to this wallet for mining a coin. If false, your wallet is Bitcoin, and the pool auto-exchanges the mined coins to BTC. Ignored on pools that use a site balance.",
+            "required": true,
+            "default": false
+          },
+          "User": {
+            "type": "string",
+            "description": "Pool user name. Ignored on pools that use a wallet address.",
+            "required": false,
+            "default": ""
+          },
+          "Region": {
+            "type": "string",
+            "description": "Pool region. Only required on pools that have regions.",
+            "required": false,
+            "default": ""
+          },
+          "ExtraArgs": {
+            "type": "string",
+            "description": "Any additional command line arguments you want to pass to the miner.",
+            "required": false,
+            "default": ""
+          }
+        }
+      },
+      "default": [
+        {
+          "Pool": "zpool",
+          "Algo": "equihash",
+          "Coin": "",
+          "Miner": "dstm",
+          "Wallet": "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk",
+          "WalletIsAltcoin": false
+        }
+      ]
+    }
+  }
+};
+
+var $element = document.getElementById('editor');
+var $output = document.getElementById('output');
+var $set_value_button = document.getElementById('setvalue');
+
+var $editor = new JSONEditor($element, {
+  schema: $rudeSchema,
+  theme: 'bootstrap3',
+  iconlib: 'foundation3'
+});
+
+/* update JSON when config changes */
+$editor.on('change',function() {
+  $output.value = JSON.stringify($editor.getValue(),null,2);
+});
+
+/* update config from JSON when button clicked */
+$set_value_button.addEventListener('click',function() {
+  $editor.setValue(JSON.parse($output.value));
+});
+</script>
+
+</body>
+</html>
