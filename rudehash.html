@@ -253,7 +253,10 @@ var $file_input = document.getElementById('file-input')
 var $editor = new JSONEditor($element, {
   schema: $rudeSchema,
   theme: 'bootstrap3',
-  iconlib: 'foundation3'
+  iconlib: 'foundation3',
+  disable_edit_json: true,
+  disable_properties: true,
+  disable_collapse: true
 });
 
 /* update JSON when config changes */
