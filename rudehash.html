@@ -93,6 +93,12 @@ var $rudeSchema =
       "default": "",
       "required": false
     },
+    "Debug": {
+      "type": "boolean",
+      "description": "If true, RudeHash will print diagnostic information along with the rest. Useful for troubleshooting.",
+      "required": true,
+      "default": false
+    },
     "ActiveProfile": {
       "type": "integer",
       "description": "RudeHash profile currently in use.",
@@ -206,12 +212,6 @@ var $rudeSchema =
             "description": "If true, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes.",
             "required": true,
             "default": true
-          },
-          "Debug": {
-            "type": "boolean",
-            "description": "If true, RudeHash will print diagnostic information along with the rest. Useful for troubleshooting.",
-            "required": true,
-            "default": false
           },
           "Wallet": {
             "type": "string",
