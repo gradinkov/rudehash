@@ -8,6 +8,7 @@ $TempDir = [io.path]::combine($PSScriptRoot, "temp")
 [cultureinfo]::CurrentCulture = [cultureinfo]::InvariantCulture
 
 # globals
+$Version = "8.0-dev"
 [System.Collections.Hashtable]$Config = @{}
 [System.Collections.Hashtable]$FileConfig = @{}
 # current keys: Api CoinMode DevMining Port Rates
@@ -51,7 +52,7 @@ function Write-PrettyDots ()
 function Write-PrettyHeader ()
 {
 	Write-PrettyDots
-	Write-Pretty DarkCyan "RudeHash NVIDIA Miner `u{00a9} gradinkov"
+	Write-Pretty DarkCyan "RudeHash $($Version) NVIDIA Miner `u{00a9} gradinkov"
 	Write-PrettyDots
 }
 
@@ -2461,7 +2462,7 @@ function Set-WindowTitle ()
 		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
 	}
 
-	$Host.UI.RawUI.WindowTitle = "RudeHash" + $Sep + "Pool: " + $Pools[$Config.Pool].Name + $Sep + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner + $WalletStr
+	$Host.UI.RawUI.WindowTitle = "RudeHash " + $Version + $Sep + "Pool: " + $Pools[$Config.Pool].Name + $Sep + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner + $WalletStr
 }
 
 function Update-MinerUptime ()
@@ -2709,6 +2710,7 @@ function Ping-Monitoring ()
 			Path = $Miners[$Config.Miner].ExeFile
 			Type = @()
 			PID = $RigStats.Pid
+			Version = $Version
 			Active = $Active
 			Algorithm = @($AlgoNames[$Config.Algo])
 			Pool = @($Pools[$Config.Pool].Name)

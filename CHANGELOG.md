@@ -3,6 +3,7 @@
 ## RudeHash 8.0 (TBD)
 
 * New pools: TheBSODPool
+* Add version info to monitoring
 * Remove Polytimos from zpool
 
 ## RudeHash 7.1 (2018-03-20)
