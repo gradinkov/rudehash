@@ -2,7 +2,6 @@
 
 ## RudeHash 8.0 (TBD)
 
-* New coins: Pyro
 * New pools: TheBSODPool
 * Remove Polytimos from zpool
 

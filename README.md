@@ -76,7 +76,6 @@ Set-ExecutionPolicy Unrestricted
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
 | POLY | Polytimos | Polytimos |
-| PYRO | Pyro | Lyra2Z |
 | RVN | Ravencoin | X16R |
 | TZC | Trezarcoin | NeoScrypt |
 | VTC | Vertcoin | Lyra2REv2 |
