@@ -300,7 +300,7 @@ $Pools =
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233; Modifier = 1000000 }
 			"nist5" = @{ Server = "nist5.mine.zpool.ca"; Port = 3833; Modifier = 1000000 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333; Modifier = 1000000 }
-			"polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463; Modifier = 1000000 }
+			# "polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463; Modifier = 1000000 }
 			"xevan" = @{ Server = "xevan.mine.zpool.ca"; Port = 3739; Modifier = 1000000 }
 		}
 	}

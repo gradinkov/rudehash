@@ -4,6 +4,7 @@
 
 * New coins: Pyro
 * New pools: TheBSODPool
+* Remove Polytimos from zpool
 
 ## RudeHash 7.1 (2018-03-20)
 
