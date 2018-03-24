@@ -76,42 +76,45 @@ function Write-PrettyEarnings ($String)
 	Write-Pretty DarkGreen $String
 }
 
-if (Test-Path $ConfigFile)
+function Initialize-Config ()
 {
-	try
+	if (Test-Path $ConfigFile)
 	{
-		$Config = Get-Content -Path $ConfigFile -Raw | ConvertFrom-Json -AsHashtable
-
-		# make sure we don't fail if the file is empty
-		if (-Not ($Config))
+		try
 		{
-			[System.Collections.Hashtable]$Config = @{}
-			$FirstRun = $true
+			$Config = Get-Content -Path $ConfigFile -Raw | ConvertFrom-Json -AsHashtable
+
+			# make sure we don't fail if the file is empty
+			if (-Not ($Config))
+			{
+				[System.Collections.Hashtable]$Config = @{}
+				$FirstRun = $true
+			}
+		}
+		catch [System.Management.Automation.PSInvalidOperationException]
+		{
+			Write-PrettyError "Error parsing '$ConfigFile'! Do you have an option set multiple times?"
+			Exit-RudeHash
+		}
+		catch
+		{
+			Write-PrettyError "Error accessing '$ConfigFile'!"
+			Exit-RudeHash
 		}
 	}
-	catch [System.Management.Automation.PSInvalidOperationException]
+	else
 	{
-		Write-PrettyError "Error parsing '$ConfigFile'! Do you have an option set multiple times?"
-		Exit-RudeHash
-	}
-	catch
-	{
-		Write-PrettyError "Error accessing '$ConfigFile'!"
-		Exit-RudeHash
-	}
-}
-else
-{
-	$FirstRun = $true
+		$FirstRun = $true
 
-	try
-	{
-		New-Item $ConfigFile -ItemType File | Out-Null
-	}
-	catch
-	{
-		Write-PrettyError "Error creating '$ConfigFile'!"
-		Exit-RudeHash
+		try
+		{
+			New-Item $ConfigFile -ItemType File | Out-Null
+		}
+		catch
+		{
+			Write-PrettyError "Error creating '$ConfigFile'!"
+			Exit-RudeHash
+		}
 	}
 }
 
@@ -2815,6 +2818,7 @@ function Start-RudeHash ()
 
 Clear-Host
 Write-PrettyHeader
+Initialize-Config
 Initialize-Temp
 Initialize-Properties
 Set-WindowTitle
