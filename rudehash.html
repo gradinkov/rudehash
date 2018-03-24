@@ -87,7 +87,7 @@ var $rudeSchema =
     },
     "MphApiKey": {
       "type": "string",
-      "description": "Allows for monitoring at miningpoolhubstats.com using your MPH API key.",
+      "description": "Allows for monitoring at miningpoolhubstats.com using your <a href=\"https://miningpoolhub.com/?page=account&action=edit\" target=\"_blank\">MPH API key</a>.",
       "minLength": 0,
       "maxLength": 64,
       "default": "",
@@ -350,9 +350,16 @@ function uuidv4() {
 }
 
 function fill_uuid() {
-  $editor.setValue({MonitoringKey: uuidv4()});
-}
+  /* this would trim any properties that are empty yet */
+  //$editor.setValue({MonitoringKey: uuidv4()});
 
+  var $MonitoringKey = $editor.getEditor('root.MonitoringKey');
+
+  if($MonitoringKey)
+  {
+    $MonitoringKey.setValue(uuidv4());
+  }
+}
 </script>
 
 </body>
