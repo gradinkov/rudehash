@@ -78,8 +78,9 @@ var $rudeSchema =
     },
     "MonitoringKey": {
       "type": "string",
-      "description": "Allows for monitoring your rigs at rudehash.org/monitor.",
+      "description": "Allows for monitoring your rigs at rudehash.org/monitor. <button id=\"uuid\" onclick=\"fill_uuid()\">Generate one</a>",
       "minLength": 0,
+      "id": "monitoringkey",
       "maxLength": 36,
       "default": "",
       "required": false
@@ -275,8 +276,7 @@ var $editor = new JSONEditor($element, {
   no_additional_properties: true
 });
 
-/* update JSON when config changes */
-$editor.on('change',function() {
+function update_output() {
   $output.value = JSON.stringify($editor.getValue(),null,2);
 
   var $validation_errors = $editor.validate();
@@ -288,7 +288,10 @@ $editor.on('change',function() {
   else {
       $validate.value = 'The configuration syntax is valid.';
   }
-});
+}
+
+/* update JSON when config changes */
+$editor.on('change', update_output);
 
 /* update config from JSON when button clicked */
 //$set_value_button.addEventListener('click',function() {
@@ -339,6 +342,16 @@ function downloadJson ($e) {
 }
 
 $save_button.addEventListener('click', downloadJson);
+
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  )
+}
+
+function fill_uuid() {
+  $editor.setValue({MonitoringKey: uuidv4()});
+}
 
 </script>
 
