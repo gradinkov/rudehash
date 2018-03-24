@@ -3,6 +3,7 @@
 ## RudeHash 8.0 (TBD)
 
 * New pools: TheBSODPool
+* Add config generator & validator tool
 * Add version info to monitoring
 * Remove Polytimos from zpool
 
