@@ -5,7 +5,7 @@
   "ElectricityCost":0.1,
   "MonitoringKey":"",
   "MphApiKey":"",
-  "ActiveProfile":1,
+  "ActiveProfile":2,
   "Profiles":[
     {
       "Pool":"zpool",
