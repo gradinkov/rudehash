@@ -306,6 +306,7 @@ $Coins =
 
 $Miners =
 @{
+	"ccminer-alexis-hsr" = @{ Url = "https://github.com/nemosminer/ccminer-hcash/releases/download/alexishsr/ccminer-hsr-alexis-x86-cuda8.7z"; ArchiveFile = "ccminer-alexis-hsr.7z"; ExeFile = "ccminer-alexis.exe"; FilesInRoot = $true; Algos = @("hsr", "lyra2v2", "neoscrypt", "nist5"); Api = $true }
 	"ccminer-allium" = @{ Url = "https://github.com/lenis0012/ccminer/releases/download/2.3.0-allium/ccminer-x64.exe"; ArchiveFile = "ccminer-allium.exe"; ExeFile = "ccminer-allium.exe"; FilesInRoot = $true; Algos = @("allium"); Api = $true; Version = "2.2.4" }
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5", "tribus"); Api = $true }
 	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "nist5"); Api = $true; Version = "2.0" }
@@ -1596,7 +1597,7 @@ function Get-GpuCount ()
 {
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-MinerApi 'summary' $false
 
@@ -1837,7 +1838,7 @@ function Initialize-MinerArgs ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Profile.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Profile.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"ccminer-polytimos" { $Args = "--algo=poly --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Profile.Pool].StratumProto }
@@ -1865,7 +1866,7 @@ function Get-HashRate ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-MinerApi 'threads' $false
 
@@ -2016,7 +2017,7 @@ function Get-PowerUsage ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
 			$Response = Read-MinerApi 'threads' $false
 

@@ -45,12 +45,12 @@ Set-ExecutionPolicy Unrestricted
 | Allium | ccminer-allium |
 | Ethash | ethminer, Excavator |
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
-| HSR | ccminer-tpruvot, hsrminer-hsr |
+| HSR | ccminer-alexis-hsr, ccminer-tpruvot, hsrminer-hsr |
 | Keccak-C | ccminer-tpruvot |
-| Lyra2REv2 | ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, vertminer |
+| Lyra2REv2 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, vertminer |
 | Lyra2Z | ccminer-palginmod, ccminer-tpruvot |
-| NeoScrypt | ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
-| Nist5 | ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator |
+| NeoScrypt | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
+| Nist5 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |

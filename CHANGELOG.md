@@ -5,6 +5,7 @@
 * New pools: TheBSODPool
 * New coins: Denarius
 * New algos: Tribus
+* New miners: ccminer-alexis-hsr
 * Add support for mining profiles
 * Add config generator & validator tool
 * Add version info to monitoring
