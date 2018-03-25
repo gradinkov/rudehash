@@ -399,13 +399,13 @@ function Set-Property ($Name, $Value, $Permanent, $ProfileItem)
 {
 	if ($ProfileItem)
 	{
-		# we never call this before ActiveProfile is set
 		if (-Not ($Config.Profiles))
 		{
 			[System.Collections.ArrayList]$Config.Profiles = @()
 			$Config.Profiles.Add([System.Collections.Hashtable] @{}) | Out-Null
 		}
 
+		# we never call this before ActiveProfile is set
 		$Config.Profiles[$Config.ActiveProfile - 1].$Name = $Value
 		$Profile.$Name = $Value
 	}
@@ -1115,7 +1115,6 @@ function Select-Profile ()
 		Write-PrettyDebug "Evaluating $($Name) property..."
 	}
 
-	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
 	while (-Not (Test-ActiveProfileProperty))
 	{
 		Write-Help $Name
