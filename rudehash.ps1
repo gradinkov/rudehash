@@ -13,6 +13,7 @@ $Version = "8.0-dev"
 [System.Collections.Hashtable]$FileConfig = @{}
 # current keys: Api CoinMode DevMining Port Rates
 [System.Collections.Hashtable]$SessionConfig = @{}
+[System.Collections.Hashtable]$Profile = @{}
 $FirstRun = $false
 $FirstLoop = $true
 $MinerPort = 28178
@@ -375,6 +376,7 @@ $Remarks =
 	"Watchdog" = "If true, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes."
 	"MonitoringKey" = "Allows for monitoring your rigs at rudehash.org/monitor. A newly generated random key for you:`r`n$(New-Guid)"
 	"MphApiKey" = "Allows for monitoring at miningpoolhubstats.com using your MPH API key."
+	"ActiveProfile" = "The profile currently in use, starting at 1."
 	# Pool
 	"Worker" = "Your rig's nickname."
 	"Wallet" = "Your Bitcoin or Altcoin wallet. Ignored on pools that use a site balance."
@@ -393,9 +395,24 @@ $Remarks =
 [System.Collections.Hashtable]$BtcRates = @{}
 [System.Collections.Hashtable]$ZergpoolCoins = @{}
 
-function Set-Property ($Name, $Value, $Permanent)
+function Set-Property ($Name, $Value, $Permanent, $ProfileItem)
 {
-	$Config.$Name = $Value
+	if ($ProfileItem)
+	{
+		# we never call this before ActiveProfile is set
+		if (-Not ($Config.Profiles))
+		{
+			[System.Collections.ArrayList]$Config.Profiles = @()
+			$Config.Profiles.Add([System.Collections.Hashtable] @{}) | Out-Null
+		}
+
+		$Config.Profiles[$Config.ActiveProfile - 1].$Name = $Value
+		$Profile.$Name = $Value
+	}
+	else
+	{
+		$Config.$Name = $Value
+	}
 
 	if ($Permanent)
 	{
@@ -628,7 +645,7 @@ function Test-WatchdogProperty ()
 {
 	try
 	{
-		$Config.Watchdog = [System.Convert]::ToBoolean($Config.Watchdog)
+		$Profile.Watchdog = [System.Convert]::ToBoolean($Profile.Watchdog)
 		return $true
 	}
 	catch
@@ -690,16 +707,49 @@ function Test-MphApiKeyProperty ()
 	}
 }
 
+function Test-ActiveProfileProperty ()
+{
+	# if first run, we won't have any profile
+	if ($FirstRun)
+	{
+		Set-Property "ActiveProfile" 1 $true $false
+		return $true
+	}
+	else
+	{
+		# we have at least one profile
+		if ($Config.Profiles.Length -gt 0)
+		{
+			# ActiveProfile starts at 1!
+			if ($Config.Profiles.Length -ge $Config.ActiveProfile)
+			{
+				return $true
+			}
+			else
+			{
+				Write-PrettyError "Profile $($Config.ActiveProfile) does not exist!"
+				return $false
+			}
+		}
+		# profiles are missing
+		else
+		{
+			Set-Property "ActiveProfile" 1 $true $false
+			return $true
+		}
+	}
+}
+
 function Test-PoolProperty ()
 {
-	if (-Not ($Config.Pool))
+	if (-Not ($Profile.Pool))
 	{
 		Write-PrettyError ("Pool must be set!")
 		return $false
 	}
-	elseif (-Not ($Pools.ContainsKey($Config.Pool)))
+	elseif (-Not ($Pools.ContainsKey($Profile.Pool)))
 	{
-		Write-PrettyError ("The """ + $Config.Pool + """ pool is not supported!")
+		Write-PrettyError ("The """ + $Profile.Pool + """ pool is not supported!")
 
 		return $false
 	}
@@ -759,11 +809,11 @@ function Test-WalletProperty ()
 
 function Test-WalletIsAltcoinProperty ()
 {
-	if ($Config.WalletIsAltcoin)
+	if ($Profile.WalletIsAltcoin)
 	{
 		try
 		{
-			$Config.WalletIsAltcoin = [System.Convert]::ToBoolean($Config.WalletIsAltcoin)
+			$Profile.WalletIsAltcoin = [System.Convert]::ToBoolean($Profile.WalletIsAltcoin)
 			return $true
 		}
 		catch
@@ -786,11 +836,11 @@ function Test-WalletIsAltcoinProperty ()
 
 function Test-UserProperty ()
 {
-	if ($Config.User)
+	if ($Profile.User)
 	{
 		$Pattern = "^[a-zA-Z0-9]{1,20}$"
 
-		if ($Config.User -match $Pattern)
+		if ($Profile.User -match $Pattern)
 		{
 			return $true
 		}
@@ -808,7 +858,7 @@ function Test-UserProperty ()
 
 function Test-RegionProperty ()
 {
-	if ($Config.Region)
+	if ($Profile.Region)
 	{
 		# make the array of dynamic size
 		[System.Collections.ArrayList]$ValidRegions = @()
@@ -825,13 +875,13 @@ function Test-RegionProperty ()
 			}
 		}
 
-		if ($ValidRegions.Contains($Config.Region))
+		if ($ValidRegions.Contains($Profile.Region))
 		{
 			return $true
 		}
 		else
 		{
-			Write-PrettyError ("The """ + $Config.Region + """ region does not exist!")
+			Write-PrettyError ("The """ + $Profile.Region + """ region does not exist!")
 
 			return $false
 		}
@@ -844,13 +894,13 @@ function Test-RegionProperty ()
 
 function Test-CoinProperty ()
 {
-	if ($Config.Coin)
+	if ($Profile.Coin)
 	{
-		$Config.Coin = $Config.Coin.ToLower()
+		$Profile.Coin = $Profile.Coin.ToLower()
 
-		if (-Not ($Coins.ContainsKey($Config.Coin)))
+		if (-Not ($Coins.ContainsKey($Profile.Coin)))
 		{
-			Write-PrettyError ("The """ + $Config.Coin.ToUpper() + """ coin is not supported!")
+			Write-PrettyError ("The """ + $Profile.Coin.ToUpper() + """ coin is not supported!")
 
 			return $false
 		}
@@ -867,14 +917,14 @@ function Test-CoinProperty ()
 
 function Test-MinerProperty ()
 {
-	if (-Not ($Config.Miner))
+	if (-Not ($Profile.Miner))
 	{
 		Write-PrettyError ("Miner must be set!")
 		return $false
 	}
-	elseif (-Not ($Miners.ContainsKey($Config.Miner)))
+	elseif (-Not ($Miners.ContainsKey($Profile.Miner)))
 	{
-		Write-PrettyError ("The """ + $Config.Miner + """ miner is not supported!")
+		Write-PrettyError ("The """ + $Profile.Miner + """ miner is not supported!")
 
 		return $false
 	}
@@ -886,7 +936,7 @@ function Test-MinerProperty ()
 
 function Test-AlgoProperty ()
 {
-	if ($Config.Algo)
+	if ($Profile.Algo)
 	{
 		# make the array of dynamic size
 		[System.Collections.ArrayList]$Algos = @()
@@ -904,9 +954,9 @@ function Test-AlgoProperty ()
 			}
 		}
 
-		if (-Not ($Algos.Contains($Config.Algo)))
+		if (-Not ($Algos.Contains($Profile.Algo)))
 		{
-			Write-PrettyError ("The """ + $Config.Algo + """ algo is not supported!")
+			Write-PrettyError ("The """ + $Profile.Algo + """ algo is not supported!")
 
 			return $false
 		}
@@ -923,7 +973,7 @@ function Test-AlgoProperty ()
 
 function Test-CoinExchangeSupport ()
 {
-	if ($Config.Pool -eq "zergpool")
+	if ($Profile.Pool -eq "zergpool")
 	{
 		if ($ZergpoolCoins.Count -eq 0)
 		{
@@ -938,7 +988,7 @@ function Test-CoinExchangeSupport ()
 
 				if ($Config.Debug)
 				{
-					Write-PrettyDebug ("Server response: $($Response.($Config.Coin))")
+					Write-PrettyDebug ("Server response: $($Response.($Profile.Coin))")
 				}
 
 				foreach ($Coin in $Pools["zergpool"].Coins.Keys)
@@ -960,7 +1010,7 @@ function Test-CoinExchangeSupport ()
 		}
 
 		# noautotrade = 0
-		if ($ZergpoolCoins.($Config.Coin) -eq 0)
+		if ($ZergpoolCoins.($Profile.Coin) -eq 0)
 		{
 			return $true
 		}
@@ -1023,7 +1073,7 @@ function Write-Help ($Property)
 	}
 }
 
-function Initialize-Property ($Name, $Mandatory, $Force)
+function Initialize-Property ($Name, $Mandatory, $Force, $ProfileItem)
 {
 	if ($Config.Debug)
 	{
@@ -1038,7 +1088,14 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 	if ($Force)
 	{
 		$Ret = Receive-Property $Name $Mandatory
-		Set-Property $Name $Ret $true
+		Set-Property $Name $Ret $true $ProfileItem
+	}
+
+	# make sure $Profile is populated even if no config changes are made after start
+	# shouldn't cause indexing errors coz we never use profile options before ActiveProfile
+	if ($ProfileItem -And $Config.Profiles[$Config.ActiveProfile - 1].$Name)
+	{
+		$Profile.$Name = $Config.Profiles[$Config.ActiveProfile - 1].$Name
 	}
 
 	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
@@ -1046,173 +1103,190 @@ function Initialize-Property ($Name, $Mandatory, $Force)
 	{
 		Write-Help $Name
 		$Ret = Receive-Property $Name $Mandatory
-		Set-Property $Name $Ret $true
+		Set-Property $Name $Ret $true $ProfileItem
+	}
+}
+
+function Select-Profile ()
+{
+	$Name = "ActiveProfile"
+	if ($Config.Debug)
+	{
+		Write-PrettyDebug "Evaluating $($Name) property..."
+	}
+
+	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
+	while (-Not (Test-ActiveProfileProperty))
+	{
+		Write-Help $Name
+		$Ret = Receive-Property $Name $true
+		Set-Property $Name $Ret $true $false
 	}
 }
 
 function Test-Compatibility ()
 {
-	if ($Pools[$Config.Pool].Authless)
+	if ($Pools[$Profile.Pool].Authless)
 	{
-		if (-Not ($Config.Wallet))
+		if (-Not ($Profile.Wallet))
 		{
-			Write-PrettyError ("""" + $Config.Pool + """ is anonymous, wallet address must be set!")
+			Write-PrettyError ("""" + $Profile.Pool + """ is anonymous, wallet address must be set!")
 			$Choice = Receive-Choice "Wallet" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 	}
-	elseif (-Not ($Config.User))
+	elseif (-Not ($Profile.User))
 	{
-		Write-PrettyError ("""" + $Config.Pool + """ implements authentication, user name must be set!")
+		Write-PrettyError ("""" + $Profile.Pool + """ implements authentication, user name must be set!")
 		$Choice = Receive-Choice "User" "Pool"
-		$Config.$Choice = ""
-		Initialize-Property $Choice $true $true
+		$Profile.$Choice = ""
+		Initialize-Property $Choice $true $true $true
 		Test-Compatibility
 	}
 
-	if ($Pools[$Config.Pool].Regions)
+	if ($Pools[$Profile.Pool].Regions)
 	{
-		if (-Not ($Config.Region))
+		if (-Not ($Profile.Region))
 		{
-			Write-PrettyError ("Region must be set for the """ + $Config.Pool + """ pool!")
+			Write-PrettyError ("Region must be set for the """ + $Profile.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
-		if (-Not ($Regions[$Config.Pool].Contains($Config.Region)))
+		if (-Not ($Regions[$Profile.Pool].Contains($Profile.Region)))
 		{
-			Write-PrettyError ("The """ + $Config.Region + """ region is not supported on the """ + $Config.Pool + """ pool!")
+			Write-PrettyError ("The """ + $Profile.Region + """ region is not supported on the """ + $Profile.Pool + """ pool!")
 			$Choice = Receive-Choice "Region" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 	}
 
 	$SessionConfig.CoinMode = $false
 
-	if ($Config.Coin)
+	if ($Profile.Coin)
 	{
-		if (-Not ($Pools[$Config.Pool].Coins))
+		if (-Not ($Pools[$Profile.Pool].Coins))
 		{
-			Write-PrettyError ("Coin mining is not supported on """ + $Config.Pool + """!")
+			Write-PrettyError ("Coin mining is not supported on """ + $Profile.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
-		elseif (-Not ($Pools[$Config.Pool].Coins.ContainsKey($Config.Coin)))
+		elseif (-Not ($Pools[$Profile.Pool].Coins.ContainsKey($Profile.Coin)))
 		{
-			Write-PrettyError ("The """ + $Config.Coin + """ coin is not supported on """ + $Config.Pool + """!")
+			Write-PrettyError ("The """ + $Profile.Coin + """ coin is not supported on """ + $Profile.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 		elseif (-Not (Test-CoinExchangeSupport))
 		{
-			Write-PrettyError ("The """ + $Config.Coin + """ coin cannot be exchanged on """ + $Config.Pool + """!")
+			Write-PrettyError ("The """ + $Profile.Coin + """ coin cannot be exchanged on """ + $Profile.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 		else
 		{
 			# use coin algo if coin is specified
-			$Config.Algo = $Coins[$Config.Coin].Algo
+			$Profile.Algo = $Coins[$Profile.Coin].Algo
 			$SessionConfig.CoinMode = $true
 		}
 	}
-	elseif (-Not $Config.Algo)
+	elseif (-Not $Profile.Algo)
 	{
 		Write-PrettyError ("You specified neither a coin nor an algo!")
 		$Choice = Receive-Choice "Coin" "Algo"
-		$Config.$Choice = ""
-		Initialize-Property $Choice $true $true
+		$Profile.$Choice = ""
+		Initialize-Property $Choice $true $true $true
 		Test-Compatibility
 	}
-	elseif (-Not ($Pools[$Config.Pool].Algos))
+	elseif (-Not ($Pools[$Profile.Pool].Algos))
 	{
-		Write-PrettyError ("Algo mining is not supported on """ + $Config.Pool + """!")
+		Write-PrettyError ("Algo mining is not supported on """ + $Profile.Pool + """!")
 		$Choice = Receive-Choice "Coin" "Pool"
-		$Config.$Choice = ""
-		Initialize-Property $Choice $true $true
+		$Profile.$Choice = ""
+		Initialize-Property $Choice $true $true $true
 		Test-Compatibility
 	}
 	# reason for elseif: if the coin is supported on the pool, its algo doesn't need to be checked
-	elseif (-Not ($Pools[$Config.Pool].Algos.ContainsKey($Config.Algo)))
+	elseif (-Not ($Pools[$Profile.Pool].Algos.ContainsKey($Profile.Algo)))
 	{
-		Write-PrettyError ("Incompatible configuration! """ + $Config.Algo + """ cannot be mined on """ + $Config.Pool + """.")
+		Write-PrettyError ("Incompatible configuration! """ + $Profile.Algo + """ cannot be mined on """ + $Profile.Pool + """.")
 		$Choice = Receive-Choice "Algo" "Pool"
-		$Config.$Choice = ""
-		Initialize-Property $Choice $true $true
+		$Profile.$Choice = ""
+		Initialize-Property $Choice $true $true $true
 		Test-Compatibility
 	}
 
-	if (-Not ($Miners[$Config.Miner].Algos.Contains($Config.Algo)))
+	if (-Not ($Miners[$Profile.Miner].Algos.Contains($Profile.Algo)))
 	{
-		if ($Config.Coin)
+		if ($Profile.Coin)
 		{
-			Write-PrettyError ("Incompatible configuration! The """ + $Config.Coin.ToUpper() + """ coin cannot be mined with """ + $Config.Miner + """.")
+			Write-PrettyError ("Incompatible configuration! The """ + $Profile.Coin.ToUpper() + """ coin cannot be mined with """ + $Profile.Miner + """.")
 			$Choice = Receive-Choice "Coin" "Miner"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 		else
 		{
-			Write-PrettyError ("Incompatible configuration! The """ + $Config.Algo + """ algo cannot be mined with """ + $Config.Miner + """.")
+			Write-PrettyError ("Incompatible configuration! The """ + $Profile.Algo + """ algo cannot be mined with """ + $Profile.Miner + """.")
 			$Choice = Receive-Choice "Algo" "Miner"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 	}
 
 	# wallet checks, only relevant on wallet pools
-	if ($Pools[$Config.Pool].Authless)
+	if ($Pools[$Profile.Pool].Authless)
 	{
 		# altcoin payouts are only possible if the pool has coins
-		if ($Config.WalletIsAltcoin -And (-Not ($Pools[$Config.Pool].Coins)))
+		if ($Profile.WalletIsAltcoin -And (-Not ($Pools[$Profile.Pool].Coins)))
 		{
-			Write-PrettyError ("""" + $Config.Pool + """ doesn't support Altcoin payouts!")
+			Write-PrettyError ("""" + $Profile.Pool + """ doesn't support Altcoin payouts!")
 			$Choice = Receive-Choice "WalletIsAltcoin" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 
 		# bitcoin payouts are only possible if the pool has algos (at least ATM)
-		if ((-Not ($Config.WalletIsAltcoin)) -And (-Not ($Pools[$Config.Pool].Algos)))
+		if ((-Not ($Profile.WalletIsAltcoin)) -And (-Not ($Pools[$Profile.Pool].Algos)))
 		{
-			Write-PrettyError ("""" + $Config.Pool + """ doesn't support Bitcoin payouts!")
+			Write-PrettyError ("""" + $Profile.Pool + """ doesn't support Bitcoin payouts!")
 			$Choice = Receive-Choice "WalletIsAltcoin" "Pool"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 
 		# altcoin payouts are only possible if mining a coin
-		if ($Config.WalletIsAltcoin -And (-Not ($SessionConfig.CoinMode)))
+		if ($Profile.WalletIsAltcoin -And (-Not ($SessionConfig.CoinMode)))
 		{
 			Write-PrettyError ("Altcoin payouts are only possible if mining a coin!")
 			$Choice = Receive-Choice "WalletIsAltcoin" "Coin"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 
 		# if getting paid in BTC, check its format, let's accept altcoin wallets as-is
-		if ((-Not ($Config.WalletIsAltcoin)) -And (-Not (Test-Wallet $Config.Wallet "BTC")))
+		if ((-Not ($Profile.WalletIsAltcoin)) -And (-Not (Test-Wallet $Profile.Wallet "BTC")))
 		{
 			Write-PrettyError ("Wallet is not a valid BTC address!")
 			$Choice = Receive-Choice "WalletIsAltcoin" "Wallet"
-			$Config.$Choice = ""
-			Initialize-Property $Choice $true $true
+			$Profile.$Choice = ""
+			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
 	}
@@ -1220,22 +1294,22 @@ function Test-Compatibility ()
 	# configuration is good, let's set up globals
 	if ($SessionConfig.CoinMode)
 	{
-		$SessionConfig.Server = $Pools[$Config.Pool].Coins[$Config.Coin].Server
-		$SessionConfig.Port = $Pools[$Config.Pool].Coins[$Config.Coin].Port
+		$SessionConfig.Server = $Pools[$Profile.Pool].Coins[$Profile.Coin].Server
+		$SessionConfig.Port = $Pools[$Profile.Pool].Coins[$Profile.Coin].Port
 	}
 	else
 	{
-		$SessionConfig.Server = $Pools[$Config.Pool].Algos[$Config.Algo].Server
-		$SessionConfig.Port = $Pools[$Config.Pool].Algos[$Config.Algo].Port
+		$SessionConfig.Server = $Pools[$Profile.Pool].Algos[$Profile.Algo].Server
+		$SessionConfig.Port = $Pools[$Profile.Pool].Algos[$Profile.Algo].Port
 	}
 
-	if ($Pools[$Config.Pool].Regions)
+	if ($Pools[$Profile.Pool].Regions)
 	{
-		$RegionStr = $Config.Region + "."
+		$RegionStr = $Profile.Region + "."
 		$SessionConfig.Server = $SessionConfig.Server -Replace "%REGION%",$RegionStr
 	}
 
-	if ($Miners[$Config.Miner].Api)
+	if ($Miners[$Profile.Miner].Api)
 	{
 		$SessionConfig.Api = $true
 	}
@@ -1367,24 +1441,28 @@ function Initialize-Properties ()
 	}
 
 	Initialize-Property "Debug" $true $FirstRun
-	Initialize-Property "Watchdog" $true $FirstRun
+	Initialize-Property "Worker" $true $FirstRun
 	Initialize-Property "MonitoringKey" $false $FirstRun
 	Initialize-Property "MphApiKey" $false $FirstRun
-	Initialize-Property "Pool" $true $FirstRun
-	Initialize-Property "Worker" $true $FirstRun
-	Initialize-Property "Wallet" $false $FirstRun
-	Initialize-Property "WalletIsAltcoin" $false $FirstRun
-	Initialize-Property "User" $false $FirstRun
-	Initialize-Property "Region" $false $FirstRun
-	Initialize-Property "Coin" $false $FirstRun
-	Initialize-Property "Miner" $true $FirstRun
-	Initialize-Property "Algo" $false $FirstRun
+
+	Select-Profile
+
+	# profile items
+	Initialize-Property "Watchdog" $true $FirstRun $true
+	Initialize-Property "Pool" $true $FirstRun $true $true
+	Initialize-Property "Wallet" $false $FirstRun $true
+	Initialize-Property "WalletIsAltcoin" $false $FirstRun $true
+	Initialize-Property "User" $false $FirstRun $true
+	Initialize-Property "Region" $false $FirstRun $true
+	Initialize-Property "Coin" $false $FirstRun $true
+	Initialize-Property "Miner" $true $FirstRun $true
+	Initialize-Property "Algo" $false $FirstRun $true
+	Initialize-Property "ExtraArgs" $false $FirstRun $true
 
 	Test-Compatibility
 
 	Initialize-Property "Currency" $true $FirstRun
 	Initialize-Property "ElectricityCost" $true $FirstRun
-	Initialize-Property "ExtraArgs" $false $FirstRun
 }
 
 $RigStats =
@@ -1508,7 +1586,7 @@ function Resolve-PoolIp ()
 
 function Get-GpuCount ()
 {
-	switch ($Config.Miner)
+	switch ($Profile.Miner)
 	{
 		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
@@ -1624,7 +1702,7 @@ function Initialize-Json ($User, $Pass)
 	$ExcavatorJson = @"
 [
 	{"time":0,"commands":[
-		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Config.Algo])","$(Resolve-PoolIp):$($SessionConfig.Port)","$($User):$($Pass)"]}
+		{"id":1,"method":"algorithm.add","params":["$($ExcavatorAlgos[$Profile.Algo])","$(Resolve-PoolIp):$($SessionConfig.Port)","$($User):$($Pass)"]}
 	]},
 	{"time":3,"commands":[
 		$(for ($i = 0; $i -lt $Count; $i++)
@@ -1689,48 +1767,48 @@ function Initialize-Excavator ($User, $Pass)
 
 function Initialize-MinerArgs ()
 {
-	switch ($Config.Pool)
+	switch ($Profile.Pool)
 	{
 		"bsod"
 		{
-			$PoolUser = $Config.Wallet + "." + $Config.Worker
-			$PoolPass = "c=" + $Config.Coin.ToUpper()
+			$PoolUser = $Profile.Wallet + "." + $Config.Worker
+			$PoolPass = "c=" + $Profile.Coin.ToUpper()
 		}
 		"masterhash"
 		{
-			$PoolUser = $Config.Wallet
-			$PoolPass = "c=" + $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+			$PoolUser = $Profile.Wallet
+			$PoolPass = "c=" + $Profile.Coin.ToUpper() + ",ID=" + $Config.Worker
 		}
 		{$_ -in "miningpoolhub", "suprnova" }
 		{
-			$PoolUser = $Config.User + "." + $Config.Worker
+			$PoolUser = $Profile.User + "." + $Config.Worker
 			$PoolPass = "x"
 		}
 		"nicehash"
 		{
 			# https://www.nicehash.com/help/how-to-create-a-worker
-			$PoolUser = $Config.Wallet + "." + $Config.Worker
+			$PoolUser = $Profile.Wallet + "." + $Config.Worker
 			$PoolPass = "x"
 		}
 		"poolr"
 		{
-			$PoolUser = $Config.Wallet + "." + $Config.Worker
-			$PoolPass = "c=" + $Config.Coin.ToUpper()
+			$PoolUser = $Profile.Wallet + "." + $Config.Worker
+			$PoolPass = "c=" + $Profile.Coin.ToUpper()
 		}
 		"zergpool"
 		{
-			$PoolUser = $Config.Wallet
+			$PoolUser = $Profile.Wallet
 
 			if ($SessionConfig.CoinMode)
 			{
 				# zergpool only accepts the coin in uppercase
-				if ($Config.WalletIsAltcoin)
+				if ($Profile.WalletIsAltcoin)
 				{
-					$PoolPass = "c=" + $Config.Coin.ToUpper() + ",mc="+ $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+					$PoolPass = "c=" + $Profile.Coin.ToUpper() + ",mc="+ $Profile.Coin.ToUpper() + ",ID=" + $Config.Worker
 				}
 				else
 				{
-					$PoolPass = "c=BTC,mc="+ $Config.Coin.ToUpper() + ",ID=" + $Config.Worker
+					$PoolPass = "c=BTC,mc="+ $Profile.Coin.ToUpper() + ",ID=" + $Config.Worker
 				}
 			}
 			else
@@ -1740,7 +1818,7 @@ function Initialize-MinerArgs ()
 		}
 		"zpool"
 		{
-			$PoolUser = $Config.Wallet
+			$PoolUser = $Profile.Wallet
 			# zpool only guarantees BTC payouts, so we enforce it, potentially suboptimal coin is better than completely lost mining
 			$PoolPass = "c=BTC,ID=" + $Config.Worker
 		}
@@ -1749,12 +1827,12 @@ function Initialize-MinerArgs ()
 	# always update the IP, the miner could've crashed because of an IP change to begin with
 	$PoolIp = Resolve-PoolIp
 
-	switch ($Config.Miner)
+	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Config.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan" } { $Args = "--algo=" + $Profile.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"ccminer-polytimos" { $Args = "--algo=poly --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
-		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Config.Pool].StratumProto }
+		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Profile.Pool].StratumProto }
 		"excavator"
 		{
 			Initialize-Excavator $PoolUser $PoolPass
@@ -1765,9 +1843,9 @@ function Initialize-MinerArgs ()
 		"zecminer" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --api 127.0.0.1:" + $MinerPort }
 	}
 
-	if ($Config.ExtraArgs)
+	if ($Profile.ExtraArgs)
 	{
-		$Args += " " + $Config.ExtraArgs
+		$Args += " " + $Profile.ExtraArgs
 	}
 
 	return $Args
@@ -1777,7 +1855,7 @@ function Get-HashRate ()
 {
 	$HashRate = 0
 
-	switch ($Config.Miner)
+	switch ($Profile.Miner)
 	{
 		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
@@ -1928,7 +2006,7 @@ function Get-PowerUsage ()
 {
 	$PowerUsage = 0
 
-	switch ($Config.Miner)
+	switch ($Profile.Miner)
 	{
 		{$_ -in "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
 		{
@@ -1952,7 +2030,7 @@ function Get-PowerUsage ()
 
 				# these return mW instead of W, because reasons
 				# most likely ccminer-phi also returns mW, but I really don't know coz it always returns 0 lol
-				if ($Config.Miner.StartsWith("ccminer"))
+				if ($Profile.Miner.StartsWith("ccminer"))
 				{
 					$PowerUsage /= 1000
 				}
@@ -2070,12 +2148,12 @@ function Measure-Earnings ()
 {
 	if ($SessionConfig.CoinMode)
 	{
-		if ($Coins[$Config.Coin].WtmId)
+		if ($Coins[$Profile.Coin].WtmId)
 		{
 			try
 			{
-				[double]$HashRate = $RigStats.HashRate / $WtmModifiers[$Config.Algo]
-				$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Config.Coin].WtmId + ".json?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Config.Pool].PoolFee + "&commit=Calculate"
+				[double]$HashRate = $RigStats.HashRate / $WtmModifiers[$Profile.Algo]
+				$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Profile.Coin].WtmId + ".json?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Profile.Pool].PoolFee + "&commit=Calculate"
 				$Response = Invoke-RestMethod -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
 				[double]$Revenue = $Response.btc_revenue
 				$RigStats.EarningsBtc = [math]::Round($Revenue, 8)
@@ -2098,18 +2176,18 @@ function Measure-Earnings ()
 	}
 	else
 	{
-		if ($Pools[$Config.Pool].ApiUrl)
+		if ($Pools[$Profile.Pool].ApiUrl)
 		{
 			try
 			{
-				[double]$HashRate = $RigStats.HashRate / $Pools[$Config.Pool].Algos[$Config.Algo].Modifier
-				[double]$Multiplier = 1 - ($Pools[$Config.Pool].PoolFee / 100)
-				$Response = Invoke-RestMethod -Uri $Pools[$Config.Pool].ApiUrl -UseBasicParsing -ErrorAction SilentlyContinue
+				[double]$HashRate = $RigStats.HashRate / $Pools[$Profile.Pool].Algos[$Profile.Algo].Modifier
+				[double]$Multiplier = 1 - ($Pools[$Profile.Pool].PoolFee / 100)
+				$Response = Invoke-RestMethod -Uri $Pools[$Profile.Pool].ApiUrl -UseBasicParsing -ErrorAction SilentlyContinue
 
-				switch ($Config.Pool)
+				switch ($Profile.Pool)
 				{
-					"nicehash" { [double]$Price = $Response.result.stats[$Pools[$Config.Pool].Algos[$Config.Algo].Id].price }
-					{$_ -in "zergpool", "zpool"} { [double]$Price = $Response.($Config.Algo).estimate_current }
+					"nicehash" { [double]$Price = $Response.result.stats[$Pools[$Profile.Pool].Algos[$Profile.Algo].Id].price }
+					{$_ -in "zergpool", "zpool"} { [double]$Price = $Response.($Profile.Algo).estimate_current }
 				}
 
 				$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price * $Multiplier), 8)
@@ -2121,7 +2199,7 @@ function Measure-Earnings ()
 			}
 			catch
 			{
-				Write-PrettyError "$($Pools[$Config.Pool].Name) API request failed! Earnings estimations will not work."
+				Write-PrettyError "$($Pools[$Profile.Pool].Name) API request failed! Earnings estimations will not work."
 
 				if ($Config.Debug)
 				{
@@ -2405,25 +2483,25 @@ function Set-WindowTitle ()
 
 	if ($SessionConfig.CoinMode)
 	{
-		$CoinStr = ("Coin: " + $Coins[$Config.Coin].Name + $Sep)
+		$CoinStr = ("Coin: " + $Coins[$Profile.Coin].Name + $Sep)
 	}
 	else
 	{
 		$CoinStr = ""
 	}
 
-	if ($Pools[$Config.Pool].Authless)
+	if ($Pools[$Profile.Pool].Authless)
 	{
-		$WalletStr = $Sep + "Wallet: " + $Config.Wallet
+		$WalletStr = $Sep + "Wallet: " + $Profile.Wallet
 		$WorkerStr = "Worker: " + $Config.Worker + $Sep
 	}
 	else
 	{
 		$WalletStr = ""
-		$WorkerStr = "Worker: " + $Config.User + "." + $Config.Worker + $Sep
+		$WorkerStr = "Worker: " + $Profile.User + "." + $Config.Worker + $Sep
 	}
 
-	$Host.UI.RawUI.WindowTitle = "RudeHash " + $Version + $Sep + "Pool: " + $Pools[$Config.Pool].Name + $Sep + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Config.Algo] + $Sep + "Miner: " + $Config.Miner + $WalletStr
+	$Host.UI.RawUI.WindowTitle = "RudeHash " + $Version + $Sep + "Pool: " + $Pools[$Profile.Pool].Name + $Sep + $WorkerStr + $CoinStr + "Algo: " + $AlgoNames[$Profile.Algo] + $Sep + "Miner: " + $Profile.Miner + $WalletStr
 }
 
 function Update-MinerUptime ()
@@ -2470,7 +2548,7 @@ function Read-Stats ()
 			Get-HashRate
 			Get-PowerUsage
 
-			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmId) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
+			if (($SessionConfig.CoinMode -And $Coins[$Profile.Coin].WtmId) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Profile.Pool].ApiUrl))
 			{
 				Measure-Earnings
 
@@ -2507,7 +2585,7 @@ function Write-Stats ()
 			Write-PrettyInfo ("Uptime: " + (Get-PrettyUptime) + $Sep + "Number of GPUs: " + $RigStats.GpuCount + $Sep + "Hash Rate: " + (Get-PrettyHashRate $RigStats.HashRate) + $PowerUsageStr)
 
 			# use WTM for coins, NH for algos
-			if (($SessionConfig.CoinMode -And $Coins[$Config.Coin].WtmId) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Config.Pool].ApiUrl))
+			if (($SessionConfig.CoinMode -And $Coins[$Profile.Coin].WtmId) -Or (-Not ($SessionConfig.CoinMode) -And $Pools[$Profile.Pool].ApiUrl))
 			{
 				# we could keep trying to obtain exchange rates, but if it would eventually succeed and the
 				# list didn't contain the currency specified in the config, it'd result in indexing errors
@@ -2532,9 +2610,9 @@ function Start-Miner ()
 {
 	# in the extremely rare case of AV deleting the miner, or even 7-Zip, try to re-download
 	Test-Tools
-	Test-Miner $Config.Miner
+	Test-Miner $Profile.Miner
 
-	$Exe = [io.path]::combine($MinersDir, $Config.Miner, $Miners[$Config.Miner].ExeFile)
+	$Exe = [io.path]::combine($MinersDir, $Profile.Miner, $Miners[$Profile.Miner].ExeFile)
 	$Args = Initialize-MinerArgs
 
 	if ($Config.Debug)
@@ -2552,23 +2630,23 @@ function Enable-DevMining ()
 {
 	# we could just re-read the config file but that might cause a file access error in the middle of the day
 	# let's just make sure we don't do anything risky
-	$FileConfig.Pool = $Config.Pool
-	$Config.Pool = "zpool"
+	$FileConfig.Pool = $Profile.Pool
+	$Profile.Pool = "zpool"
 
-	$FileConfig.Algo = $Config.Algo
-	$Config.Algo = "equihash"
+	$FileConfig.Algo = $Profile.Algo
+	$Profile.Algo = "equihash"
 
-	$FileConfig.Miner = $Config.Miner
-	$Config.Miner = "dstm"
+	$FileConfig.Miner = $Profile.Miner
+	$Profile.Miner = "dstm"
 
-	$FileConfig.Coin = $Config.Coin
-	$Config.Coin = ""
+	$FileConfig.Coin = $Profile.Coin
+	$Profile.Coin = ""
 
-	$FileConfig.Wallet = $Config.Wallet
-	$Config.Wallet = "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk"
+	$FileConfig.Wallet = $Profile.Wallet
+	$Profile.Wallet = "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk"
 
-	$FileConfig.ExtraArgs = $Config.ExtraArgs
-	$Config.ExtraArgs = ""
+	$FileConfig.ExtraArgs = $Profile.ExtraArgs
+	$Profile.ExtraArgs = ""
 
 	# update server, port, etc
 	Test-Compatibility
@@ -2576,12 +2654,12 @@ function Enable-DevMining ()
 
 function Disable-DevMining ()
 {
-	$Config.Pool = $FileConfig.Pool
-	$Config.Algo = $FileConfig.Algo
-	$Config.Miner = $FileConfig.Miner
-	$Config.Coin = $FileConfig.Coin
-	$Config.Wallet = $FileConfig.Wallet
-	$Config.ExtraArgs = $FileConfig.ExtraArgs
+	$Profile.Pool = $FileConfig.Pool
+	$Profile.Algo = $FileConfig.Algo
+	$Profile.Miner = $FileConfig.Miner
+	$Profile.Coin = $FileConfig.Coin
+	$Profile.Wallet = $FileConfig.Wallet
+	$Profile.ExtraArgs = $FileConfig.ExtraArgs
 
 	# update server, port, etc
 	Test-Compatibility
@@ -2620,7 +2698,7 @@ function Test-DevMining ($Proc)
 
 function Ping-Miner ($Proc)
 {
-	if ($SessionConfig.Api -And $Config.Watchdog -And (-Not ($SessionConfig.DevMining)))
+	if ($SessionConfig.Api -And $Profile.Watchdog -And (-Not ($SessionConfig.DevMining)))
 	{
 		if ($RigStats.HashRate -eq 0)
 		{
@@ -2662,19 +2740,19 @@ function Ping-Monitoring ()
 		}
 		else
 		{
-			$Name = $Config.Miner
+			$Name = $Profile.Miner
 			$Active = Get-PrettyUptime
 		}
 
 		$MinerStats= @{
 			Name = $Name
-			Path = $Miners[$Config.Miner].ExeFile
+			Path = $Miners[$Profile.Miner].ExeFile
 			Type = @()
 			PID = $RigStats.Pid
 			Version = $Version
 			Active = $Active
-			Algorithm = @($AlgoNames[$Config.Algo])
-			Pool = @($Pools[$Config.Pool].Name)
+			Algorithm = @($AlgoNames[$Profile.Algo])
+			Pool = @($Pools[$Profile.Pool].Name)
 			'BTC/day' = $RigStats.EarningsBtc
 		}
 
@@ -2741,7 +2819,7 @@ function Start-RudeHash ()
 	while (1)
 	{
 		# get GPU count quickly, but not on excavator, it knows the GPU count already
-		if ($FirstLoop -And $SessionConfig.Api -And (-Not($Config.Miner -eq "excavator")))
+		if ($FirstLoop -And $SessionConfig.Api -And (-Not($Profile.Miner -eq "excavator")))
 		{
 			$Delay = 15
 		}
