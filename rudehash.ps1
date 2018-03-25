@@ -95,6 +95,7 @@ $Pools =
 			"crs" = @{ Server = "%REGION%bsod.pw"; Port = 2145 }
 			"dnr" = @{ Server = "%REGION%bsod.pw"; Port = 2153 }
 			"flm" = @{ Server = "%REGION%bsod.pw"; Port = 2150 }
+			"gin" = @{ Server = "%REGION%bsod.pw"; Port = 2159 }
 			"ifx" = @{ Server = "%REGION%bsod.pw"; Port = 2142 }
 			"lux" = @{ Server = "%REGION%bsod.pw"; Port = 6667 }
 			"rvn" = @{ Server = "%REGION%bsod.pw"; Port = 2176 }
@@ -237,6 +238,7 @@ $Pools =
 			"dnr" = @{ Server = "tribus.mine.zergpool.com"; Port = 8533 }
 			"flm" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
+			"gin" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
 			"hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433 }
 			"ifx" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553 }
 			"lux" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
@@ -287,6 +289,7 @@ $Coins =
 	"eth" = @{ Name = "Ethereum"; Algo = "ethash"; WtmId = 151 }
 	"flm" = @{ Name = "Folm Coin"; Algo = "phi" }
 	"ftc" = @{ Name = "Feathercoin"; Algo = "neoscrypt"; WtmId = 8 }
+	"gin" = @{ Name = "GINcoin"; Algo = "neoscrypt" }
 	"grlc" = @{ Name = "Garlicoin"; Algo = "allium" }
 	"hsr" = @{ Name = "Hshare"; Algo = "hsr" }
 	"ifx" = @{ Name = "Infinex"; Algo = "lyra2z" }

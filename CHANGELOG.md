@@ -3,7 +3,7 @@
 ## RudeHash 8.0 (TBD)
 
 * New pools: TheBSODPool
-* New coins: Denarius
+* New coins: Denarius, GINcoin
 * New algos: Tribus
 * New miners: ccminer-alexis-hsr
 * Add support for mining profiles

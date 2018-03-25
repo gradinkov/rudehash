@@ -73,6 +73,7 @@ Set-ExecutionPolicy Unrestricted
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |
+| GIN | GINcoin | NeoScrypt |
 | GRLC | Garlicoin | Allium |
 | HSR | Hshare | HSR |
 | IFX | Infinex | Lyra2Z |
