@@ -2038,7 +2038,7 @@ function Get-PowerUsage ()
 
 				# these return mW instead of W, because reasons
 				# most likely ccminer-phi also returns mW, but I really don't know coz it always returns 0 lol
-				if ($Profile.Miner.StartsWith("ccminer"))
+				if ($Profile.Miner -ne "ccminer-klaust" -And $Profile.Miner.StartsWith("ccminer"))
 				{
 					$PowerUsage /= 1000
 				}
