@@ -22,7 +22,7 @@
     {
       "Pool":"miningpoolhub",
       "Algo":"neoscrypt",
-      "Coin":"",
+      "Coin":"ftc",
       "Miner":"hsrminer-neoscrypt",
       "Watchdog":false,
       "Wallet":"",
