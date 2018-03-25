@@ -276,32 +276,32 @@ $Pools =
 
 $Coins =
 @{
-	"bsd" = @{ Name = "BitSend"; Algo = "xevan"; WtmId = "201" }
-	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash"; WtmId = "230" }
-	"btg" = @{ Name = "Bitcoin Gold"; Algo = "equihash"; WtmId = "214" }
-	"btx" = @{ Name = "Bitcore"; Algo = "bitcore"; WtmId = "202" }
-	"bwk" = @{ Name = "Bulwark"; Algo = "nist5"; WtmId = "224" }
-	"crea" = @{ Name = "Creativecoin"; Algo = "keccakc"; WtmId = "199" }
+	"bsd" = @{ Name = "BitSend"; Algo = "xevan"; WtmId = 201 }
+	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash"; WtmId = 230 }
+	"btg" = @{ Name = "Bitcoin Gold"; Algo = "equihash"; WtmId = 214 }
+	"btx" = @{ Name = "Bitcore"; Algo = "bitcore"; WtmId = 202 }
+	"bwk" = @{ Name = "Bulwark"; Algo = "nist5"; WtmId = 224 }
+	"crea" = @{ Name = "Creativecoin"; Algo = "keccakc"; WtmId = 199 }
 	"crs" = @{ Name = "Criptoreal"; Algo = "lyra2z" }
 	"dnr" = @{ Name = "Denarius"; Algo = "tribus"; WtmId = 187 }
-	"eth" = @{ Name = "Ethereum"; Algo = "ethash"; WtmId = "151" }
+	"eth" = @{ Name = "Ethereum"; Algo = "ethash"; WtmId = 151 }
 	"flm" = @{ Name = "Folm Coin"; Algo = "phi" }
-	"ftc" = @{ Name = "Feathercoin"; Algo = "neoscrypt"; WtmId = "8" }
+	"ftc" = @{ Name = "Feathercoin"; Algo = "neoscrypt"; WtmId = 8 }
 	"grlc" = @{ Name = "Garlicoin"; Algo = "allium" }
 	"hsr" = @{ Name = "Hshare"; Algo = "hsr" }
 	"ifx" = @{ Name = "Infinex"; Algo = "lyra2z" }
 	"kreds" = @{ Name = "Kreds"; Algo = "lyra2v2" }
-	"lux" = @{ Name = "LUXCoin"; Algo = "phi"; WtmId = "212" }
-	"mona" = @{ Name = "Monacoin"; Algo = "lyra2v2"; WtmId = "148" }
+	"lux" = @{ Name = "LUXCoin"; Algo = "phi"; WtmId = 212 }
+	"mona" = @{ Name = "Monacoin"; Algo = "lyra2v2"; WtmId = 148 }
 	"poly" = @{ Name = "Polytimos"; Algo = "polytimos" }
 	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
-	"tzc" = @{ Name = "Trezarcoin"; Algo = "neoscrypt"; WtmId = "215" }
-	"vtc" = @{ Name = "Vertcoin"; Algo = "lyra2v2"; WtmId = "5" }
-	"xlr" = @{ Name = "Solaris"; Algo = "xevan"; WtmId = "179" }
-	"xzc" = @{ Name = "Zcoin"; Algo = "lyra2z"; WtmId = "175" }
-	"zcl" = @{ Name = "ZClassic"; Algo = "equihash"; WtmId = "167" }
-	"zec" = @{ Name = "Zcash"; Algo = "equihash"; WtmId = "166" }
-	"zen" = @{ Name = "ZenCash"; Algo = "equihash"; WtmId = "185" }
+	"tzc" = @{ Name = "Trezarcoin"; Algo = "neoscrypt"; WtmId = 215 }
+	"vtc" = @{ Name = "Vertcoin"; Algo = "lyra2v2"; WtmId = 5 }
+	"xlr" = @{ Name = "Solaris"; Algo = "xevan"; WtmId = 179 }
+	"xzc" = @{ Name = "Zcoin"; Algo = "lyra2z"; WtmId = 175 }
+	"zcl" = @{ Name = "ZClassic"; Algo = "equihash"; WtmId = 167 }
+	"zec" = @{ Name = "Zcash"; Algo = "equihash"; WtmId = 166 }
+	"zen" = @{ Name = "ZenCash"; Algo = "equihash"; WtmId = 185 }
 }
 
 $Miners =
@@ -311,8 +311,8 @@ $Miners =
 	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5", "tribus"); Api = $true }
 	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "nist5"); Api = $true; Version = "2.0" }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
-	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
+	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "nist5", "phi", "polytimos", "tribus"); Api = $true; Version = "2.2.4" }
 	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
