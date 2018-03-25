@@ -1102,7 +1102,7 @@ function Initialize-Property ($Name, $Mandatory, $Force, $ProfileItem)
 
 	# make sure $Profile is populated even if no config changes are made after start
 	# shouldn't cause indexing errors coz we never use profile options before ActiveProfile
-	if ($ProfileItem -And $Config.Profiles[$Config.ActiveProfile - 1].$Name)
+	if ($ProfileItem -And $Config.Profiles -And $Config.Profiles[$Config.ActiveProfile - 1].$Name)
 	{
 		$Profile.$Name = $Config.Profiles[$Config.ActiveProfile - 1].$Name
 	}
