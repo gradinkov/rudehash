@@ -2871,7 +2871,7 @@ if (Test-Path $ConfigFile)
 	}
 	catch
 	{
-		Write-PrettyError "Error accessing '$ConfigFile'!"
+		Write-PrettyError "Error accessing '$ConfigFile'! Check it with the config editor!"
 		Exit-RudeHash
 	}
 }
