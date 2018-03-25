@@ -111,6 +111,7 @@ var $rudeSchema =
       "format": "tabs",
       "title": "Profiles",
       "uniqueItems": true,
+      "minItems" : 1,
       "required": true,
       "items": {
         "type": "object",
@@ -272,6 +273,8 @@ var $editor = new JSONEditor($element, {
   disable_edit_json: true,
   disable_properties: true,
   disable_collapse: true,
+  disable_array_delete_all_rows: true,
+  disable_array_delete_last_row: true,
   no_additional_properties: true
 });
 
