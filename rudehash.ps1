@@ -17,6 +17,8 @@ $Version = "8.0-dev"
 $FirstRun = $false
 $FirstLoop = $true
 $MinerPort = 28178
+$BtcDigits = 6
+$FiatDigits = 2
 $BlockchainUrl = "https://blockchain.info/ticker"
 $MonitoringUrl = "https://rudehash.org/monitor/miner.php"
 $MphStatsUrl = "https://miningpoolhubstats.com/api/worker/"
@@ -2162,11 +2164,11 @@ function Measure-Earnings ()
 				$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Profile.Coin].WtmId + ".json?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Profile.Pool].PoolFee + "&commit=Calculate"
 				$Response = Invoke-RestMethod -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
 				[double]$Revenue = $Response.btc_revenue
-				$RigStats.EarningsBtc = [math]::Round($Revenue, 8)
+				$RigStats.EarningsBtc = [math]::Round($Revenue, $BtcDigits)
 
 				if ($SessionConfig.Rates)
 				{
-					$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+					$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), $FiatDigits)
 				}
 			}
 			catch
@@ -2196,11 +2198,11 @@ function Measure-Earnings ()
 					{$_ -in "zergpool", "zpool"} { [double]$Price = $Response.($Profile.Algo).estimate_current }
 				}
 
-				$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price * $Multiplier), 8)
+				$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price * $Multiplier), $BtcDigits)
 
 				if ($SessionConfig.Rates)
 				{
-					$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), 2)
+					$RigStats.EarningsFiat = [math]::Round(($RigStats.EarningsBtc * $BtcRates[$Config.Currency]), $FiatDigits)
 				}
 			}
 			catch
@@ -2242,7 +2244,7 @@ function Update-ExchangeRates ()
 function Measure-Profit ()
 {
 	Update-ExchangeRates
-	$RigStats.Profit = [math]::Round($RigStats.EarningsFiat - ($Config.ElectricityCost * $RigStats.PowerUsage * 24 / 1000), 2)
+	$RigStats.Profit = [math]::Round($RigStats.EarningsFiat - ($Config.ElectricityCost * $RigStats.PowerUsage * 24 / 1000), $FiatDigits)
 }
 
 function Get-Archive ($Url, $FileName)
@@ -2606,7 +2608,7 @@ function Write-Stats ()
 					}
 				}
 
-				Write-PrettyEarnings ("Daily earnings: " + $RigStats.EarningsBtc + " BTC" + $FiatStr + $ProfitStr)
+				Write-PrettyEarnings ("Daily earnings: " + ("{0:f$BtcDigits}" -f $RigStats.EarningsBtc) + " BTC" + $FiatStr + $ProfitStr)
 			}
 		}
 	}
@@ -2750,6 +2752,8 @@ function Ping-Monitoring ()
 			$Active = Get-PrettyUptime
 		}
 
+		$PrettyEarningsBtc = ("{0:f$BtcDigits}" -f $RigStats.EarningsBtc)
+
 		$MinerStats= @{
 			Name = $Name
 			Path = $Miners[$Profile.Miner].ExeFile
@@ -2759,7 +2763,7 @@ function Ping-Monitoring ()
 			Active = $Active
 			Algorithm = @($AlgoNames[$Profile.Algo])
 			Pool = @($Pools[$Profile.Pool].Name)
-			'BTC/day' = $RigStats.EarningsBtc
+			'BTC/day' = $PrettyEarningsBtc
 		}
 
 		# if sent as array, MPM Monitoring displays it as H/s regardless of suffix
@@ -2777,7 +2781,7 @@ function Ping-Monitoring ()
 				$MinerStats.Remove("CurrentSpeed")
 				$MinerStats.Remove("EstimatedSpeed")
 
-				$Response = Invoke-RestMethod -Uri $MonitoringUrl -Method Post -Body @{ address = $Config.MonitoringKey; workername = $Config.Worker; miners = $MinerJson; profit = $RigStats.EarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
+				$Response = Invoke-RestMethod -Uri $MonitoringUrl -Method Post -Body @{ address = $Config.MonitoringKey; workername = $Config.Worker; miners = $MinerJson; profit = $PrettyEarningsBtc } -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue
 
 				if ($Config.Debug)
 				{

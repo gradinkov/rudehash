@@ -9,6 +9,7 @@
 * Add config generator & validator tool
 * Add version info to monitoring
 * Remove Polytimos from zpool
+* Fix displaying earnings less than 0.0001 BTC
 
 ## RudeHash 7.1 (2018-03-20)
 
