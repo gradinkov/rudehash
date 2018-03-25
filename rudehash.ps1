@@ -1476,13 +1476,13 @@ function Initialize-Properties ()
 $RigStats =
 @{
 	GpuCount = 0;
-	HashRate = 0;
-	Difficulty = 0;
-	PowerUsage = 0;
-	EarningsBtc = 0;
-	EarningsFiat = 0;
-	Profit = 0;
-	ExchangeRate = 0;
+	HashRate = 0.0;
+	PowerUsage = 0.0;
+	EarningsBtc = 0.0;
+	EarningsFiat = 0.0;
+	Profit = 0.0;
+	ExchangeRate = 0.0;
+	Price = 0.0;
 	FailedChecks = 0;
 	DevMinutes = 0;
 	Pid = 0;
@@ -2163,8 +2163,17 @@ function Measure-Earnings ()
 				[double]$HashRate = $RigStats.HashRate / $WtmModifiers[$Profile.Algo]
 				$WtmUrl = "https://whattomine.com/coins/" + $Coins[$Profile.Coin].WtmId + ".json?hr=" + $HashRate + "&p=0&cost=0&fee=" + $Pools[$Profile.Pool].PoolFee + "&commit=Calculate"
 				$Response = Invoke-RestMethod -Uri $WtmUrl -UseBasicParsing -ErrorAction SilentlyContinue
-				[double]$Revenue = $Response.btc_revenue
-				$RigStats.EarningsBtc = [math]::Round($Revenue, $BtcDigits)
+
+				if ($Response.btc_revenue)
+				{
+					$RigStats.Price = [double]$Response.btc_revenue
+				}
+				elseif ($Config.Debug)
+				{
+					Write-PrettyDebug "WhatToMine API request failed!"
+				}
+
+				$RigStats.EarningsBtc = [math]::Round($RigStats.Price, $BtcDigits)
 
 				if ($SessionConfig.Rates)
 				{
@@ -2173,7 +2182,7 @@ function Measure-Earnings ()
 			}
 			catch
 			{
-				Write-PrettyError "WhatToMine API request failed! Earnings estimations will not work."
+				Write-PrettyError "WhatToMine API request failed! Earnings estimations are not updated."
 
 				if ($Config.Debug)
 				{
@@ -2194,11 +2203,31 @@ function Measure-Earnings ()
 
 				switch ($Profile.Pool)
 				{
-					"nicehash" { [double]$Price = $Response.result.stats[$Pools[$Profile.Pool].Algos[$Profile.Algo].Id].price }
-					{$_ -in "zergpool", "zpool"} { [double]$Price = $Response.($Profile.Algo).estimate_current }
+					"nicehash"
+					{
+						if ($Response.result.stats[$Pools[$Profile.Pool].Algos[$Profile.Algo].Id].price)
+						{
+							$RigStats.Price = [double]$Response.result.stats[$Pools[$Profile.Pool].Algos[$Profile.Algo].Id].price
+						}
+						elseif ($Config.Debug)
+						{
+							Write-PrettyDebug "$($Pools[$Profile.Pool].Name) API request failed!"
+						}
+					}
+					{$_ -in "zergpool", "zpool"}
+					{
+						if ($Response.($Profile.Algo).estimate_current)
+						{
+							$RigStats.Price = [double]$Response.($Profile.Algo).estimate_current
+						}
+						elseif ($Config.Debug)
+						{
+							Write-PrettyDebug "$($Pools[$Profile.Pool].Name) API request failed!"
+						}
+					}
 				}
 
-				$RigStats.EarningsBtc = [math]::Round(($HashRate * $Price * $Multiplier), $BtcDigits)
+				$RigStats.EarningsBtc = [math]::Round(($HashRate * $RigStats.Price * $Multiplier), $BtcDigits)
 
 				if ($SessionConfig.Rates)
 				{
@@ -2207,7 +2236,7 @@ function Measure-Earnings ()
 			}
 			catch
 			{
-				Write-PrettyError "$($Pools[$Profile.Pool].Name) API request failed! Earnings estimations will not work."
+				Write-PrettyError "$($Pools[$Profile.Pool].Name) API request failed! Earnings estimations are not updated."
 
 				if ($Config.Debug)
 				{
