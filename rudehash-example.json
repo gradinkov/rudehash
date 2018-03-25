@@ -1,18 +1,35 @@
 {
-  "Pool": "zpool",
-  "Algo": "equihash",
-  "Coin": "",
-  "Miner": "dstm",
-  "Worker": "rudehash",
-  "Currency": "USD",
-  "ElectricityCost": 0.1,
-  "Watchdog": true,
-  "Debug": false,
-  "MonitoringKey": "",
-  "MphApiKey": "",
-  "Wallet": "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk",
-  "WalletIsAltcoin": false,
-  "User": "",
-  "Region": "",
-  "ExtraArgs": ""
+  "Debug":false,
+  "Worker":"rudehash",
+  "Currency":"USD",
+  "ElectricityCost":0.1,
+  "MonitoringKey":"",
+  "MphApiKey":"",
+  "ActiveProfile":1,
+  "Profiles":[
+    {
+      "Pool":"zpool",
+      "Algo":"equihash",
+      "Coin":"",
+      "Miner":"dstm",
+      "Watchdog":true,
+      "Wallet":"1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk",
+      "WalletIsAltcoin":false,
+      "User":"",
+      "Region":"",
+      "ExtraArgs":""
+    },
+    {
+      "Pool":"miningpoolhub",
+      "Algo":"neoscrypt",
+      "Coin":"",
+      "Miner":"hsrminer-neoscrypt",
+      "Watchdog":false,
+      "Wallet":"",
+      "WalletIsAltcoin":false,
+      "User":"gradinkov",
+      "Region":"us-east",
+      "ExtraArgs":""
+    }
+  ]
 }
