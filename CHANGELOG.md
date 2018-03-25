@@ -3,6 +3,8 @@
 ## RudeHash 8.0 (TBD)
 
 * New pools: TheBSODPool
+* New coins: Denarius
+* New algos: Tribus
 * Add support for mining profiles
 * Add config generator & validator tool
 * Add version info to monitoring

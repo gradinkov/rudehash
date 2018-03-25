@@ -54,6 +54,7 @@ Set-ExecutionPolicy Unrestricted
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |
+| Tribus | ccminer-klaust, ccminer-tpruvot |
 | X16R | ccminer-rvn |
 | Xevan | ccminer-xevan |
 
@@ -68,6 +69,7 @@ Set-ExecutionPolicy Unrestricted
 | BWK | Bulwark | Nist5 |
 | CREA | Creativecoin | Keccak-C |
 | CRS | Criptoreal | Lyra2Z |
+| DNR | Denarius | Tribus |
 | ETH | Ethereum | Ethash |
 | FLM | Folm Coin | PHI1612 |
 | FTC | Feathercoin | NeoScrypt |

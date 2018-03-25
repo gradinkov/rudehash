@@ -91,6 +91,7 @@ $Pools =
 			"btx" = @{ Server = "%REGION%bsod.pw"; Port = 3556 }
 			"bwk" = @{ Server = "%REGION%bsod.pw"; Port = 3833 }
 			"crs" = @{ Server = "%REGION%bsod.pw"; Port = 2145 }
+			"dnr" = @{ Server = "%REGION%bsod.pw"; Port = 2153 }
 			"flm" = @{ Server = "%REGION%bsod.pw"; Port = 2150 }
 			"ifx" = @{ Server = "%REGION%bsod.pw"; Port = 2142 }
 			"lux" = @{ Server = "%REGION%bsod.pw"; Port = 6667 }
@@ -222,6 +223,7 @@ $Pools =
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233; Modifier = 1000000 }
 			"nist5" = @{ Server = "nist5.mine.zergpool.com"; Port = 3833; Modifier = 1000000 }
 			"phi" = @{ Server = "phi.mine.zergpool.com"; Port = 8333; Modifier = 1000000 }
+			"tribus" = @{ Server = "tribus.mine.zergpool.com"; Port = 8533; Modifier = 1000000 }
 			"x16r" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636; Modifier = 1000000 }
 			"xevan" = @{ Server = "xevan.mine.zergpool.com"; Port = 3739; Modifier = 1000000 }
 		}
@@ -230,6 +232,7 @@ $Pools =
 			"bsd" = @{ Server = "xevan.mine.zergpool.com"; Port = 3739 }
 			"btx" = @{ Server = "bitcore.mine.zergpool.com"; Port = 3556 }
 			"crea" = @{ Server = "keccakc.mine.zergpool.com"; Port = 5134 }
+			"dnr" = @{ Server = "tribus.mine.zergpool.com"; Port = 8533 }
 			"flm" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
 			"hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433 }
@@ -262,6 +265,7 @@ $Pools =
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233; Modifier = 1000000 }
 			"nist5" = @{ Server = "nist5.mine.zpool.ca"; Port = 3833; Modifier = 1000000 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333; Modifier = 1000000 }
+			"tribus" = @{ Server = "tribus.mine.zpool.ca"; Port = 8533; Modifier = 1000000 }
 			# "polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463; Modifier = 1000000 }
 			"xevan" = @{ Server = "xevan.mine.zpool.ca"; Port = 3739; Modifier = 1000000 }
 		}
@@ -277,6 +281,7 @@ $Coins =
 	"bwk" = @{ Name = "Bulwark"; Algo = "nist5"; WtmId = "224" }
 	"crea" = @{ Name = "Creativecoin"; Algo = "keccakc"; WtmId = "199" }
 	"crs" = @{ Name = "Criptoreal"; Algo = "lyra2z" }
+	"dnr" = @{ Name = "Denarius"; Algo = "tribus"; WtmId = 187 }
 	"eth" = @{ Name = "Ethereum"; Algo = "ethash"; WtmId = "151" }
 	"flm" = @{ Name = "Folm Coin"; Algo = "phi" }
 	"ftc" = @{ Name = "Feathercoin"; Algo = "neoscrypt"; WtmId = "8" }
@@ -300,12 +305,12 @@ $Coins =
 $Miners =
 @{
 	"ccminer-allium" = @{ Url = "https://github.com/lenis0012/ccminer/releases/download/2.3.0-allium/ccminer-x64.exe"; ArchiveFile = "ccminer-allium.exe"; ExeFile = "ccminer-allium.exe"; FilesInRoot = $true; Algos = @("allium"); Api = $true; Version = "2.2.4" }
-	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5"); Api = $true }
+	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5", "tribus"); Api = $true }
 	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "nist5"); Api = $true; Version = "2.0" }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
-	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "nist5", "phi", "polytimos"); Api = $true; Version = "2.2.4" }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "nist5", "phi", "polytimos", "tribus"); Api = $true; Version = "2.2.4" }
 	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev4/ethminer-0.14.0.dev4-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev4" }
@@ -349,6 +354,7 @@ $WtmModifiers =
 	"neoscrypt" = 1000
 	"nist5" = 1000000
 	"phi" = 1000000
+	"tribus" = 1000000
 	"xevan" = 1000000
 }
 
@@ -366,6 +372,7 @@ $AlgoNames =
 	"nist5" = "Nist5"
 	"phi" = "PHI1612"
 	"polytimos" = "Polytimos"
+	"tribus" = "Tribus"
 	"x16r" = "X16R"
 	"xevan" = "Xevan"
 }
