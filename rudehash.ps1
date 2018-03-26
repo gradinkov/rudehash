@@ -389,7 +389,7 @@ $Remarks =
 	"Watchdog" = "If true, RudeHash will restart the miner if it reports 0 hashrate for 5 consecutive minutes."
 	"MonitoringKey" = "Allows for monitoring your rigs at rudehash.org/monitor. A newly generated random key for you:`r`n$(New-Guid)"
 	"MphApiKey" = "Allows for monitoring at miningpoolhubstats.com using your MPH API key."
-	"ActiveProfile" = "The profile currently in use, starting at 1."
+	#"ActiveProfile" = "The profile currently in use, starting at 1."
 	# Pool
 	"Worker" = "Your rig's nickname."
 	"Wallet" = "Your Bitcoin or Altcoin wallet. Ignored on pools that use a site balance."
@@ -640,6 +640,72 @@ function Get-RegionSupport ()
 	return $Support
 }
 
+function Get-ActiveProfileSupport ()
+{
+	$Table = New-Object System.Data.DataTable
+	$Table.Columns.Add("Profile", "string") | Out-Null
+	$Table.Columns.Add("Pool", "string") | Out-Null
+	$Table.Columns.Add("Coin", "string") | Out-Null
+	$Table.Columns.Add("Algo", "string") | Out-Null
+	$Table.Columns.Add("Miner", "string") | Out-Null
+	$Table.DefaultView.Sort = "Profile ASC"
+
+	$Support += "Available profiles:"
+	for ($i = 0; $i -lt $Config.Profiles.Length; $i++)
+	{
+		$Row = $Table.NewRow()
+		$Row.Profile = $i + 1
+
+		# gotta check each of these, as activeprofile is checked before profile options, they may or may not exist
+		if ($Config.Profiles[$i].Pool)
+		{
+			$Row.Pool = $Config.Profiles[$i].Pool
+		}
+		else
+		{
+			$Row.Pool = "N/A"
+		}
+
+		if ($Config.Profiles[$i].Coin)
+		{
+			$Row.Coin = $Config.Profiles[$i].Coin
+			$Row.Algo = $Coins[$Config.Profiles[$i].Coin].Algo
+		}
+		else
+		{
+			$Row.Coin = "N/A"
+
+			# don't print algo if coin is set, because in that case we ignore it anyway
+			if ($Config.Profiles[$i].Algo)
+			{
+				$Row.Algo = $Config.Profiles[$i].Algo
+			}
+			else
+			{
+				$Row.Algo = "N/A"
+			}
+		}
+
+		if ($Config.Profiles[$i].Miner)
+		{
+			$Row.Miner = $Config.Profiles[$i].Miner
+		}
+		else
+		{
+			$Row.Miner = "N/A"
+		}
+
+		$Table.Rows.Add($Row)
+	}
+
+	$Table = $Table.DefaultView.ToTable()
+	# use Format-Table to force flushing to screen immediately
+	$Support += Out-String -InputObject ($Table | Format-Table)
+	$Table.Dispose()
+
+	return $Support
+}
+
 function Test-DebugProperty ()
 {
 	try
@@ -722,34 +788,52 @@ function Test-MphApiKeyProperty ()
 
 function Test-ActiveProfileProperty ()
 {
-	# if first run, we won't have any profile
+	# if first run, we won't have any profiles, force selecting that first one we'll create
 	if ($FirstRun)
 	{
 		Set-Property "ActiveProfile" 1 $true $false
 		return $true
 	}
-	else
+	# we have at least one profile
+	elseif ($Config.Profiles.Length -gt 0)
 	{
-		# we have at least one profile
-		if ($Config.Profiles.Length -gt 0)
+		# profiles exist, but we haven't selected one
+		if (-Not ($Config.ActiveProfile))
 		{
-			# ActiveProfile starts at 1!
-			if ($Config.Profiles.Length -ge $Config.ActiveProfile)
-			{
-				return $true
-			}
-			else
-			{
-				Write-PrettyError "Profile $($Config.ActiveProfile) does not exist!"
-				return $false
-			}
+			Write-PrettyError "Active profile must be selected!"
+			return $false
 		}
-		# profiles are missing
-		else
+
+		# we have profiles, we have activeprofile, check format
+		try
 		{
-			Set-Property "ActiveProfile" 1 $true $false
+			$Config.ActiveProfile = [System.Convert]::ToInt16($Config.ActiveProfile)
+		}
+		catch
+		{
+			Write-PrettyError "Active profile is in invalid format, make sure to enter a positive integer!"
+			return $false
+		}
+
+		# alles gut, selected profile exists
+		# ActiveProfile starts at 1!
+		if (($Config.ActiveProfile -le $Config.Profiles.Length) -And ($Config.ActiveProfile -gt 0))
+		{
 			return $true
 		}
+		# profile is selected but doesn't exist
+		else
+		{
+			Write-PrettyError "Profile $($Config.ActiveProfile) does not exist!"
+			return $false
+		}
+	}
+	# profiles are missing, but that's okay, we'll force creating one
+	# don't ask for number because it's always 1
+	else
+	{
+		Set-Property "ActiveProfile" 1 $true $false
+		return $true
 	}
 }
 
@@ -1060,6 +1144,9 @@ function Receive-Choice ($A, $B)
 
 function Receive-Property ($Name, $Mandatory)
 {
+	# if we ask for a property, it sure helps to print remarks
+	Write-Help $Name
+
 	if ($Mandatory)
 	{
 		return Read-Host "Enter value for ""$($Name)"""
@@ -1093,11 +1180,6 @@ function Initialize-Property ($Name, $Mandatory, $Force, $ProfileItem)
 		Write-PrettyDebug "Evaluating $Name property..."
 	}
 
-	if ($FirstRun)
-	{
-		Write-Help $Name
-	}
-
 	if ($Force)
 	{
 		$Ret = Receive-Property $Name $Mandatory
@@ -1114,7 +1196,6 @@ function Initialize-Property ($Name, $Mandatory, $Force, $ProfileItem)
 	# awesome trick from https://wprogramming.wordpress.com/2011/07/18/dynamic-function-and-variable-access-in-powershell/
 	while (-Not (& (Get-ChildItem "Function:Test-$($Name)Property")))
 	{
-		Write-Help $Name
 		$Ret = Receive-Property $Name $Mandatory
 		Set-Property $Name $Ret $true $ProfileItem
 	}
@@ -1130,7 +1211,6 @@ function Select-Profile ()
 
 	while (-Not (Test-ActiveProfileProperty))
 	{
-		Write-Help $Name
 		$Ret = Receive-Property $Name $true
 		Set-Property $Name $Ret $true $false
 	}
