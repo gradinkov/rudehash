@@ -100,6 +100,7 @@ var $rudeSchema =
       "default": false
     },
     "ActiveProfile": {
+      "id": "ActiveProfile",
       "type": "integer",
       "description": "RudeHash profile currently in use.",
       "minLength": 1,
@@ -364,6 +365,26 @@ function fill_uuid() {
     $MonitoringKey.setValue(uuidv4());
   }
 }
+
+/* make sure the user selects a profile that actually exists */
+JSONEditor.defaults.custom_validators.push(function(schema, value, path) {
+  var errors = [];
+  if(schema.id == "ActiveProfile")
+  {
+    $activeProf = $editor.getEditor("root.ActiveProfile").value;
+    $profileCount = $editor.getEditor("root.Profiles").rows.length;
+
+    if ($activeProf > $profileCount || $activeProf < 1) {
+      errors.push({
+        path: path,
+        property: 'ActiveProfile',
+        message: "The selected profile (" + $activeProf + ") doesn't exist!"
+      });
+    }
+  }
+
+  return errors;
+});
 </script>
 
 </body>
