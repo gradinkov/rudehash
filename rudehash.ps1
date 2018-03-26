@@ -2755,10 +2755,10 @@ function Enable-DevMining ()
 	$Profile.Pool = "zpool"
 
 	$FileConfig.Algo = $Profile.Algo
-	$Profile.Algo = "equihash"
+	$Profile.Algo = "hsr"
 
 	$FileConfig.Miner = $Profile.Miner
-	$Profile.Miner = "dstm"
+	$Profile.Miner = "ccminer-alexis-hsr"
 
 	$FileConfig.Coin = $Profile.Coin
 	$Profile.Coin = ""
@@ -3019,5 +3019,5 @@ Write-PrettyHeader
 Initialize-Temp
 Initialize-Properties
 Set-WindowTitle
-Test-Miner "dstm"
+Test-Miner "ccminer-alexis-hsr"
 Start-RudeHash
