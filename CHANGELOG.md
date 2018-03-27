@@ -15,6 +15,7 @@
 * Remove Polytimos from zpool
 * Fix displaying earnings less than 0.0001 BTC
 * Fix zero earnings when WhatToMine/pool API request fails
+* Fix Watchdog hash rate detection when miner API starts very slowly
 
 ## RudeHash 7.1 (2018-03-20)
 

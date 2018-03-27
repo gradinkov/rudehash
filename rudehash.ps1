@@ -1777,7 +1777,27 @@ function Get-GpuCount ()
 		}
 	}
 
-	$RigStats.GpuCount = $Count
+	# miner might return empty string, then it's "not zero", thus we don't attempt to obtain count again
+	# and then we're stuck restarting the miner every 5 minutes, forever
+	# that's bad, very bad, let's check if we actually got a number at all
+	try
+	{
+		$Count = [System.Convert]::ToInt16($Count)
+
+		if ($Count -gt 0)
+		{
+			$RigStats.GpuCount = $Count
+		}
+	}
+	catch
+	{
+		# this should only happen when the miner's API has not started *yet*, so it's not an error
+		# best example is when hsrminer gets stuck at devfee check for too long
+		if ($Config.Debug)
+		{
+			Write-PrettyDebug $_.Exception
+		}
+	}
 }
 
 function Start-Excavator ()
