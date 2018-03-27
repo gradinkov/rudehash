@@ -55,7 +55,7 @@ Set-ExecutionPolicy Unrestricted
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |
 | Tribus | ccminer-klaust, ccminer-tpruvot |
-| X16R | ccminer-rvn |
+| X16R | ccminer-rvn, suprminer |
 | Xevan | ccminer-xevan |
 
 ### Coins

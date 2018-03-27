@@ -5,7 +5,7 @@
 * New pools: TheBSODPool
 * New coins: Denarius, GINcoin
 * New algos: Tribus
-* New miners: ccminer-alexis-hsr
+* New miners: ccminer-alexis-hsr, suprminer
 * Updates: ethminer v0.14.0rc1
 * Add support for mining profiles
 * Add support for hsrminer's API
