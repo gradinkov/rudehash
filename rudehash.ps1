@@ -16,7 +16,8 @@ $Version = "8.0-dev"
 [System.Collections.Hashtable]$Profile = @{}
 $FirstRun = $false
 $FirstLoop = $true
-$MinerPort = 28178
+# hsrminer uses fixed port, so let's change it for all other miners
+$MinerPort = 4001
 $BtcDigits = 6
 $FiatDigits = 2
 $BlockchainUrl = "https://blockchain.info/ticker"
@@ -311,7 +312,7 @@ $Miners =
 @{
 	"ccminer-alexis-hsr" = @{ Url = "https://github.com/nemosminer/ccminer-hcash/releases/download/alexishsr/ccminer-hsr-alexis-x86-cuda8.7z"; ArchiveFile = "ccminer-alexis-hsr.7z"; ExeFile = "ccminer-alexis.exe"; FilesInRoot = $true; Algos = @("hsr", "lyra2v2", "neoscrypt", "nist5"); Api = $true }
 	"ccminer-allium" = @{ Url = "https://github.com/lenis0012/ccminer/releases/download/2.3.0-allium/ccminer-x64.exe"; ArchiveFile = "ccminer-allium.exe"; ExeFile = "ccminer-allium.exe"; FilesInRoot = $true; Algos = @("allium"); Api = $true; Version = "2.2.4" }
-	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5", "tribus"); Api = $true }
+	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5"); Api = $true }
 	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "nist5"); Api = $true; Version = "2.0" }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
@@ -319,10 +320,10 @@ $Miners =
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "nist5", "phi", "polytimos", "tribus"); Api = $true; Version = "2.2.4" }
 	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
-	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0.dev4/ethminer-0.14.0.dev4-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0.dev4" }
+	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0rc1/ethminer-0.14.0rc1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0rc1" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt", "nist5"); Api = $true; Version = "1.4.4a_nvidia" }
-	"hsrminer-hsr" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer_hsr.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $false; Version = "1.0" }
-	"hsrminer-neoscrypt" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/Neoscrypt%20algo/Windows/hsrminer_neoscrypt.zip"; ArchiveFile = "hsrminer_neoscrypt.zip"; ExeFile = "hsrminer_neoscrypt.exe"; FilesInRoot = $true; Algos = @("neoscrypt"); Api = $false; Version = "1.0.1" }
+	"hsrminer-hsr" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer_hsr.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $true; Version = "1.0" }
+	"hsrminer-neoscrypt" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/Neoscrypt%20algo/Windows/hsrminer_neoscrypt.zip"; ArchiveFile = "hsrminer_neoscrypt.zip"; ExeFile = "hsrminer_neoscrypt.exe"; FilesInRoot = $true; Algos = @("neoscrypt"); Api = $true; Version = "1.0.1" }
 	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true; Version = "1.0.1" }
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true; Version = "0.3.4b" }
 }
@@ -1680,13 +1681,20 @@ function Get-GpuCount ()
 {
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "vertminer"}
 		{
 			$Response = Read-MinerApi 'summary' $false
 
 			try
 			{
-				$Count = $Response.Split("|")[0].Split(";")[4].Split("=")[1]
+				[System.Collections.Hashtable]$Summary = @{}
+
+				foreach ($Item in $Response.Split(";"))
+				{
+					$Summary.Add($Item.Split("=")[0], $Item.Split("=")[1])
+				}
+
+				$Count = $Summary["GPUS"]
 			}
 			catch
 			{
@@ -1949,7 +1957,7 @@ function Get-HashRate ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "vertminer"}
 		{
 			$Response = Read-MinerApi 'threads' $false
 
@@ -1965,11 +1973,20 @@ function Get-HashRate ()
 						$GpuStats.Add($Item.Split("=")[0], $Item.Split("=")[1])
 					}
 
-					$HashRate += $GpuStats["KHS"]
+					if ($Profile.Miner.StartsWith("hsrminer"))
+					{
+						$Key = "SPEED"
+					}
+					else
+					{
+						$Key = "KHS"
+					}
+
+					$HashRate += $GpuStats[$Key]
 					$GpuStats.Clear()
 				}
 
-				# ccminer returns KH/s
+				# ccminer and hsrminer returns KH/s
 				$HashRate *= 1000
 			}
 			catch
@@ -2100,7 +2117,7 @@ function Get-PowerUsage ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "vertminer"}
 		{
 			$Response = Read-MinerApi 'threads' $false
 
@@ -2116,13 +2133,22 @@ function Get-PowerUsage ()
 						$GpuStats.Add($Item.Split("=")[0], $Item.Split("=")[1])
 					}
 
-					$PowerUsage += $GpuStats["POWER"]
+					if ($Profile.Miner.StartsWith("hsrminer"))
+					{
+						$Key = "POWER_CONSUMPTION"
+					}
+					else
+					{
+						$Key = "POWER"
+					}
+
+					$PowerUsage += $GpuStats[$Key]
 					$GpuStats.Clear()
 				}
 
 				# these return mW instead of W, because reasons
 				# most likely ccminer-phi also returns mW, but I really don't know coz it always returns 0 lol
-				if ($Profile.Miner -ne "ccminer-klaust" -And $Profile.Miner.StartsWith("ccminer"))
+				if ($Profile.Miner.StartsWith("ccminer") -Or $Profile.Miner.StartsWith("hsrminer"))
 				{
 					$PowerUsage /= 1000
 				}

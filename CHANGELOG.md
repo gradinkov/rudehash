@@ -6,14 +6,15 @@
 * New coins: Denarius, GINcoin
 * New algos: Tribus
 * New miners: ccminer-alexis-hsr
+* Updates: ethminer v0.14.0rc1
 * Add support for mining profiles
+* Add support for hsrminer's API
 * Add config generator & validator tool
 * Add version info to monitoring
 * Always show related help when requesting user input
 * Remove Polytimos from zpool
 * Fix displaying earnings less than 0.0001 BTC
 * Fix zero earnings when WhatToMine/pool API request fails
-* Fix reporting ccminer-klaust power usage
 
 ## RudeHash 7.1 (2018-03-20)
 
