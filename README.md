@@ -54,7 +54,7 @@ Set-ExecutionPolicy Unrestricted
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | TimeTravel10 | ccminer-tpruvot |
-| Tribus | ccminer-klaust, ccminer-tpruvot |
+| Tribus | ccminer-tpruvot |
 | X16R | ccminer-rvn, suprminer |
 | X16S | nevermore-x16s |
 | Xevan | ccminer-xevan |
