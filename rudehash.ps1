@@ -199,6 +199,7 @@ $Pools =
 			"grlc" = @{ Server = "grlc.suprnova.cc"; Port = 8600 }
 			"mona" = @{ Server = "mona.suprnova.cc"; Port = 2995 }
 			"kreds" = @{ Server = "kreds.suprnova.cc"; Port = 7196 }
+			"pgn" = @{ Server = "pign.suprnova.cc"; Port = 4096 }
 			"poly" = @{ Server = "poly.suprnova.cc"; Port = 7935 }
 			"rvn" = @{ Server = "rvn.suprnova.cc"; Port = 6667 }
 			"vtc" = @{ Server = "vtc.suprnova.cc"; Port = 5678 }
@@ -297,6 +298,7 @@ $Coins =
 	"kreds" = @{ Name = "Kreds"; Algo = "lyra2v2" }
 	"lux" = @{ Name = "LUXCoin"; Algo = "phi"; WtmId = 212 }
 	"mona" = @{ Name = "Monacoin"; Algo = "lyra2v2"; WtmId = 148 }
+	"pgn" = @{ Name = "Pigeoncoin"; Algo = "x16s" }
 	"poly" = @{ Name = "Polytimos"; Algo = "polytimos" }
 	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
 	"tzc" = @{ Name = "Trezarcoin"; Algo = "neoscrypt"; WtmId = 215 }
@@ -324,6 +326,7 @@ $Miners =
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt", "nist5"); Api = $true; Version = "1.4.4a_nvidia" }
 	"hsrminer-hsr" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer_hsr.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $true; Version = "1.0" }
 	"hsrminer-neoscrypt" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/Neoscrypt%20algo/Windows/hsrminer_neoscrypt.zip"; ArchiveFile = "hsrminer_neoscrypt.zip"; ExeFile = "hsrminer_neoscrypt.exe"; FilesInRoot = $true; Algos = @("neoscrypt"); Api = $true; Version = "1.0.1" }
+	"nevermore-x16s" = @{ Url = "https://github.com/brian112358/nevermore-miner-x16s/releases/download/v0.1-alpha/nevermore-x16s-v0.1-alpha-win64.zip"; ArchiveFile = "nevermore-z16s.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("x16s"); Api = $true; Version = "0.1" }
 	"suprminer" = @{ Url = "https://github.com/ocminer/suprminer/releases/download/1.1/suprminer-1.1.7z"; ArchiveFile = "suprminer.7z"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("x16r"); Api = $true }
 	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true; Version = "1.0.1" }
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true; Version = "0.3.4b" }
@@ -382,6 +385,7 @@ $AlgoNames =
 	"polytimos" = "Polytimos"
 	"tribus" = "Tribus"
 	"x16r" = "X16R"
+	"x16s" = "X16S"
 	"xevan" = "Xevan"
 }
 
@@ -1682,7 +1686,7 @@ function Get-GpuCount ()
 {
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "suprminer", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "nevermore-x16s", "suprminer", "vertminer"}
 		{
 			$Response = Read-MinerApi 'summary' $false
 
@@ -1950,7 +1954,7 @@ function Initialize-MinerArgs ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "suprminer" } { $Args = "--algo=" + $Profile.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "nevermore-x16s", "suprminer" } { $Args = "--algo=" + $Profile.Algo + " --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"ccminer-polytimos" { $Args = "--algo=poly --url=stratum+tcp://" + $PoolIp + ":" + $SessionConfig.Port + " --user=" + $PoolUser + " --pass " + $PoolPass + " --api-bind 127.0.0.1:" + $MinerPort }
 		"dstm" { $Args = "--server " + $PoolIp + " --user " + $PoolUser + " --pass " + $PoolPass + " --port " + $SessionConfig.Port + " --telemetry=127.0.0.1:" + $MinerPort + " --noreconnect" }
 		"ethminer" { $Args = "--cuda --stratum " + $PoolIp + ":" + $SessionConfig.Port + " --userpass " + $PoolUser + ":" + $PoolPass + " --api-port " + $MinerPort + " --stratum-protocol " + $Pools[$Profile.Pool].StratumProto }
@@ -1978,7 +1982,7 @@ function Get-HashRate ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "suprminer", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "nevermore-x16s", "suprminer", "vertminer"}
 		{
 			$Response = Read-MinerApi 'threads' $false
 
@@ -2138,7 +2142,7 @@ function Get-PowerUsage ()
 
 	switch ($Profile.Miner)
 	{
-		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "suprminer", "vertminer"}
+		{$_ -in "ccminer-alexis-hsr", "ccminer-allium", "ccminer-klaust", "ccminer-palginmod", "ccminer-phi", "ccminer-polytimos", "ccminer-rvn", "ccminer-tpruvot", "ccminer-xevan", "hsrminer-hsr", "hsrminer-neoscrypt", "nevermore-x16s", "suprminer", "vertminer"}
 		{
 			$Response = Read-MinerApi 'threads' $false
 
@@ -2167,9 +2171,8 @@ function Get-PowerUsage ()
 					$GpuStats.Clear()
 				}
 
-				# these return mW instead of W, because reasons
-				# most likely ccminer-phi also returns mW, but I really don't know coz it always returns 0 lol
-				if ($Profile.Miner.StartsWith("ccminer") -Or $Profile.Miner.StartsWith("hsrminer"))
+				# everything except these returns mW instead of W, because reasons
+				if (-Not (($Profile.Miner -eq "suprminer") -Or ($Profile.Miner -eq "vertminer")))
 				{
 					$PowerUsage /= 1000
 				}
@@ -2536,7 +2539,7 @@ function Get-MinerVersion ($Name)
 			# klaust messes up stdio, can't determine version reliably
 			#"ccminer-klaust" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
 			"ccminer-phi" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split("-")[1] }
-			{$_ -in "ccminer-allium", "ccminer-palginmod", "ccminer-rvn", "ccminer-tpruvot"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			{$_ -in "ccminer-allium", "ccminer-palginmod", "ccminer-rvn", "ccminer-tpruvot", "nevermore-x16s"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
 			"dstm" { $VersionStr = (Get-ProcessOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
 			"ethminer" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
 			"excavator" { $VersionStr = (Get-ProcessOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
