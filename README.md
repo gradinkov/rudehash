@@ -56,7 +56,7 @@ Set-ExecutionPolicy Unrestricted
 | TimeTravel10 | ccminer-tpruvot |
 | Tribus | ccminer-tpruvot |
 | X16R | ccminer-rvn, suprminer |
-| X16S | nevermore-x16s |
+| X16S | nevermore-x16s, suprminer |
 | Xevan | ccminer-xevan |
 
 ### Coins
