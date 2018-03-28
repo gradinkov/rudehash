@@ -99,6 +99,7 @@ $Pools =
 			"gin" = @{ Server = "%REGION%bsod.pw"; Port = 2159 }
 			"ifx" = @{ Server = "%REGION%bsod.pw"; Port = 2142 }
 			"lux" = @{ Server = "%REGION%bsod.pw"; Port = 6667 }
+			"pgn" = @{ Server = "%REGION%bsod.pw"; Port = 2196 }
 			"rvn" = @{ Server = "%REGION%bsod.pw"; Port = 2176 }
 			"xlr" = @{ Server = "%REGION%bsod.pw"; Port = 3739 }
 		}
