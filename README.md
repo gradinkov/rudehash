@@ -56,6 +56,7 @@ Set-ExecutionPolicy Unrestricted
 | TimeTravel10 | ccminer-tpruvot |
 | Tribus | ccminer-klaust, ccminer-tpruvot |
 | X16R | ccminer-rvn, suprminer |
+| X16S | nevermore-x16s |
 | Xevan | ccminer-xevan |
 
 ### Coins
@@ -80,6 +81,7 @@ Set-ExecutionPolicy Unrestricted
 | KREDS | Kreds | Lyra2REv2 |
 | LUX | LUXCoin | PHI1612 |
 | MONA | Monacoin | Lyra2REv2 |
+| PGN | Pigeoncoin | X16S |
 | POLY | Polytimos | Polytimos |
 | RVN | Ravencoin | X16R |
 | TZC | Trezarcoin | NeoScrypt |
