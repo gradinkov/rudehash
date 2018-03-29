@@ -3,7 +3,7 @@
 ## RudeHash 8.0 (TBD)
 
 * New pools: TheBSODPool
-* New coins: Denarius, GINcoin
+* New coins: Denarius, GINcoin, Pigeoncoin
 * New algos: Tribus, X16S
 * New miners: ccminer-alexis-hsr, nevermore-x16s, suprminer
 * Updates: ethminer v0.14.0rc1
