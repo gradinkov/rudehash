@@ -5,4 +5,7 @@ tools/*
 firmware.bin
 rudehash.ini
 rudehash.json
+rudehash.msi
 rudehash.properties
+rudehash.wixobj
+rudehash.wixpdb

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+TODO
+- show license, ask for accept
+- create roaming, local appdata folders
+- start in local
+- change script to use roaming folder for config, local folder for miners etc
+- download powershell and vc redists from web and install
+- change shortcut to start pwsh with ps1 param
+- change icon
+- add shortcuts for config generator
+- change config generator to load json from/to roaming folder by default
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Name="RudeHash" Manufacturer="Gradinkov" Id="02A5B2D0-210C-4040-B39F-E201FED20F54" UpgradeCode="C6B80A11-99F5-42EF-ADF9-CD628927362D" Language="1033" Codepage="1252" Version="8.0.0">
+
+		<Package Id="*" Keywords="Installer" Description="NVIDIA miner in PowerShell" Manufacturer="Gradinkov" InstallerVersion="100" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
+
+		<Media Id="1" Cabinet="RudeHash.cab" EmbedCab="yes" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder" Name="PFiles">
+				<Directory Id="INSTALLDIR" Name="RudeHash">
+
+				<Component Id="CompCHANGELOG.MD" Guid="666F1889-7F67-4D4B-9314-842FAD3F7BFE">
+					<File Id="CHANGELOG.MD" Name="CHANGELOG.md" Source="CHANGELOG.md" KeyPath="yes" />
+				</Component>
+
+				<Component Id="CompLICENSE" Guid="0510B5E6-849D-4D4F-B200-752FCDC0A6BF">
+					<File Id="LICENSE" Name="LICENSE" Source="LICENSE" KeyPath="yes" />
+				</Component>
+
+				<Component Id="CompREADME.MD" Guid="82C9B6D4-19C2-4263-9AA5-DB9C06E99FD4">
+					<File Id="README.MD" Name="README.md" Source="README.md" KeyPath="yes" />
+				</Component>
+
+				<Component Id="CompRUDEHASH.HTML" Guid="ED536EC8-20AE-474C-A879-ADBC24356BF9">
+					<File Id="RUDEHASH.HTML" Name="rudehash.html" Source="rudehash.html" KeyPath="yes" />
+				</Component>
+
+				<Component Id="CompRUDEHASH.PS1" Guid="A63BD319-DF61-41B5-8076-FEAECDA69165">
+					<File Id="RUDEHASH.PS1" Name="rudehash.ps1" Source="rudehash.ps1" KeyPath="yes" />
+					<Shortcut Id="StartmenuRUDEHASH.PS1" Directory="ProgramMenuDir" Name="RudeHash 8.0" WorkingDirectory='INSTALLDIR' Advertise="yes" />
+				</Component>
+
+				<Component Id="CompRUDEHASH_EXAMPLE.JSON" Guid="2A22D191-A400-47C2-BC30-DB308E378645">
+					<File Id="RUDEHASH_EXAMPLE.JSON" Name="rudehash-example.json" Source="rudehash-example.json" KeyPath="yes" />
+				</Component>
+
+				<Directory Id="DIST" Name="dist">
+
+					<Component Id="CompBOOTSTRAP.MIN.CSS" Guid="B64F287E-2CD3-411E-B88A-F101DD1A062B">
+						<File Id="BOOTSTRAP.MIN.CSS" Name="bootstrap.min.css" Source="dist\bootstrap.min.css" KeyPath="yes" />
+					</Component>
+
+					<Component Id="CompBOOTSTRAP.MIN.CSS.MAP" Guid="C781B0A8-BAAD-4452-BB7B-6EB254BA3963">
+						<File Id="BOOTSTRAP.MIN.CSS.MAP" Name="bootstrap.min.css.map" Source="dist\bootstrap.min.css.map" KeyPath="yes" />
+					</Component>
+
+					<Component Id="CompFOUNDATION_ICONS.CSS" Guid="31472910-0322-4527-B05C-14C607D6F03D">
+						<File Id="FOUNDATION_ICONS.CSS" Name="foundation-icons.css" Source="dist\foundation-icons.css" KeyPath="yes" />
+					</Component>
+
+					<Component Id="CompFOUNDATION_ICONS.WOFF" Guid="62F64258-EA42-4FE2-8E9A-D50EB48C0895">
+						<File Id="FOUNDATION_ICONS.WOFF" Name="foundation-icons.woff" Source="dist\foundation-icons.woff" KeyPath="yes" />
+					</Component>
+
+					<Component Id="CompJSONEDITOR.MIN.JS" Guid="A3864F1F-9B77-4A86-B108-CB924F213D22">
+						<File Id="JSONEDITOR.MIN.JS" Name="jsoneditor.min.js" Source="dist\jsoneditor.min.js" KeyPath="yes" />
+					</Component>
+
+					<Component Id="CompJSONEDITOR.MIN.JS.MAP" Guid="0640A51E-9B72-4785-8E19-BFD8234624BE">
+						<File Id="JSONEDITOR.MIN.JS.MAP" Name="jsoneditor.min.js.map" Source="dist\jsoneditor.min.js.map" KeyPath="yes" />
+					</Component>
+
+					</Directory>
+				</Directory>
+			</Directory>
+
+			<Directory Id="ProgramMenuFolder" Name="Programs">
+				<Directory Id="ProgramMenuDir" Name="RudeHash">
+					<Component Id="ProgramMenuDir" Guid="362DC031-35AE-47C1-BCEB-A66F4CDD33F2">
+						<RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+						<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" KeyPath="yes" />
+					</Component>
+				</Directory>
+			</Directory>
+
+		</Directory>
+
+		<Feature Id="Complete" Level="1">
+			<ComponentRef Id="CompCHANGELOG.MD" />
+			<ComponentRef Id="CompLICENSE" />
+			<ComponentRef Id="CompREADME.MD" />
+			<ComponentRef Id="CompRUDEHASH.HTML" />
+			<ComponentRef Id="CompRUDEHASH.PS1" />
+			<ComponentRef Id="CompRUDEHASH_EXAMPLE.JSON" />
+
+			<ComponentRef Id="CompBOOTSTRAP.MIN.CSS" />
+			<ComponentRef Id="CompBOOTSTRAP.MIN.CSS.MAP" />
+			<ComponentRef Id="CompFOUNDATION_ICONS.CSS" />
+			<ComponentRef Id="CompFOUNDATION_ICONS.WOFF" />
+			<ComponentRef Id="CompJSONEDITOR.MIN.JS" />
+			<ComponentRef Id="CompJSONEDITOR.MIN.JS.MAP" />
+
+			<ComponentRef Id="ProgramMenuDir" />
+		</Feature>
+
+	</Product>
+</Wix>
