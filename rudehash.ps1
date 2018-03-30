@@ -1286,7 +1286,7 @@ function Test-Compatibility ()
 			Initialize-Property $Choice $true $true $true
 			Test-Compatibility
 		}
-		elseif (-Not (Test-CoinExchangeSupport))
+		elseif ((-Not $Profile.WalletIsAltcoin) -And (-Not (Test-CoinExchangeSupport)))
 		{
 			Write-PrettyError ("The """ + $Profile.Coin + """ coin cannot be exchanged on """ + $Profile.Pool + """!")
 			$Choice = Receive-Choice "Coin" "Pool"
