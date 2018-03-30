@@ -246,6 +246,7 @@ $Pools =
 			"ifx" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553 }
 			"lux" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
 			"mona" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533 }
+			"pgn" = @{ Server = "x16s.mine.zergpool.com"; Port = 3663 }
 			"rvn" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636 }
 			"tzc" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
 			"vtc" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533 }
