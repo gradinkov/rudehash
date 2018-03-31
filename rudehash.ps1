@@ -2845,7 +2845,7 @@ function Test-DevMining ($Proc)
 		$RigStats.DevMinutes += 1
 	}
 	# only start devfee processing if user's miner has been running for 24 hours straight
-	elseif ($RigStats.Uptime.Hours -ge 24)
+	elseif ($RigStats.Uptime.Days -ge 1)
 	{
 		Write-PrettyInfo ("Starting dev mining...")
 		Enable-DevMining
