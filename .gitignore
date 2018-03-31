@@ -3,9 +3,10 @@ temp/*
 tools/*
 .vscode/*
 firmware.bin
+rudehash*.exe
 rudehash.ini
 rudehash.json
-rudehash.msi
+rudehash*.msi
 rudehash.properties
 rudehash.wixobj
 rudehash.wixpdb
