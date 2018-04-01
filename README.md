@@ -22,7 +22,7 @@ RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in 
 * Download and install the latest release of:
   * [NVIDIA Driver](https://www.geforce.com/drivers)
   * [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
-  * [RudeHash](https://rudehash.org/download/).
+  * [RudeHash](https://rudehash.org/download/)
 
 Pick the development version of RudeHash for the latest features and goodies, but be warned, this code is less stable, and things might get shaky!
 
