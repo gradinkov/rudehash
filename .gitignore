@@ -1,4 +1,5 @@
 miners/*
+powershell/*
 temp/*
 tools/*
 .vscode/*

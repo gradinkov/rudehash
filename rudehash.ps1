@@ -1,8 +1,10 @@
 # files, directories
-$ConfigFile = [io.path]::combine($PSScriptRoot, "rudehash.json")
-$MinersDir = [io.path]::combine($PSScriptRoot, "miners")
-$ToolsDir = [io.path]::combine($PSScriptRoot, "tools")
-$TempDir = [io.path]::combine($PSScriptRoot, "temp")
+$AppDir = [io.path]::combine($Env:Appdata, "RudeHash")
+$LocalAppDir = [io.path]::combine($Env:LocalAppdata, "RudeHash")
+$ConfigFile = [io.path]::combine($AppDir, "rudehash.json")
+$MinersDir = [io.path]::combine($LocalAppDir, "miners")
+$ToolsDir = [io.path]::combine($LocalAppDir, "tools")
+$TempDir = [io.path]::combine($LocalAppDir, "temp")
 
 # make sure math functions work regardless of regional settings
 [cultureinfo]::CurrentCulture = [cultureinfo]::InvariantCulture
@@ -3057,6 +3059,7 @@ else
 
 	try
 	{
+		New-Item -ItemType Directory -Path $AppDir -Force -ErrorAction Stop | Out-Null
 		New-Item $ConfigFile -ItemType File | Out-Null
 	}
 	catch
@@ -3071,5 +3074,6 @@ Write-PrettyHeader
 Initialize-Temp
 Initialize-Properties
 Set-WindowTitle
+Test-Tools
 Test-Miner "ccminer-alexis-hsr"
 Start-RudeHash
