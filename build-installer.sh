@@ -1,8 +1,16 @@
 set -Ee
 
+sh ./build-electron.sh
+
 PROGX86=$(awk 'BEGIN{print(ENVIRON["ProgramFiles(x86)"])}')
 export PATH=${PATH}:${PROGX86}/NSIS
 
-makensis rudehash.nsi
+VERSION=$(grep "^\!define VERSION" rudehash.nsi | awk -F'"' '{ print $2 }')
+DATESTR=$(date +%Y%m%d)
 
-pause
+if [[ $VERSION == *-dev ]]
+then
+    makensis /X"OutFile 'rudehash-${VERSION}-${DATESTR}.exe'" rudehash.nsi
+else
+    makensis /X"OutFile 'rudehash-${VERSION}.exe'" rudehash.nsi
+fi

@@ -1,10 +1,10 @@
 !define VERSION "8.0-dev"
 !define CNAME "RudeHash"
-!define FNAME "rudehash"
+#!define FNAME "rudehash"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${CNAME}"
 
 Name "${CNAME} ${VERSION}"
-OutFile "${FNAME}-${VERSION}.exe"
+#OutFile "${FNAME}-${VERSION}.exe"
 InstallDir $PROGRAMFILES64\${CNAME}
 RequestExecutionLevel admin
 SetCompressor /SOLID lzma
