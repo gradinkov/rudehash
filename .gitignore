@@ -1,4 +1,5 @@
-config-editor/node_modules
+config-editor/node_modules/*
+dist/*
 miners/*
 powershell/*
 temp/*

@@ -22,27 +22,25 @@ Section
     SetShellVarContext all
 
     SetOutPath "$INSTDIR"
-    File /r "powershell"
     File "CHANGELOG.md"
     File "LICENSE"
     File "README.md"
-    File "rudehash.html"
     File "rudehash.ps1"
     File "rudehash-example.json"
 
+    # workaround; using just "dist" without SetOutPath also copies the config-editor folder altogether
+    # because reasons.
     SetOutPath "$INSTDIR\dist"
-    File "dist\bootstrap.min.css"
-    File "dist\bootstrap.min.css.map"
-    File "dist\foundation-icons.css"
-    File "dist\foundation-icons.woff"
-    File "dist\jsoneditor.min.js"
-    File "dist\jsoneditor.min.js.map"
+    File /r "dist\*"
 
-    # SetOutPath determines "start in" property for CreateShortCut
+    SetOutPath "$INSTDIR\powershell"
+    File /r "powershell\*"
+
+    # CreateShortCut's "start in" depends on "SetOutPath"
     SetOutPath "$INSTDIR"
     CreateDirectory "$SMPROGRAMS\${CNAME}"
     CreateShortCut "$SMPROGRAMS\${CNAME}\${CNAME}.lnk" "$INSTDIR\powershell\pwsh.exe" "-ExecutionPolicy Bypass -File $\"$INSTDIR\rudehash.ps1$\"" "$SYSDIR\setupapi.dll" 13
-    CreateShortCut "$SMPROGRAMS\${CNAME}\${CNAME} Config Editor.lnk" "$INSTDIR\rudehash.html" "" "$SYSDIR\setupapi.dll" 15
+    CreateShortCut "$SMPROGRAMS\${CNAME}\${CNAME} Config Editor.lnk" "$INSTDIR\dist\rudehash-config-editor.exe"
 
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
@@ -69,14 +67,7 @@ Section "Uninstall"
     Delete "$INSTDIR\rudehash.ps1"
     Delete "$INSTDIR\rudehash-example.json"
 
-    Delete "$INSTDIR\dist\bootstrap.min.css"
-    Delete "$INSTDIR\dist\bootstrap.min.css.map"
-    Delete "$INSTDIR\dist\foundation-icons.css"
-    Delete "$INSTDIR\dist\foundation-icons.woff"
-    Delete "$INSTDIR\dist\jsoneditor.min.js"
-    Delete "$INSTDIR\dist\jsoneditor.min.js.map"
-
-    RMDir "$INSTDIR\dist"
+    RMDir /r "$INSTDIR\dist"
     RMDir /r "$INSTDIR\powershell"
     RMDir "$INSTDIR"
 
