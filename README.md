@@ -6,35 +6,29 @@
 
 RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in PowerShell. Features:
 
+* Easy 1-click installer
 * Easy switching between supported pools, coins, algos and miners
 * Automatic download of miners
 * Auto-restart upon miner crash
 * Earnings and profit estimation, using WhatToMine for coins and pool APIs for algos
 * Watchdog to restart mining automatically if hash rate is repeatedly zero
 * Interactive first run wizard
-* Intuitive, web-based configuration generator & validator
+* Intuitive config editor & validator
 * Miner status reporting to RudeHash Monitoring and MPHStats
 * Mining profiles
 
 ## Installation
 
-* First you need to modify PowerShell's execution policy, because by default it requires code to be digitally signed. Such a certificate costs about $220 per year, which is currently out of the scope of this project. So find your PowerShell shortcut in the Start Menu, right click on it, then _Run as Administrator_. Issue the following command:
-
-~~~~
-Set-ExecutionPolicy Unrestricted
-~~~~
-
 * Download and install the latest release of:
   * [NVIDIA Driver](https://www.geforce.com/drivers)
-  * [PowerShell Core](https://github.com/PowerShell/PowerShell/releases/latest) (x64 MSI recommended)
   * [Visual C++ 2017 x64 Redistributable](https://go.microsoft.com/fwlink/?LinkId=746572) - for **Excavator**
-* Download and extract the [latest release of RudeHash](https://rudehash.org/download/).
-  * Alternatively, for the latest features and goodies, download the [development version](https://github.com/gradinkov/rudehash/archive/master.zip), but be warned, this code is less stable, and things might get shaky!
-* Finally, create a new shortcut: `pwsh.exe -Command C:\path\to\rudehash\rudehash.ps1`, then start it. The first run wizard will guide you through the options.
+  * [RudeHash](https://rudehash.org/download/).
+
+Pick the development version of RudeHash for the latest features and goodies, but be warned, this code is less stable, and things might get shaky!
 
 **Important:** on Suprnova you need to manually create your workers on the pool website beforehand. Make sure to always set the password to **x**, otherwise authentication will fail!
 
-**Important:** certain antivirus software may randomly delete your miner executables. For this reason, it is recommended to add the main `rudehash` folder to your AV's exclusions.
+**Important:** certain antivirus software may randomly delete your miner executables. For this reason, it is recommended to add the `%LOCALAPPDATA%\RudeHash` folder to your AV's exclusions.
 
 ## Support
 

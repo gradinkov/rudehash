@@ -11,6 +11,9 @@
 * Add support for hsrminer's API
 * Add config generator & validator tool
 * Add version info to monitoring
+* Add installer
+* Change config location to AppData
+* Change miner/tool/temp location to LocalAppData
 * Always show related help when requesting user input
 * Remove Polytimos from zpool
 * Fix displaying earnings less than 0.0001 BTC
