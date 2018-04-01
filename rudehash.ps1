@@ -1819,7 +1819,7 @@ function Start-Excavator ()
 		Write-PrettyDebug ("$Excavator $Args")
 	}
 
-	$Proc = Start-Process -FilePath $Excavator -ArgumentList $Args -PassThru -NoNewWindow -RedirectStandardOutput nul
+	$Proc = Start-Process -FilePath $Excavator -ArgumentList $Args -PassThru -NoNewWindow -WorkingDirectory $LocalAppDir -RedirectStandardOutput nul
 	Write-PrettyInfo "Determining the number of GPUs..."
 	Start-Sleep -Seconds 5
 	return $Proc
@@ -2796,7 +2796,7 @@ function Start-Miner ()
 		Write-PrettyDebug ("Miner command line: $Exe $Args")
 	}
 
-	$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow
+	$Proc = Start-Process -FilePath $Exe -ArgumentList $Args -PassThru -NoNewWindow -WorkingDirectory $LocalAppDir
 	$RigStats.Pid = $Proc.Id
 	return $Proc
 }
