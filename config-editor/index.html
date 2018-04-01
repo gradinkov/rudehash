@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>RudeHash Config Editor</title>
+    <link rel='stylesheet' href='dist/bootstrap.min.css'>
+    <link rel='stylesheet' href='dist/foundation-icons.css'>
+    <script src='dist/jsoneditor.min.js'></script>
+</head>
+<body>
+
+<div class='container'>
+    <div class='row'>
+        <div class='span7 col-md-7 columns seven large-7'>
+            <div id='editor'></div>
+        </div>
+        <div class='span6 col-md-5 columns five large-5'>
+            <h3>Config file</h3>
+            <p>
+                To use your existing <code>rudehash.json</code> file, you can load it here: <input type="file" class='btn' id="file-input" />
+            </p>
+
+            <!--p>
+                Paste the contents below to your <code>rudehash.json</code> file.
+            </p-->
+
+            <p>
+                <textarea id='output' style='width: 100%; height: 475px; font-family: monospace;' onclick="this.select()" readonly class='form-control'></textarea>
+            </p>
+
+            <!--p>
+                <button class='btn btn-primary' id='setvalue'>Update Form</button>
+            </p-->
+
+            <p>
+                <button class='btn btn-primary' id='save'>Save</button>
+            </p>
+
+            <h3>Validation</h3>
+            <p>
+              Whenever you change the configuration, validation errors will be shown here, if any. Please note that this only checks for syntax errors, the specified
+              options will also be checked for compatibility when you start RudeHash.
+            </p>
+
+            <p>
+              <textarea id='validate' style='width: 100%; height: 160px; font-family: monospace;' readonly disabled class='form-control'></textarea>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+  require('./renderer.js')
+</script>
+
+</body>
+</html>

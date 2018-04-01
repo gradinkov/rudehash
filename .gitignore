@@ -1,3 +1,4 @@
+config-editor/node_modules
 miners/*
 powershell/*
 temp/*

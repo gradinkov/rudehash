@@ -1,0 +1,22 @@
+{
+  "name": "rudehash-config-editor",
+  "version": "8.0.0",
+  "description": "RudeHash Config Editor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/gradinkov/rudehash",
+  "keywords": [
+    "RudeHash",
+    "Mining",
+    "PowerShell",
+    "NVIDIA",
+    "Windows"
+  ],
+  "author": "Gradinkov",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^1.8.4"
+  }
+}
