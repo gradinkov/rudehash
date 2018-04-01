@@ -157,12 +157,13 @@ var $rudeSchema =
             "type": "string",
             "description": "The miner you want to use.",
             "enum": [
+              "ccminer-alexis-hsr",
               "ccminer-allium",
               "ccminer-klaust",
               "ccminer-palginmod",
               "ccminer-phi",
-              "ccminer-rvn",
               "ccminer-polytimos",
+              "ccminer-rvn",
               "ccminer-tpruvot",
               "ccminer-xevan",
               "dstm",
@@ -218,9 +219,9 @@ var $rudeSchema =
       "default": [
         {
           "Pool": "zpool",
-          "Algo": "equihash",
+          "Algo": "hsr",
           "Coin": "",
-          "Miner": "dstm",
+          "Miner": "ccminer-alexis-hsr",
           "Wallet": "1HFapEBFTyaJ74SULTJ5oN5BK3C5AYHWzk",
           "WalletIsAltcoin": false
         }
