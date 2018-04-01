@@ -304,7 +304,7 @@ $Coins =
 	"mona" = @{ Name = "Monacoin"; Algo = "lyra2v2"; WtmId = 148 }
 	"pgn" = @{ Name = "Pigeoncoin"; Algo = "x16s" }
 	"poly" = @{ Name = "Polytimos"; Algo = "polytimos" }
-	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r" }
+	"rvn" = @{ Name = "Ravencoin"; Algo = "x16r"; WtmId = 234 }
 	"tzc" = @{ Name = "Trezarcoin"; Algo = "neoscrypt"; WtmId = 215 }
 	"vtc" = @{ Name = "Vertcoin"; Algo = "lyra2v2"; WtmId = 5 }
 	"xlr" = @{ Name = "Solaris"; Algo = "xevan"; WtmId = 179 }
