@@ -1,6 +1,18 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
+
+const {app} = require('electron').remote;
+const path = require('path');
+const fs = require('fs');
+var $configDirPath = path.join(app.getPath('appData'), 'RudeHash');
+var $configFilePath = path.join($configDirPath, 'rudehash.json');
+
+/* to have a single config folder, electron app name is also RudeHash
+ * we don't have to worry about the dir, it is created when the app is started
+ */
+// fs.mkdirSync($configDirPath);
+
 var $rudeSchema =
 {
   "title": "Config",
@@ -221,6 +233,7 @@ var $element = document.getElementById('editor');
 var $output = document.getElementById('output');
 //var $set_value_button = document.getElementById('setvalue');
 var $save_button = document.getElementById('save');
+var $export_button = document.getElementById('export');
 var $file_input = document.getElementById('file-input')
 var $validate = document.getElementById('validate');
 
@@ -269,11 +282,31 @@ function readSingleFile($e) {
   var $reader = new FileReader();
 
   $reader.onload = function($e) {
-    $output.value = $e.target.result;
+    /* unnecessary, editor change triggers update_output anyway */
+    //$output.value = $e.target.result;
     $editor.setValue(JSON.parse($e.target.result));
   };
 
   $reader.readAsText($file);
+}
+
+function readConfigFile()
+{
+  fs.readFile($configFilePath, 'utf-8', (err, data) =>
+  {
+    if(err)
+    {
+        alert("An error ocurred reading the file :" + err.message);
+        return;
+    }
+
+    $editor.setValue(JSON.parse(data));
+  });
+}
+
+if (fs.existsSync($configFilePath))
+{
+  readConfigFile();
 }
 
 $file_input.addEventListener('change', readSingleFile, false);
@@ -301,7 +334,21 @@ function downloadJson ($e) {
   }
 }
 
-$save_button.addEventListener('click', downloadJson);
+function saveConfigFile()
+{
+  fs.writeFile($configFilePath, JSON.stringify($editor.getValue(),null,2), (err) => {
+      if (err) {
+          alert("An error ocurred updating the file" + err.message);
+          console.log(err);
+          return;
+      }
+
+      //alert("The file has been succesfully saved");
+  });
+}
+
+$save_button.addEventListener('click', saveConfigFile);
+$export_button.addEventListener('click', downloadJson);
 
 function uuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
