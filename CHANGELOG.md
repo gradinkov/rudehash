@@ -1,6 +1,6 @@
 # RudeHash Changelog
 
-## RudeHash 8.0 (TBD)
+## RudeHash 8.0 (2018-04-01)
 
 * New pools: TheBSODPool
 * New coins: Denarius, GINcoin, Pigeoncoin
