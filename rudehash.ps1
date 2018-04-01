@@ -10,7 +10,7 @@ $TempDir = [io.path]::combine($LocalAppDir, "temp")
 [cultureinfo]::CurrentCulture = [cultureinfo]::InvariantCulture
 
 # globals
-$Version = "8.0"
+$Version = "9.0-dev"
 [System.Collections.Hashtable]$Config = @{}
 [System.Collections.Hashtable]$FileConfig = @{}
 # current keys: Api CoinMode DevMining Port Rates

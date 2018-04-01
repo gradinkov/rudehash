@@ -1,6 +1,6 @@
 !include "MUI2.nsh"
 
-!define VERSION "8.0"
+!define VERSION "9.0-dev"
 !define CNAME "RudeHash"
 #!define FNAME "rudehash"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${CNAME}"
