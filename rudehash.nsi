@@ -1,4 +1,4 @@
-!define VERSION "8.0"
+!define VERSION "8.0-dev"
 !define CNAME "RudeHash"
 !define FNAME "rudehash"
 !define UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${CNAME}"
@@ -77,3 +77,19 @@ Section "Uninstall"
 
     DeleteRegKey HKLM "${UNINST_KEY}"
 SectionEnd
+
+Function .onInit
+    SetRegView 64
+    SetShellVarContext all
+
+    ReadRegStr $R0 HKLM "${UNINST_KEY}" "QuietUninstallString"
+    StrCmp $R0 "" done
+
+    MessageBox MB_OKCANCEL|MB_ICONINFORMATION "${CNAME} is already installed. $\n$\nClick $\"OK$\" to remove the previous version or $\"Cancel$\" to cancel this upgrade." IDOK uninst
+    Abort
+
+    uninst:
+        ClearErrors
+        ExecWait $R0
+    done:
+FunctionEnd
