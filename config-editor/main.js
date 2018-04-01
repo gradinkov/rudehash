@@ -1,6 +1,8 @@
 const electron = require('electron')
 // Module to control application life.
 const app = electron.app
+// disable hw accel because it makes the window lag during mining
+app.disableHardwareAcceleration()
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
