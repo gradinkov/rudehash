@@ -1,6 +1,6 @@
 {
   "name": "rudehash-config-editor",
-  "version": "8.0.0",
+  "version": "1.0.0",
   "description": "RudeHash Config Editor",
   "main": "main.js",
   "scripts": {
