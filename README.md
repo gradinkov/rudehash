@@ -6,7 +6,7 @@
 
 RudeHash is a wrapper script to mine coins and algos on NVIDIA GPUs, written in PowerShell. Features:
 
-* Easy 1-click installer
+* Simple, self-contained installation wizard
 * Easy switching between supported pools, coins, algos and miners
 * Automatic download of miners
 * Auto-restart upon miner crash

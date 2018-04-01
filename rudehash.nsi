@@ -1,3 +1,5 @@
+!include "MUI2.nsh"
+
 !define VERSION "8.0-dev"
 !define CNAME "RudeHash"
 #!define FNAME "rudehash"
@@ -8,8 +10,23 @@ Name "${CNAME} ${VERSION}"
 InstallDir $PROGRAMFILES64\${CNAME}
 RequestExecutionLevel admin
 SetCompressor /SOLID lzma
-LicenseText "License"
-LicenseData "LICENSE"
+
+!define MUI_PAGE_HEADER_TEXT "RudeHash"
+!define MUI_PAGE_HEADER_SUBTEXT "(c) Gradinkov"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\dist\rudehash-config-editor.exe"
+!define MUI_FINISHPAGE_RUN_CHECKED
+!define MUI_FINISHPAGE_RUN_TEXT "Open RudeHash Config Editor after installer closes"
+
+#!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "LICENSE"
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
+
+!insertmacro MUI_LANGUAGE "English"
 
 Section
     !include "x64.nsh"
