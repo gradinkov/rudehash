@@ -326,12 +326,12 @@ $Miners =
 	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.2.4-tpruvot/ccminer-x64-2.2.4-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "nist5", "phi", "polytimos", "tribus"); Api = $true; Version = "2.2.4" }
 	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
-	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0rc1/ethminer-0.14.0rc1-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0rc1" }
+	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0rc2/ethminer-0.14.0rc2-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0rc2" }
 	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt", "nist5"); Api = $true; Version = "1.4.4a_nvidia" }
 	"hsrminer-hsr" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer_hsr.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $true; Version = "1.0" }
 	"hsrminer-neoscrypt" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/Neoscrypt%20algo/Windows/hsrminer_neoscrypt.zip"; ArchiveFile = "hsrminer_neoscrypt.zip"; ExeFile = "hsrminer_neoscrypt.exe"; FilesInRoot = $true; Algos = @("neoscrypt"); Api = $true; Version = "1.0.1" }
 	"nevermore-x16s" = @{ Url = "https://github.com/brian112358/nevermore-miner-x16s/releases/download/v0.1.1/nevermore-x16s-v0.1.1-win64.zip"; ArchiveFile = "nevermore-z16s.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("x16s"); Api = $true }
-	"suprminer" = @{ Url = "https://github.com/ocminer/suprminer/releases/download/1.2/suprminer-1.2.7z"; ArchiveFile = "suprminer.7z"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("x16r", "x16s"); Api = $true }
+	"suprminer" = @{ Url = "https://github.com/ocminer/suprminer/releases/download/1.5/suprminer-1.5.7z"; ArchiveFile = "suprminer.7z"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("x16r", "x16s"); Api = $true; Version = "1.5" }
 	"vertminer" = @{ Url = "https://github.com/vertcoin-project/vertminer-nvidia/releases/download/v1.0-stable.2/vertminer-nvdia-v1.0.2_windows.zip"; ArchiveFile = "vertminer.zip"; ExeFile = "vertminer.exe"; FilesInRoot = $false; Algos = @("lyra2v2"); Api = $true; Version = "1.0.1" }
 	"zecminer" = @{ Url = "https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.zip"; ArchiveFile = "zecminer.zip"; ExeFile = "miner.exe"; FilesInRoot = $true; Algos = @("equihash"); Api = $true; Version = "0.3.4b" }
 }
@@ -2543,7 +2543,7 @@ function Get-MinerVersion ($Name)
 			# klaust messes up stdio, can't determine version reliably
 			#"ccminer-klaust" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[1].Split("-")[0] }
 			"ccminer-phi" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split("-")[1] }
-			{$_ -in "ccminer-allium", "ccminer-palginmod", "ccminer-rvn", "ccminer-tpruvot", "nevermore-x16s"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
+			{$_ -in "ccminer-allium", "ccminer-palginmod", "ccminer-rvn", "ccminer-tpruvot", "nevermore-x16s", "suprminer"} { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2] }
 			"dstm" { $VersionStr = (Get-ProcessOutput $MinerExe "").Split("`r`n")[0].Split(" ")[1].Split(",")[0] }
 			"ethminer" { $VersionStr = (Get-ProcessOutput $MinerExe "-V").Split("`r`n")[0].Split(" ")[2].Split("+")[0] }
 			"excavator" { $VersionStr = (Get-ProcessOutput $MinerExe "-h").Split("`r`n")[2].Trim().Split(" ")[1].Substring(1) }
