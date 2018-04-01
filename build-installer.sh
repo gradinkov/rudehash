@@ -2,6 +2,7 @@ set -Ee
 
 sh ./build-electron.sh
 
+# alternatively: printenv 'ProgramFiles(x86)'
 PROGX86=$(awk 'BEGIN{print(ENVIRON["ProgramFiles(x86)"])}')
 export PATH=${PATH}:${PROGX86}/NSIS
 
