@@ -45,17 +45,22 @@ Section
     CreateShortCut "$SMPROGRAMS\${CNAME}\${CNAME} Config Editor.lnk" "$INSTDIR\rudehash.html" "" "$SYSDIR\setupapi.dll" 15
 
     WriteUninstaller "$INSTDIR\uninstall.exe"
+
+    WriteRegStr HKLM "${UNINST_KEY}" "DisplayIcon" "$SYSDIR\setupapi.dll,13"
     WriteRegStr HKLM "${UNINST_KEY}" "DisplayName" "RudeHash"
     WriteRegStr HKLM "${UNINST_KEY}" "DisplayVersion" "${VERSION}"
-    WriteRegStr HKLM "${UNINST_KEY}" "DisplayIcon" "$SYSDIR\setupapi.dll,13"
-    WriteRegStr HKLM "${UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+    WriteRegStr HKLM "${UNINST_KEY}" "HelpLink" "https://github.com/gradinkov/rudehash/issues"
+    WriteRegStr HKLM "${UNINST_KEY}" "Publisher" "Gradinkov"
     WriteRegStr HKLM "${UNINST_KEY}" "QuietUninstallString" "$INSTDIR\uninstall.exe /S"
+    WriteRegStr HKLM "${UNINST_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+    WriteRegStr HKLM "${UNINST_KEY}" "URLInfoAbout" "https://rudehash.org/"
 SectionEnd
 
 Section "Uninstall"
     SetRegView 64
     SetShellVarContext all
 
+    # this needs to be first because reasons, so be it
     Delete "$INSTDIR\uninstall.exe"
     Delete "$INSTDIR\CHANGELOG.md"
     Delete "$INSTDIR\LICENSE"
