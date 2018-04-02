@@ -112,6 +112,8 @@ var $rudeSchema =
               "nist5",
               "phi",
               "polytimos",
+              "skein",
+              "tribus",
               "x16r",
               "x16s",
               "xevan"

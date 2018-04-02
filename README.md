@@ -47,6 +47,7 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | Nist5 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
+| Skein | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, suprminer |
 | TimeTravel10 | ccminer-tpruvot |
 | Tribus | ccminer-tpruvot |
 | X16R | ccminer-rvn, suprminer |

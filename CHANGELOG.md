@@ -1,5 +1,10 @@
 # RudeHash Changelog
 
+## RudeHash 9.0 (TBD)
+
+* New algos: Skein
+* Fix Tribus missing from Config Editor
+
 ## RudeHash 8.0 (2018-04-01)
 
 * New pools: TheBSODPool
