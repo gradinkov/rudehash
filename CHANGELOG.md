@@ -3,6 +3,7 @@
 ## RudeHash 9.0 (TBD)
 
 * New algos: Skein
+* Change DNS resolver to 1.1.1.1
 * Fix Tribus missing from Config Editor
 
 ## RudeHash 8.0 (2018-04-01)
