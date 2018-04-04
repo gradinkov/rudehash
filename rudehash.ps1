@@ -104,6 +104,7 @@ $Pools =
 			"pgn" = @{ Server = "%REGION%bsod.pw"; Port = 2196 }
 			"rvn" = @{ Server = "%REGION%bsod.pw"; Port = 2176 }
 			"xlr" = @{ Server = "%REGION%bsod.pw"; Port = 3739 }
+			"xzc" = @{ Server = "%REGION%bsod.pw"; Port = 1455 }
 		}
 	}
 
@@ -355,7 +356,7 @@ $Tools =
 
 $Regions =
 @{
-	"bsod" = @("eu1", "eu2", "pool")
+	"bsod" = @("eu1", "eu2", "eu3", "eu4", "eu5", "pool", "us1")
 	"miningpoolhub" = @("asia", "europe", "us-east")
 	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
 }
