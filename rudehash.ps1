@@ -356,7 +356,7 @@ $Tools =
 
 $Regions =
 @{
-	"bsod" = @("eu1", "eu2", "eu3", "eu4", "eu5", "pool", "us1")
+	"bsod" = @("asia1", "eu1", "eu2", "eu3", "eu4", "eu5", "pool", "us1")
 	"miningpoolhub" = @("asia", "europe", "us-east")
 	"nicehash" = @("br", "eu", "hk", "in", "jp", "usa")
 }
