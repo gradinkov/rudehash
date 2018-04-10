@@ -181,8 +181,8 @@ $Pools =
 		StratumProto = 0
 		Coins =
 		@{
-			"bwk" = @{ Server = "poolr.io"; Port = 3833 }
-			"flm" = @{ Server = "poolr.io"; Port = 8333 }
+			"bwk" = @{ Server = "poolr.io"; Port = 3838 }
+			"flm" = @{ Server = "poolr.io"; Port = 8383 }
 		}
 	}
 
