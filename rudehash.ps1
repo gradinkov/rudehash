@@ -232,6 +232,7 @@ $Pools =
 			"skein" = @{ Server = "skein.mine.zergpool.com"; Port = 4933; Modifier = 1000000 }
 			"tribus" = @{ Server = "tribus.mine.zergpool.com"; Port = 8533; Modifier = 1000000 }
 			"x16r" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636; Modifier = 1000000 }
+			"x16s" = @{ Server = "x16s.mine.zergpool.com"; Port = 3663; Modifier = 1000000 }
 			"xevan" = @{ Server = "xevan.mine.zergpool.com"; Port = 3739; Modifier = 1000000 }
 		}
 		Coins =
@@ -277,6 +278,8 @@ $Pools =
 			"skein" = @{ Server = "skein.mine.zpool.ca"; Port = 4933; Modifier = 1000000000 }
 			"tribus" = @{ Server = "tribus.mine.zpool.ca"; Port = 8533; Modifier = 1000000 }
 			# "polytimos" = @{ Server = "polytimos.mine.zpool.ca"; Port = 8463; Modifier = 1000000 }
+			"x16r" = @{ Server = "x16r.mine.zpool.ca"; Port = 3636; Modifier = 1000000 }
+			"x16s" = @{ Server = "x16s.mine.zpool.ca"; Port = 3663; Modifier = 1000000 }
 			"xevan" = @{ Server = "xevan.mine.zpool.ca"; Port = 3739; Modifier = 1000000 }
 		}
 	}
