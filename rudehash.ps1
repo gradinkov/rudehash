@@ -228,6 +228,7 @@ $Pools =
 			"lyra2z" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553; Modifier = 1000000 }
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233; Modifier = 1000000 }
 			"phi" = @{ Server = "phi.mine.zergpool.com"; Port = 8333; Modifier = 1000000 }
+			"phi2" = @{ Server = "phi2.mine.zergpool.com"; Port = 8332; Modifier = 1000000 }
 			"skein" = @{ Server = "skein.mine.zergpool.com"; Port = 4933; Modifier = 1000000 }
 			"tribus" = @{ Server = "tribus.mine.zergpool.com"; Port = 8533; Modifier = 1000000 }
 			"x16r" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636; Modifier = 1000000 }
@@ -244,7 +245,7 @@ $Pools =
 			"gin" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
 			# "hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433 }
 			"ifx" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553 }
-			"lux" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
+			"lux" = @{ Server = "phi2.mine.zergpool.com"; Port = 8332 }
 			"mona" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533 }
 			"pgn" = @{ Server = "x16s.mine.zergpool.com"; Port = 3663 }
 			"rvn" = @{ Server = "x16r.mine.zergpool.com"; Port = 3636 }
