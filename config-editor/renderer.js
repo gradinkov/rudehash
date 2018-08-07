@@ -111,6 +111,7 @@ var $rudeSchema =
               "neoscrypt",
               "nist5",
               "phi",
+              "phi2",
               "polytimos",
               "skein",
               "tribus",

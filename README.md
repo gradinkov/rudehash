@@ -46,6 +46,7 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | NeoScrypt | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
 | Nist5 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
+| PHI2 | ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
 | Skein | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, suprminer |
 | TimeTravel10 | ccminer-tpruvot |
@@ -74,7 +75,7 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | HSR | Hshare | HSR |
 | IFX | Infinex | Lyra2Z |
 | KREDS | Kreds | Lyra2REv2 |
-| LUX | LUXCoin | PHI1612 |
+| LUX | LUXCoin | PHI2 |
 | MONA | Monacoin | Lyra2REv2 |
 | PGN | Pigeoncoin | X16S |
 | POLY | Polytimos | Polytimos |
