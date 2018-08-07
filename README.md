@@ -39,7 +39,6 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | Allium | ccminer-allium |
 | Ethash | ethminer, Excavator |
 | EquiHash | ccminer-tpruvot, DSTM, Excavator, Zec Miner |
-| HSR | ccminer-alexis-hsr, ccminer-tpruvot, hsrminer-hsr |
 | Keccak-C | ccminer-tpruvot |
 | Lyra2REv2 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, vertminer |
 | Lyra2Z | ccminer-palginmod, ccminer-tpruvot |
@@ -70,7 +69,6 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | FTC | Feathercoin | NeoScrypt |
 | GIN | GINcoin | NeoScrypt |
 | GRLC | Garlicoin | Allium |
-| HSR | Hshare | HSR |
 | IFX | Infinex | Lyra2Z |
 | KREDS | Kreds | Lyra2REv2 |
 | LUX | LUXCoin | PHI2 |

@@ -5,7 +5,8 @@
 * New algos: PHI2, Skein
 * Updates: ccminer-tpruvot 2.3, PowerShell 6.1.0-preview4
 * Change DNS resolver to 1.1.1.1
-* Remove Bulwark, Nist5
+* Remove Bulwark, Hshare coins
+* Remove HSR, Nist5 algos
 * Fix Tribus missing from Config Editor
 * Fix Skein profit calculation on zpool
 

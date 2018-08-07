@@ -222,7 +222,7 @@ $Pools =
 		Algos =
 		@{
 			"bitcore" = @{ Server = "bitcore.mine.zergpool.com"; Port = 3556; Modifier = 1000000 }
-			"hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433; Modifier = 1000000 }
+			# "hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433; Modifier = 1000000 }
 			"keccakc" = @{ Server = "keccakc.mine.zergpool.com"; Port = 5134; Modifier = 1000000000 }
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533; Modifier = 1000000 }
 			"lyra2z" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553; Modifier = 1000000 }
@@ -242,7 +242,7 @@ $Pools =
 			"flm" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
 			"ftc" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
 			"gin" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233 }
-			"hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433 }
+			# "hsr" = @{ Server = "hsr.mine.zergpool.com"; Port = 7433 }
 			"ifx" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553 }
 			"lux" = @{ Server = "phi.mine.zergpool.com"; Port = 8333 }
 			"mona" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533 }
@@ -266,7 +266,7 @@ $Pools =
 		@{
 			"bitcore" = @{ Server = "bitcore.mine.zpool.ca"; Port = 3556; Modifier = 1000000 }
 			"equihash" = @{ Server = "equihash.mine.zpool.ca"; Port = 2142; Modifier = 1000 }
-			"hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433; Modifier = 1000000 }
+			# "hsr" = @{ Server = "hsr.mine.zpool.ca"; Port = 7433; Modifier = 1000000 }
 			"keccakc" = @{ Server = "keccakc.mine.zpool.ca"; Port = 5134; Modifier = 1000000000 }
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533; Modifier = 1000000 }
 			"lyra2z" = @{ Server = "lyra2z.mine.zpool.ca"; Port = 4553; Modifier = 1000000 }
