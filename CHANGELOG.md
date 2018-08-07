@@ -6,6 +6,7 @@
 * Updates: ccminer-tpruvot 2.3, PowerShell 6.1.0-preview4
 * Change DNS resolver to 1.1.1.1
 * Fix Tribus missing from Config Editor
+* Fix Skein profit calculation on zpool
 
 ## RudeHash 8.0 (2018-04-01)
 
