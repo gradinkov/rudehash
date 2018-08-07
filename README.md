@@ -44,7 +44,6 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | Lyra2REv2 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, vertminer |
 | Lyra2Z | ccminer-palginmod, ccminer-tpruvot |
 | NeoScrypt | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator, hsrminer-neoscrypt |
-| Nist5 | ccminer-alexis-hsr, ccminer-klaust, ccminer-palginmod, ccminer-tpruvot, Excavator |
 | PHI1612 | ccminer-phi, ccminer-tpruvot |
 | PHI2 | ccminer-tpruvot |
 | Polytimos | ccminer-polytimos, ccminer-tpruvot |
@@ -63,7 +62,6 @@ Pick the development version of RudeHash for the latest features and goodies, bu
 | BTCP | Bitcoin Private | EquiHash |
 | BTG | Bitcoin Gold | EquiHash |
 | BTX | Bitcore | TimeTravel10 |
-| BWK | Bulwark | Nist5 |
 | CREA | Creativecoin | Keccak-C |
 | CRS | Criptoreal | Lyra2Z |
 | DNR | Denarius | Tribus |

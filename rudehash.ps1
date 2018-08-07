@@ -94,7 +94,6 @@ $Pools =
 		Coins =
 		@{
 			"btx" = @{ Server = "%REGION%bsod.pw"; Port = 3556 }
-			"bwk" = @{ Server = "%REGION%bsod.pw"; Port = 3833 }
 			"crs" = @{ Server = "%REGION%bsod.pw"; Port = 2145 }
 			"dnr" = @{ Server = "%REGION%bsod.pw"; Port = 2153 }
 			"flm" = @{ Server = "%REGION%bsod.pw"; Port = 2150 }
@@ -118,7 +117,6 @@ $Pools =
 		Coins =
 		@{
 			"btx" = @{ Server = "pool.masterhash.us"; Port = 10001 }
-			"bwk" = @{ Server = "pool.masterhash.us"; Port = 10010 }
 			"flm" = @{ Server = "pool.masterhash.us"; Port = 10019 }
 			"rvn" = @{ Server = "pool.masterhash.us"; Port = 10023 }
 		}
@@ -168,7 +166,6 @@ $Pools =
 			"ethash" = @{ Server = "daggerhashimoto.%REGION%nicehash.com"; Port = 3353; Modifier = 1000000000; Id = 20 }
 			"lyra2v2" = @{ Server = "lyra2rev2.%REGION%nicehash.com"; Port = 3347; Modifier = 1000000000000; Id = 14 }
 			"neoscrypt" = @{ Server = "neoscrypt.%REGION%nicehash.com"; Port = 3341; Modifier = 1000000000; Id = 8 }
-			"nist5" = @{ Server = "nist5.%REGION%nicehash.com"; Port = 3340; Modifier = 1000000000; Id = 7 }
 		}
 	}
 
@@ -181,7 +178,6 @@ $Pools =
 		StratumProto = 0
 		Coins =
 		@{
-			"bwk" = @{ Server = "poolr.io"; Port = 3838 }
 			"flm" = @{ Server = "poolr.io"; Port = 8383 }
 		}
 	}
@@ -231,7 +227,6 @@ $Pools =
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zergpool.com"; Port = 4533; Modifier = 1000000 }
 			"lyra2z" = @{ Server = "lyra2z.mine.zergpool.com"; Port = 4553; Modifier = 1000000 }
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zergpool.com"; Port = 4233; Modifier = 1000000 }
-			"nist5" = @{ Server = "nist5.mine.zergpool.com"; Port = 3833; Modifier = 1000000 }
 			"phi" = @{ Server = "phi.mine.zergpool.com"; Port = 8333; Modifier = 1000000 }
 			"skein" = @{ Server = "skein.mine.zergpool.com"; Port = 4933; Modifier = 1000000 }
 			"tribus" = @{ Server = "tribus.mine.zergpool.com"; Port = 8533; Modifier = 1000000 }
@@ -276,7 +271,6 @@ $Pools =
 			"lyra2v2" = @{ Server = "lyra2v2.mine.zpool.ca"; Port = 4533; Modifier = 1000000 }
 			"lyra2z" = @{ Server = "lyra2z.mine.zpool.ca"; Port = 4553; Modifier = 1000000 }
 			"neoscrypt" = @{ Server = "neoscrypt.mine.zpool.ca"; Port = 4233; Modifier = 1000000 }
-			"nist5" = @{ Server = "nist5.mine.zpool.ca"; Port = 3833; Modifier = 1000000 }
 			"phi" = @{ Server = "phi.mine.zpool.ca"; Port = 8333; Modifier = 1000000 }
 			"phi2" = @{ Server = "phi2.mine.zpool.ca"; Port = 8332; Modifier = 1000000 }
 			"skein" = @{ Server = "skein.mine.zpool.ca"; Port = 4933; Modifier = 1000 }
@@ -293,7 +287,6 @@ $Coins =
 	"btcp" = @{ Name = "Bitcoin Private"; Algo = "equihash"; WtmId = 230 }
 	"btg" = @{ Name = "Bitcoin Gold"; Algo = "equihash"; WtmId = 214 }
 	"btx" = @{ Name = "Bitcore"; Algo = "bitcore"; WtmId = 202 }
-	"bwk" = @{ Name = "Bulwark"; Algo = "nist5"; WtmId = 224 }
 	"crea" = @{ Name = "Creativecoin"; Algo = "keccakc"; WtmId = 199 }
 	"crs" = @{ Name = "Criptoreal"; Algo = "lyra2z" }
 	"dnr" = @{ Name = "Denarius"; Algo = "tribus"; WtmId = 187 }
@@ -321,18 +314,18 @@ $Coins =
 
 $Miners =
 @{
-	"ccminer-alexis-hsr" = @{ Url = "https://github.com/nemosminer/ccminer-hcash/releases/download/alexishsr/ccminer-hsr-alexis-x86-cuda8.7z"; ArchiveFile = "ccminer-alexis-hsr.7z"; ExeFile = "ccminer-alexis.exe"; FilesInRoot = $true; Algos = @("hsr", "lyra2v2", "neoscrypt", "nist5", "skein"); Api = $true }
+	"ccminer-alexis-hsr" = @{ Url = "https://github.com/nemosminer/ccminer-hcash/releases/download/alexishsr/ccminer-hsr-alexis-x86-cuda8.7z"; ArchiveFile = "ccminer-alexis-hsr.7z"; ExeFile = "ccminer-alexis.exe"; FilesInRoot = $true; Algos = @("hsr", "lyra2v2", "neoscrypt", "skein"); Api = $true }
 	"ccminer-allium" = @{ Url = "https://github.com/lenis0012/ccminer/releases/download/2.3.0-allium/ccminer-x64.exe"; ArchiveFile = "ccminer-allium.exe"; ExeFile = "ccminer-allium.exe"; FilesInRoot = $true; Algos = @("allium"); Api = $true; Version = "2.2.4" }
-	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "nist5", "skein"); Api = $true }
-	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "nist5", "skein"); Api = $true; Version = "2.0" }
+	"ccminer-klaust" = @{ Url = "https://github.com/KlausT/ccminer/releases/download/8.21/ccminer-821-cuda91-x64.zip"; ArchiveFile = "ccminer-klaust.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "neoscrypt", "skein"); Api = $true }
+	"ccminer-palginmod" = @{ Url = "https://github.com/palginpav/ccminer/releases/download/2.0-bitcore.v3/ccminer_timetravel_v3.zip"; ArchiveFile = "ccminer-palginmod.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("lyra2v2", "lyra2z", "neoscrypt", "skein"); Api = $true; Version = "2.0" }
 	"ccminer-phi" = @{ Url = "https://github.com/216k155/ccminer-phi-anxmod/releases/download/ccminer%2Fphi-1.0/ccminer-phi-1.0.zip"; ArchiveFile = "ccminer-phi.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("phi"); Api = $true; Version = "1.0" }
 	"ccminer-polytimos" = @{ Url = "https://github.com/punxsutawneyphil/ccminer/releases/download/polytimosv2/ccminer-polytimos_v2.zip"; ArchiveFile = "ccminer-polytimos.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $true; Algos = @("polytimos"); Api = $true }
 	"ccminer-rvn" = @{ Url = "https://github.com/MSFTserver/ccminer/releases/download/2.2.5-rvn/ccminer-x64-2.2.5-rvn-cuda9.7z"; ArchiveFile = "ccminer-rvn.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("x16r"); Api = $true; Version = "2.2.5" }
-	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.3-tpruvot/ccminer-2.3-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "nist5", "phi", "phi2", "polytimos", "skein", "tribus"); Api = $true; Version = "2.3" }
+	"ccminer-tpruvot" = @{ Url = "https://github.com/tpruvot/ccminer/releases/download/2.3-tpruvot/ccminer-2.3-cuda9.7z"; ArchiveFile = "ccminer-tpruvot.7z"; ExeFile = "ccminer-x64.exe"; FilesInRoot = $true; Algos = @("bitcore", "equihash", "hsr", "keccakc", "lyra2v2", "lyra2z", "neoscrypt", "phi", "phi2", "polytimos", "skein", "tribus"); Api = $true; Version = "2.3" }
 	"ccminer-xevan" = @{ Url = "https://github.com/krnlx/ccminer-xevan/releases/download/0.1/ccminer.exe"; ArchiveFile = "ccminer-xevan.exe"; ExeFile = "ccminer-xevan.exe"; FilesInRoot = $true; Algos = @("xevan"); Api = $true }
 	"dstm" = @{ Url = "https://github.com/nemosminer/DSTM-equihash-miner/releases/download/DSTM-0.6/zm_0.6_win.zip"; ArchiveFile = "dstm.zip"; ExeFile = "zm.exe"; FilesInRoot = $false; Algos = @("equihash"); Api = $true; Version = "0.6" }
 	"ethminer" = @{ Url = "https://github.com/ethereum-mining/ethminer/releases/download/v0.14.0rc2/ethminer-0.14.0rc2-Windows.zip"; ArchiveFile = "ethminer.zip"; ExeFile = "ethminer.exe"; FilesInRoot = $false; Algos = @("ethash"); Api = $true; Version = "0.14.0rc2" }
-	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt", "nist5"); Api = $true; Version = "1.4.4a_nvidia" }
+	"excavator" = @{ Url = "https://github.com/nicehash/excavator/releases/download/v1.4.4a/excavator_v1.4.4a_NVIDIA_Win64.zip"; ArchiveFile = "excavator.zip"; ExeFile = "excavator.exe"; FilesInRoot = $false; Algos = @("ethash", "equihash", "lyra2v2", "neoscrypt"); Api = $true; Version = "1.4.4a_nvidia" }
 	"hsrminer-hsr" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/HSR%20algo/Windows/hsrminer_hsr.zip"; ArchiveFile = "hsrminer_hsr.zip"; ExeFile = "hsrminer_hsr.exe"; FilesInRoot = $true; Algos = @("hsr"); Api = $true; Version = "1.0" }
 	"hsrminer-neoscrypt" = @{ Url = "https://github.com/palginpav/hsrminer/raw/master/Neoscrypt%20algo/Windows/hsrminer_neoscrypt.zip"; ArchiveFile = "hsrminer_neoscrypt.zip"; ExeFile = "hsrminer_neoscrypt.exe"; FilesInRoot = $true; Algos = @("neoscrypt"); Api = $true; Version = "1.0.1" }
 	"nevermore-x16s" = @{ Url = "https://github.com/brian112358/nevermore-miner-x16s/releases/download/v0.1.1/nevermore-x16s-v0.1.1-win64.zip"; ArchiveFile = "nevermore-z16s.zip"; ExeFile = "ccminer.exe"; FilesInRoot = $false; Algos = @("x16s"); Api = $true }
@@ -347,7 +340,6 @@ $ExcavatorAlgos =
 	"equihash" = "equihash"
 	"lyra2v2" = "lyra2rev2"
 	"neoscrypt" = "neoscrypt"
-	"nist5" = "nist5"
 }
 
 $Tools =
@@ -372,7 +364,6 @@ $WtmModifiers =
 	"lyra2v2" = 1000
 	"lyra2z" = 1000
 	"neoscrypt" = 1000
-	"nist5" = 1000000
 	"phi" = 1000000
 	"phi2" = 1000000
 	"skein" = 1000000000
@@ -391,7 +382,6 @@ $AlgoNames =
 	"lyra2v2" = "Lyra2REv2"
 	"lyra2z" = "Lyra2Z"
 	"neoscrypt" = "NeoScrypt"
-	"nist5" = "Nist5"
 	"phi" = "PHI1612"
 	"phi2" = "PHI2"
 	"polytimos" = "Polytimos"
