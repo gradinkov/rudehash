@@ -3,7 +3,7 @@
 ## RudeHash 9.0 (TBD)
 
 * New algos: PHI2, Skein
-* Updates: ccminer-tpruvot 2.3, PowerShell 6.1.0-preview4
+* Updates: ccminer-klaust 8.22, ccminer-tpruvot 2.3, DSTM 0.6.1, PowerShell 6.1.0-preview4
 * Change DNS resolver to 1.1.1.1
 * Remove Bulwark, Hshare coins
 * Remove HSR, Nist5 algos
